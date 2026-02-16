@@ -1,3 +1,6 @@
+"use client";
+
+import { useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -6,12 +9,28 @@ interface AuthLayoutProps {
 }
 
 export function AuthLayout({ children }: AuthLayoutProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleRightSideWheel = useCallback(
+    (e: React.WheelEvent<HTMLDivElement>) => {
+      const scrollable = scrollRef.current;
+      if (!scrollable) return;
+
+      // Only forward if the form area is actually scrollable
+      const isScrollable = scrollable.scrollHeight > scrollable.clientHeight;
+      if (!isScrollable) return;
+
+      scrollable.scrollBy({ top: e.deltaY, behavior: "auto" });
+    },
+    [],
+  );
+
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen overflow-hidden">
       {/* Left side - dynamic content */}
-      <div className="flex w-full flex-col justify-between px-25 py-12 lg:w-1/2">
-        {/* Logo */}
-        <div className="mb-10">
+      <div className="flex w-full flex-col lg:w-1/2 h-full">
+        {/* Fixed header */}
+        <div className="shrink-0 px-8 pt-12 md:px-25">
           <Image
             src="/a-vendors-logo.svg"
             alt="A-Vendors logo"
@@ -21,13 +40,15 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           />
         </div>
 
-        {/* Dynamic form content */}
-        <div className="flex flex-1 flex-col justify-center max-w-115">
-          {children}
+        {/* Scrollable form content */}
+        <div ref={scrollRef} className="flex-1 overflow-y-auto px-8 md:px-25">
+          <div className="flex flex-1 flex-col justify-center max-w-115 py-10">
+            {children}
+          </div>
         </div>
 
-        {/* Footer */}
-        <div className="text-sm">
+        {/* Fixed footer */}
+        <div className="shrink-0 px-8 pb-12 pt-4 md:px-25 text-sm">
           <span className="text-brand-primary/60">
             Experiencing any trouble?
           </span>{" "}
@@ -40,8 +61,11 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         </div>
       </div>
 
-      {/* Right side - static branding */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col items-center justify-center bg-brand-primary px-16 text-white">
+      {/* Right side - fixed branding */}
+      <div
+        onWheel={handleRightSideWheel}
+        className="hidden lg:flex lg:w-1/2 flex-col items-center justify-center bg-brand-primary px-16 text-white"
+      >
         <div className="flex flex-col items-start max-w-lg">
           <Image
             src="/imgs/auth-3d.png"
