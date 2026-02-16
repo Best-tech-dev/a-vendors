@@ -17,6 +17,8 @@
   --color-brand-primary: var(--brand-primary);
   --color-brand-primary-foreground: var(--brand-primary-foreground);
   --color-brand-border: var(--brand-border);
+  --color-brand-title: var(--brand-title);
+  --color-brand-description: var(--brand-description);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -43,6 +45,8 @@
   --brand-primary: #1b2232;
   --brand-primary-foreground: #ffffff;
   --brand-border: #e2e8f0;
+  --brand-title: #0f172a;
+  --brand-description: #475569;
 }
 
 .dark {
@@ -57,6 +61,8 @@
   --brand-primary: #1b2232;
   --brand-primary-foreground: #ffffff;
   --brand-border: #3b4558;
+  --brand-title: #0f172a;
+  --brand-description: #475569;
 }
 
 @layer base {
