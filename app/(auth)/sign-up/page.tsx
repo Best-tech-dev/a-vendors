@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signUpSchema, type SignUpFormValues } from "@/lib/validations/auth";
 import { Input } from "@/components/ui/input";
@@ -29,7 +29,7 @@ export default function SignUpPage() {
     mode: "onChange",
   });
 
-  const passwordValue = form.watch("password");
+  const passwordValue = useWatch({ control: form.control, name: "password" });
   const isValid = form.formState.isValid;
 
   function onSubmit(data: SignUpFormValues) {

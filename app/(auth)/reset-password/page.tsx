@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   createPasswordSchema,
@@ -29,7 +29,7 @@ export default function ResetPasswordPage() {
     mode: "onChange",
   });
 
-  const passwordValue = form.watch("password");
+  const passwordValue = useWatch({ control: form.control, name: "password" });
   const isValid = form.formState.isValid;
 
   function onSubmit(data: CreatePasswordFormValues) {
