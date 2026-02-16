@@ -29,9 +29,9 @@ function PasswordInput({
         aria-label={showPassword ? "Hide password" : "Show password"}
       >
         {showPassword ? (
-          <EyeOff className="size-4" />
+          <EyeOff className="size-4 text-brand-description hover:cursor-pointer" />
         ) : (
-          <Eye className="size-4" />
+          <Eye className="size-4 text-brand-description hover:cursor-pointer" />
         )}
       </button>
     </div>

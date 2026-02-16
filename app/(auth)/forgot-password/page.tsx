@@ -20,6 +20,7 @@ import {
 
 export default function ForgotPasswordPage() {
   const form = useForm<ForgotPasswordFormValues>({
+    // @ts-expect-error - Zod v4 compatibility with @hookform/resolvers
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
       email: "",
@@ -33,12 +34,12 @@ export default function ForgotPasswordPage() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+        <h1 className="text-3xl font-bold tracking-tight text-brand-title">
           Locked Out? No Stress.
         </h1>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          It happens to everyone. Let's get you back into your dashboard so you
-          can get back to business.
+        <p className="mt-2 text-sm leading-6 text-brand-description">
+          It happens to everyone. Let&apos;s get you back into your dashboard so
+          you can get back to business.
         </p>
       </div>
 
@@ -50,7 +51,7 @@ export default function ForgotPasswordPage() {
           <FormField
             control={form.control}
             name="email"
-            render={({ field }: any) => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel>Email address</FormLabel>
                 <FormControl>
@@ -92,8 +93,8 @@ export default function ForgotPasswordPage() {
           </li>
         </ol>
         <p className="mt-3 text-sm text-amber-700">
-          Didn't get the email? Check your spam folder or wait 60 seconds and
-          try again.
+          Didn&apos;t get the email? Check your spam folder or wait 60 seconds
+          and try again.
         </p>
       </div>
     </div>

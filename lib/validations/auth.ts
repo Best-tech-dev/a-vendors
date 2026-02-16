@@ -19,7 +19,7 @@ export const signUpSchema = z
       .min(8, "At least 8 characters")
       .regex(/[a-z]/, "At least one lower case letter")
       .regex(/[A-Z]/, "At least one upper case letter")
-      .regex(/[@!<>!?*&%$]/, "At least one special symbol (@!<>!?*&%$)"),
+      .regex(/[^a-zA-Z0-9]/, "At least one special character"),
     confirmPassword: z.string().min(1, "Please confirm your password"),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -41,7 +41,7 @@ export const createPasswordSchema = z
       .min(8, "At least 8 characters")
       .regex(/[a-z]/, "At least one lower case letter")
       .regex(/[A-Z]/, "At least one upper case letter")
-      .regex(/[@!<>!?*&%$]/, "At least one special symbol (@!<>!?*&%$)"),
+      .regex(/[^a-zA-Z0-9]/, "At least one special character"),
     confirmPassword: z.string().min(1, "Please confirm your password"),
   })
   .refine((data) => data.password === data.confirmPassword, {

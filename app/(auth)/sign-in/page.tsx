@@ -18,6 +18,7 @@ import {
 
 export default function SignInPage() {
   const form = useForm<SignInFormValues>({
+    // @ts-expect-error - Zod v4 compatibility with @hookform/resolvers
     resolver: zodResolver(signInSchema),
     defaultValues: {
       email: "",
@@ -32,10 +33,10 @@ export default function SignInPage() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+        <h1 className="text-3xl font-bold tracking-tight text-brand-title">
           Welcome Back to the Floor
         </h1>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+        <p className="mt-2 text-sm leading-6 text-brand-description">
           Managing your inventory and procurement should be the easiest part of
           your day. Log in to access your account now.
         </p>
@@ -49,7 +50,7 @@ export default function SignInPage() {
           <FormField
             control={form.control}
             name="email"
-            render={({ field }: any) => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel>Email address</FormLabel>
                 <FormControl>
@@ -63,7 +64,7 @@ export default function SignInPage() {
           <FormField
             control={form.control}
             name="password"
-            render={({ field }: any) => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>

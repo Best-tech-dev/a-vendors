@@ -1,44 +1,102 @@
 "use client";
 
 import * as React from "react";
-import { useController } from "react-hook-form";
+import {
+  Controller,
+  type Control,
+  type ControllerRenderProps,
+  type FieldValues,
+  type Path,
+} from "react-hook-form";
 
-const FormContext = React.createContext<any>(null);
+type FormFieldContextValue<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends Path<TFieldValues> = Path<TFieldValues>,
+> = {
+  name: TName;
+};
 
-export function Form(props: any) {
+const FormFieldContext = React.createContext<FormFieldContextValue>(
+  {} as FormFieldContextValue,
+);
+
+interface FormContextValue {
+  formState: {
+    errors?: Record<string, { message?: string }>;
+    isValid?: boolean;
+  };
+}
+
+const FormContext = React.createContext<FormContextValue>(
+  {} as FormContextValue,
+);
+
+export function Form(props: FormContextValue & { children: React.ReactNode }) {
   const { children, ...rest } = props;
   return <FormContext.Provider value={rest}>{children}</FormContext.Provider>;
 }
 
-export function FormField({ name, render }: { name: string; render: any }) {
-  const form = React.useContext(FormContext);
-  const control = form?.control;
-  const { field } = useController({ name, control });
-  return render({ field });
+export function FormField<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends Path<TFieldValues> = Path<TFieldValues>,
+>({
+  control,
+  name,
+  render,
+}: {
+  control: Control<TFieldValues>;
+  name: TName;
+  render: (props: {
+    field: ControllerRenderProps<TFieldValues, TName>;
+  }) => React.ReactElement;
+}) {
+  return (
+    <FormFieldContext.Provider value={{ name }}>
+      <Controller
+        control={control}
+        name={name}
+        render={({ field }) => render({ field })}
+      />
+    </FormFieldContext.Provider>
+  );
 }
 
-export function FormItem({ children, className }: any) {
+export function FormItem({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return <div className={className}>{children}</div>;
 }
 
-export function FormLabel({ children, htmlFor }: any) {
+export function FormLabel({
+  children,
+  htmlFor,
+}: {
+  children: React.ReactNode;
+  htmlFor?: string;
+}) {
   return (
     <label
       htmlFor={htmlFor}
-      className="mb-2 block text-sm font-medium text-muted-foreground"
+      className="mb-2 block text-sm font-medium text-brand-description"
     >
       {children}
     </label>
   );
 }
 
-export function FormControl({ children }: any) {
+export function FormControl({ children }: { children: React.ReactNode }) {
   return <div>{children}</div>;
 }
 
-export function FormMessage({ children, name }: any) {
+export function FormMessage({ name }: { name?: string }) {
   const form = React.useContext(FormContext);
-  const error = form?.formState?.errors?.[name];
+  const fieldContext = React.useContext(FormFieldContext);
+  const fieldName = name || fieldContext.name;
+  const error = form?.formState?.errors?.[fieldName];
   if (!error) return null;
   return (
     <p className="mt-1 text-xs text-destructive">{error.message as string}</p>

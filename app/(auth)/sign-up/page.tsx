@@ -19,6 +19,7 @@ import {
 
 export default function SignUpPage() {
   const form = useForm<SignUpFormValues>({
+    // @ts-expect-error - Zod v4 compatibility with @hookform/resolvers
     resolver: zodResolver(signUpSchema),
     defaultValues: {
       name: "",
@@ -29,6 +30,7 @@ export default function SignUpPage() {
   });
 
   const passwordValue = form.watch("password");
+  const isValid = form.formState.isValid;
 
   function onSubmit(data: SignUpFormValues) {
     console.log("Sign up:", data);
@@ -37,12 +39,12 @@ export default function SignUpPage() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Let's Get You Set Up
+        <h1 className="text-3xl font-bold tracking-tight text-brand-title">
+          Let&apos;s Get You Set Up
         </h1>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+        <p className="mt-2 mb-4 text-sm leading-6 text-brand-description">
           Welcome to the team! Setting up your account takes less than a minute.
-          Once you're in, you'll be ready to manage your account.
+          Once you&apos;re in, you&apos;ll be ready to manage your account.
         </p>
       </div>
 
@@ -54,7 +56,7 @@ export default function SignUpPage() {
           <FormField
             control={form.control}
             name="name"
-            render={({ field }: any) => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel>Name</FormLabel>
                 <FormControl>
@@ -68,7 +70,7 @@ export default function SignUpPage() {
           <FormField
             control={form.control}
             name="password"
-            render={({ field }: any) => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
@@ -86,7 +88,7 @@ export default function SignUpPage() {
           <FormField
             control={form.control}
             name="confirmPassword"
-            render={({ field }: any) => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel>Confirm Password</FormLabel>
                 <FormControl>
@@ -97,7 +99,7 @@ export default function SignUpPage() {
             )}
           />
 
-          <Button type="submit" className="mt-4 w-full">
+          <Button type="submit" className="mt-4 w-full" disabled={!isValid}>
             Create account
           </Button>
         </form>
