@@ -25,7 +25,10 @@ export default function ForgotPasswordPage() {
     defaultValues: {
       email: "",
     },
+    mode: "onChange",
   });
+
+  const isValid = form.formState.isValid;
 
   function onSubmit(data: ForgotPasswordFormValues) {
     console.log("Forgot password:", data);
@@ -62,7 +65,7 @@ export default function ForgotPasswordPage() {
             )}
           />
 
-          <Button type="submit" className="mt-4 w-full">
+          <Button type="submit" className="mt-4 w-full" disabled={!isValid}>
             Send reset email
           </Button>
         </form>

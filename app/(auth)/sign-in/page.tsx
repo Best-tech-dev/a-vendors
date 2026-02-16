@@ -24,7 +24,10 @@ export default function SignInPage() {
       email: "",
       password: "",
     },
+    mode: "onChange",
   });
+
+  const isValid = form.formState.isValid;
 
   function onSubmit(data: SignInFormValues) {
     console.log("Sign in:", data);
@@ -70,10 +73,10 @@ export default function SignInPage() {
                 <FormControl>
                   <PasswordInput placeholder="••••••" {...field} />
                 </FormControl>
-                <div className="flex justify-end">
+                <div className="flex justify-end pt-3">
                   <Link
                     href="/forgot-password"
-                    className="text-xs font-semibold uppercase tracking-wide text-muted-foreground hover:text-foreground"
+                    className="text-xs font-semibold uppercase tracking-wide text-brand-description hover:text-foreground"
                   >
                     Forgot Password?
                   </Link>
@@ -83,7 +86,7 @@ export default function SignInPage() {
             )}
           />
 
-          <Button type="submit" className="mt-4 w-full">
+          <Button type="submit" className="mt-4 w-full" disabled={!isValid}>
             Sign in
           </Button>
         </form>
