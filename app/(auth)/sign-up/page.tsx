@@ -19,7 +19,6 @@ import {
 
 export default function SignUpPage() {
   const form = useForm<SignUpFormValues>({
-    // @ts-expect-error - Zod v4 compatibility with @hookform/resolvers
     resolver: zodResolver(signUpSchema),
     defaultValues: {
       name: "",

@@ -20,7 +20,6 @@ import {
 
 export default function ResetPasswordPage() {
   const form = useForm<CreatePasswordFormValues>({
-    // @ts-expect-error - Zod v4 compatibility with @hookform/resolvers
     resolver: zodResolver(createPasswordSchema),
     defaultValues: {
       password: "",

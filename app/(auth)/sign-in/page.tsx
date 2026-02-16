@@ -18,7 +18,6 @@ import {
 
 export default function SignInPage() {
   const form = useForm<SignInFormValues>({
-    // @ts-expect-error - Zod v4 compatibility with @hookform/resolvers
     resolver: zodResolver(signInSchema),
     defaultValues: {
       email: "",

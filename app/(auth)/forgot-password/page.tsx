@@ -20,7 +20,6 @@ import {
 
 export default function ForgotPasswordPage() {
   const form = useForm<ForgotPasswordFormValues>({
-    // @ts-expect-error - Zod v4 compatibility with @hookform/resolvers
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
       email: "",
