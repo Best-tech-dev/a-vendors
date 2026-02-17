@@ -58,7 +58,7 @@ export function EditProfileDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px]">
+      <DialogContent className="sm:max-w-120">
         <DialogHeader className="text-center">
           <DialogTitle className="text-lg font-semibold">
             Manage your personal details

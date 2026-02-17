@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Eye, EyeOff, Check } from "lucide-react";
@@ -81,7 +81,7 @@ export function ChangePasswordDialog({
     mode: "onChange",
   });
 
-  const newPassword = form.watch("newPassword");
+  const newPassword = useWatch({ control: form.control, name: "newPassword" });
 
   const ruleResults = useMemo(
     () =>
@@ -100,7 +100,7 @@ export function ChangePasswordDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px]">
+      <DialogContent className="sm:max-w-120">
         <DialogHeader className="text-center">
           <DialogTitle className="text-lg font-semibold">
             Change password

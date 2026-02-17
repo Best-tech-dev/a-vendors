@@ -77,7 +77,7 @@ export function AddRoleDialog({ open, onOpenChange }: AddRoleDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[560px] max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-140 max-h-[85vh] overflow-y-auto">
         <DialogHeader className="text-center">
           <DialogTitle className="text-lg font-semibold">
             Add new role
