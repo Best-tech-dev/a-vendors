@@ -16,7 +16,7 @@ export default function DashboardGroupLayout({
       {/* Main area */}
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto bg-[#f8f9fb] p-4 md:p-6">
+        <main className="flex-1 overflow-y-auto bg-white p-4 md:p-6">
           {children}
         </main>
       </div>

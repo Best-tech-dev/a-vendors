@@ -1,8 +1,9 @@
-import { Star, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { VendorCard } from "@/components/vendor-card";
+import { Vendor } from "@/types/vendor";
 
 // ─── Mock Data ───────────────────────────────────────────────────────────────
 
@@ -23,11 +24,11 @@ const quickActions = [
   { label: "Add Vendor", href: "#" },
 ];
 
-const topVendors = [
+const topVendors: Vendor[] = [
   {
     id: 1,
     name: "Global Logistics Partners",
-    status: "Active" as const,
+    status: "Active",
     industry: "Electronics & Components",
     rating: 4.8,
     location: "Lagos, Nigeria",
@@ -35,7 +36,7 @@ const topVendors = [
   {
     id: 2,
     name: "Global Logistics Partners",
-    status: "Active" as const,
+    status: "Active",
     industry: "Electronics & Components",
     rating: 4.8,
     location: "Lagos, Nigeria",
@@ -43,7 +44,7 @@ const topVendors = [
   {
     id: 3,
     name: "Global Logistics Partners",
-    status: "Active" as const,
+    status: "Active",
     industry: "Electronics & Components",
     rating: 4.8,
     location: "Lagos, Nigeria",
@@ -51,7 +52,7 @@ const topVendors = [
   {
     id: 4,
     name: "Global Logistics Partners",
-    status: "Active" as const,
+    status: "Active",
     industry: "Electronics & Components",
     rating: 4.8,
     location: "Lagos, Nigeria",
@@ -80,8 +81,8 @@ export default function DashboardPage() {
       {/* Stats grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
-          <Card key={stat.label}>
-            <CardContent className="px-5 py-5">
+          <Card key={stat.label} className="bg-white">
+            <CardContent className="px-5 py-0">
               <p className="text-3xl font-bold text-brand-title">
                 {stat.value}
               </p>
@@ -94,80 +95,81 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick actions */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {quickActions.map((action) => (
-          <Button key={action.label} size="lg" className="h-12 w-full" asChild>
-            <Link href={action.href}>
-              <Plus className="size-4" />
-              {action.label}
-            </Link>
-          </Button>
-        ))}
-      </div>
-
-      {/* Top vendors */}
-      <div>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-brand-title">
-            Top Vendors
-          </h2>
-          <Link
-            href="/vendors"
-            className="text-sm font-medium text-brand-description underline underline-offset-4 hover:text-brand-title"
-          >
-            See more
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {topVendors.map((vendor) => (
-            <VendorCard key={vendor.id} vendor={vendor} />
+      <div className="mt-10">
+        <h2 className="text-lg font-semibold text-brand-title mb-3">
+          Quick Actions
+        </h2>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {quickActions.map((action) => (
+            <Button
+              key={action.label}
+              size="lg"
+              className="h-12 w-full"
+              asChild
+            >
+              <Link href={action.href}>
+                <Plus className="size-4" />
+                {action.label}
+              </Link>
+            </Button>
           ))}
         </div>
       </div>
+
+      {/* Top vendors */}
+      <div className="mt-10">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {/* Vendor Card 1 */}
+          <Card className="flex flex-col pt-0">
+            <CardContent className="px-5 pt-5 pb-0 flex-1 flex flex-col">
+              {/* Fixed header */}
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-brand-title">
+                  Top Vendors
+                </h2>
+                <Link
+                  href="/vendors"
+                  className="text-sm font-medium text-brand-description underline underline-offset-4 hover:text-brand-title"
+                >
+                  See more
+                </Link>
+              </div>
+
+              {/* Scrollable vendor cards */}
+              <div className="flex-1 overflow-y-auto max-h-100 pb-5 space-y-3">
+                {topVendors.map((vendor) => (
+                  <VendorCard key={vendor.id} vendor={vendor} />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Vendor Card 2 */}
+          <Card className="flex flex-col pt-0">
+            <CardContent className="px-5 pt-5 pb-0 flex-1 flex flex-col">
+              {/* Fixed header */}
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-brand-title">
+                  Top Vendors
+                </h2>
+                <Link
+                  href="/vendors"
+                  className="text-sm font-medium text-brand-description underline underline-offset-4 hover:text-brand-title"
+                >
+                  See more
+                </Link>
+              </div>
+
+              {/* Scrollable vendor cards */}
+              <div className="flex-1 overflow-y-auto max-h-100 pb-5 space-y-3">
+                {topVendors.map((vendor) => (
+                  <VendorCard key={vendor.id} vendor={vendor} />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
-  );
-}
-
-// ─── Vendor Card ─────────────────────────────────────────────────────────────
-
-interface Vendor {
-  id: number;
-  name: string;
-  status: "Active";
-  industry: string;
-  rating: number;
-  location: string;
-}
-
-function VendorCard({ vendor }: { vendor: Vendor }) {
-  return (
-    <Card className="transition-shadow hover:shadow-md">
-      <CardContent className="px-5 py-5">
-        {/* Top row */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h3 className="text-base font-semibold text-brand-title">
-              {vendor.name}
-            </h3>
-            <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200">
-              {vendor.status}
-            </Badge>
-          </div>
-          <div className="flex items-center gap-1">
-            <Star className="size-4 fill-amber-400 text-amber-400" />
-            <span className="text-sm font-semibold text-brand-title">
-              {vendor.rating}
-            </span>
-          </div>
-        </div>
-
-        {/* Bottom row */}
-        <div className="mt-3 flex items-center justify-between">
-          <p className="text-sm text-brand-description">{vendor.industry}</p>
-          <p className="text-sm text-brand-description">{vendor.location}</p>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
