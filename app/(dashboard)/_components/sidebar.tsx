@@ -5,23 +5,23 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
-  Package,
+  PackagePlus,
   FileText,
   ShoppingCart,
-  Receipt,
+  Banknote,
   CreditCard,
   Settings,
-  Warehouse,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 const mainNavItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Vendors", href: "/vendors", icon: Users },
-  { label: "Inventory", href: "/inventory", icon: Package },
+  { label: "Inventory", href: "/inventory", icon: PackagePlus },
   { label: "RFQs", href: "/rfqs", icon: FileText },
   { label: "Orders", href: "/orders", icon: ShoppingCart },
-  { label: "Invoices", href: "/invoices", icon: Receipt },
+  { label: "Invoices", href: "/invoices", icon: Banknote },
   { label: "Payments", href: "/payments", icon: CreditCard },
 ];
 
@@ -36,20 +36,25 @@ export function Sidebar() {
     <aside className="flex h-full w-65 flex-col bg-brand-primary text-white">
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-6 py-6">
-        <div className="flex size-9 items-center justify-center rounded-lg bg-white/10">
-          <Warehouse className="size-5 text-white" />
+        <div className="flex items-center justify-center">
+          <Image
+            src="/a-vendors-logo-white.svg"
+            alt="Logo"
+            width={40}
+            height={40}
+          />
         </div>
         <div className="flex flex-col leading-tight">
-          <span className="text-base font-bold tracking-wide text-white">
+          <span className="text-sm font-medium tracking-wide text-white">
             Warehouse
           </span>
-          <span className="text-xs font-medium text-slate-400">Executive</span>
+          <span className="text-xs text-white">Executive</span>
         </div>
       </div>
 
       {/* Main Menu */}
       <nav className="mt-4 flex flex-1 flex-col gap-1 px-3">
-        <span className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+        <span className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-brand-border">
           Main Menu
         </span>
         {mainNavItems.map((item) => {
@@ -59,10 +64,10 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                "flex items-center gap-3 rounded-sm px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-white text-brand-primary"
-                  : "text-slate-400 hover:bg-white/10 hover:text-white",
+                  ? "bg-[#F5F7F9] text-brand-primary"
+                  : "text-border hover:bg-[#F5F7F9] hover:text-brand-primary",
               )}
             >
               <item.icon className="size-4.5" />
@@ -72,7 +77,7 @@ export function Sidebar() {
         })}
 
         {/* System */}
-        <span className="mb-2 mt-6 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+        <span className="mb-2 mt-6 px-3 text-[11px] font-semibold uppercase tracking-wider text-brand-border">
           System
         </span>
         {systemNavItems.map((item) => {
@@ -82,10 +87,10 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                "flex items-center gap-3 rounded-sm px-3 py-2.5 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-white text-brand-primary"
-                  : "text-slate-400 hover:bg-white/10 hover:text-white",
+                  ? "bg-[#F5F7F9] text-brand-primary"
+                  : "text-brand-border hover:bg-[#F5F7F9] hover:text-brand-primary",
               )}
             >
               <item.icon className="size-4.5" />
