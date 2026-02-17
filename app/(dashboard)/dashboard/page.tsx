@@ -2,62 +2,17 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { VendorCard } from "@/components/vendor-card";
+import { VendorCard } from "@/components/dashboard/vendor-card";
 import { Vendor } from "@/types/vendor";
+import {
+  stats,
+  quickActions,
+  getTopVendors,
+} from "@/components/dashboard/mock-data/top-vendors";
 
-// ─── Mock Data ───────────────────────────────────────────────────────────────
+// ─── Mock Data (moved to components/dashboard/mock-data/top-vendors.ts) ───
 
-const stats = [
-  { label: "Total Vendors", value: 5 },
-  { label: "Total Materials", value: 3 },
-  { label: "Active RFQs", value: 2 },
-  { label: "Pending Orders", value: 3 },
-  { label: "Pending Invoices", value: 5 },
-  { label: "Pending Payments", value: 3 },
-  { label: "Total Team Members", value: 2 },
-];
-
-const quickActions = [
-  { label: "Add Team Member", href: "#" },
-  { label: "Create RFQ", href: "#" },
-  { label: "New Purchase Order", href: "#" },
-  { label: "Add Vendor", href: "#" },
-];
-
-const topVendors: Vendor[] = [
-  {
-    id: 1,
-    name: "Global Logistics Partners",
-    status: "Active",
-    industry: "Electronics & Components",
-    rating: 4.8,
-    location: "Lagos, Nigeria",
-  },
-  {
-    id: 2,
-    name: "Global Logistics Partners",
-    status: "Active",
-    industry: "Electronics & Components",
-    rating: 4.8,
-    location: "Lagos, Nigeria",
-  },
-  {
-    id: 3,
-    name: "Global Logistics Partners",
-    status: "Active",
-    industry: "Electronics & Components",
-    rating: 4.8,
-    location: "Lagos, Nigeria",
-  },
-  {
-    id: 4,
-    name: "Global Logistics Partners",
-    status: "Active",
-    industry: "Electronics & Components",
-    rating: 4.8,
-    location: "Lagos, Nigeria",
-  },
-];
+const topVendors: Vendor[] = getTopVendors(6);
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
