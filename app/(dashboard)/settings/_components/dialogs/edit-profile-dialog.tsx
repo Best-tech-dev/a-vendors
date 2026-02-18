@@ -60,10 +60,10 @@ export function EditProfileDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-120">
         <DialogHeader className="text-center">
-          <DialogTitle className="text-lg font-semibold">
+          <DialogTitle className="text-lg font-semibold text-center">
             Manage your personal details
           </DialogTitle>
-          <DialogDescription className="text-sm text-brand-description">
+          <DialogDescription className="text-sm text-brand-description text-center">
             Update your workspace info
           </DialogDescription>
         </DialogHeader>
@@ -135,11 +135,12 @@ export function EditProfileDialog({
               <Button
                 type="button"
                 variant="ghost"
+                className="hover:text-brand-description"
                 onClick={() => onOpenChange(false)}
               >
                 Cancel
               </Button>
-              <Button type="submit" className="px-10">
+              <Button size="lg" type="submit" className="px-10">
                 Save
               </Button>
             </DialogFooter>

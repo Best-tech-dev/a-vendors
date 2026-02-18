@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardAction,
+  CardContent,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { currentUser } from "../_data/mock-data";
 import { EditProfileDialog } from "./dialogs/edit-profile-dialog";
@@ -16,35 +21,37 @@ export function PersonalDetailsTab() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Basic details card */}
         <Card className="bg-white">
-          <CardContent className="px-6 py-5">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-base font-semibold text-brand-title">
-                  Basic details
-                </h3>
-                <p className="text-sm text-brand-description">
-                  Update your workspace info
-                </p>
-              </div>
+          <CardHeader className="border-b [.border-b]:pb-3">
+            <div>
+              <h3 className="text-base font-medium text-brand-title">
+                Basic details
+              </h3>
+              <p className="text-sm text-brand-description">
+                Update your workspace info
+              </p>
+            </div>
+            <CardAction>
               <Button
-                variant="outline"
-                size="sm"
+                size="lg"
+                className="bg-[#1E22540A] text-brand-primary hover:text-white"
                 onClick={() => setEditOpen(true)}
               >
                 Edit
               </Button>
-            </div>
+            </CardAction>
+          </CardHeader>
 
+          <CardContent className="px-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-brand-description">Name</span>
-                <span className="text-sm font-medium text-brand-title">
+                <span className="text-sm font-medium text-brand-description">
                   {currentUser.name}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-brand-description">Email</span>
-                <span className="text-sm font-medium text-brand-title">
+                <span className="text-sm font-medium text-brand-description">
                   {currentUser.email}
                 </span>
               </div>
@@ -52,13 +59,13 @@ export function PersonalDetailsTab() {
                 <span className="text-sm text-brand-description">
                   Phone number
                 </span>
-                <span className="text-sm font-medium text-brand-title">
+                <span className="text-sm font-medium text-brand-description">
                   {currentUser.phone || "–"}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-brand-description">Role</span>
-                <span className="text-sm font-medium text-brand-title">
+                <span className="text-sm font-medium text-brand-description">
                   {currentUser.role}
                 </span>
               </div>
@@ -68,28 +75,30 @@ export function PersonalDetailsTab() {
 
         {/* Password card */}
         <Card className="bg-white">
-          <CardContent className="px-6 py-5">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-base font-semibold text-brand-title">
-                  Password
-                </h3>
-                <p className="text-sm text-brand-description">
-                  Manage your login credentials
-                </p>
-              </div>
+          <CardHeader className="border-b [.border-b]:pb-3">
+            <div>
+              <h3 className="text-base font-medium text-brand-title">
+                Password
+              </h3>
+              <p className="text-sm text-brand-description">
+                Manage your login credentials
+              </p>
+            </div>
+            <CardAction>
               <Button
-                variant="outline"
-                size="sm"
+                size="lg"
+                className="bg-[#1E22540A] text-brand-primary hover:text-white"
                 onClick={() => setPasswordOpen(true)}
               >
                 Change password
               </Button>
-            </div>
+            </CardAction>
+          </CardHeader>
 
+          <CardContent className="px-6">
             <div className="flex items-center justify-between">
               <span className="text-sm text-brand-description">Password</span>
-              <span className="text-sm font-medium text-brand-title tracking-widest">
+              <span className="text-sm font-medium text-brand-description tracking-widest">
                 ••••••••
               </span>
             </div>

@@ -21,23 +21,23 @@ export default function SettingsPage() {
       <SettingsStats />
 
       {/* Tabs */}
-      <Tabs defaultValue="personal" className="w-full">
-        <TabsList className="bg-[#1B2559] text-white rounded-lg p-1 h-auto w-fit">
+      <Tabs defaultValue="personal" className="w-full mt-10">
+        <TabsList className="bg-brand-primary text-white rounded-sm py-5.5 px-1.5">
           <TabsTrigger
             value="personal"
-            className="rounded-md px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-[#1B2559] data-[state=inactive]:text-white/80 cursor-pointer"
+            className="rounded-sm px-2 py-4 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-[#1B2559] data-[state=inactive]:text-white/80 cursor-pointer"
           >
             Personal details
           </TabsTrigger>
           <TabsTrigger
             value="team"
-            className="rounded-md px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-[#1B2559] data-[state=inactive]:text-white/80 cursor-pointer"
+            className="rounded-sm px-2 py-4 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-[#1B2559] data-[state=inactive]:text-white/80 cursor-pointer"
           >
             Team management
           </TabsTrigger>
           <TabsTrigger
             value="roles"
-            className="rounded-md px-4 py-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-[#1B2559] data-[state=inactive]:text-white/80 cursor-pointer"
+            className="rounded-sm px-2 py-4 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-[#1B2559] data-[state=inactive]:text-white/80 cursor-pointer"
           >
             Role management
           </TabsTrigger>

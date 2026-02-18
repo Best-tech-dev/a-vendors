@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Eye, EyeOff, Check } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +22,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { PasswordChecklist } from "@/components/ui/password-checklist";
 import { Button } from "@/components/ui/button";
 
 const changePasswordSchema = z
@@ -32,11 +33,11 @@ const changePasswordSchema = z
       .min(8, "At least 8 characters")
       .regex(/[a-z]/, "At least one lower case letter")
       .regex(/[A-Z]/, "At least one upper case letter")
-      .regex(/[@!<>)!?*&%$]/, "At least one special symbol"),
+      .regex(/[^a-zA-Z0-9]/, "At least one special character"),
     confirmPassword: z.string().min(1, "Please confirm your password"),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords don't match",
+    message: "Passwords do not match",
     path: ["confirmPassword"],
   });
 
@@ -46,22 +47,6 @@ interface ChangePasswordDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-const PASSWORD_RULES = [
-  { label: "At least 8 characters", test: (v: string) => v.length >= 8 },
-  {
-    label: "At least one lower case letter",
-    test: (v: string) => /[a-z]/.test(v),
-  },
-  {
-    label: "At least one upper case letter",
-    test: (v: string) => /[A-Z]/.test(v),
-  },
-  {
-    label: "At least one special symbol (@!<>)!?*&%$)",
-    test: (v: string) => /[@!<>)!?*&%$]/.test(v),
-  },
-];
 
 export function ChangePasswordDialog({
   open,
@@ -83,15 +68,6 @@ export function ChangePasswordDialog({
 
   const newPassword = useWatch({ control: form.control, name: "newPassword" });
 
-  const ruleResults = useMemo(
-    () =>
-      PASSWORD_RULES.map((rule) => ({
-        ...rule,
-        passed: rule.test(newPassword),
-      })),
-    [newPassword],
-  );
-
   function onSubmit(values: ChangePasswordValues) {
     console.log("Password changed:", values);
     onOpenChange(false);
@@ -102,20 +78,20 @@ export function ChangePasswordDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-120">
         <DialogHeader className="text-center">
-          <DialogTitle className="text-lg font-semibold">
+          <DialogTitle className="text-lg font-semibold text-center">
             Change password
           </DialogTitle>
-          <DialogDescription className="text-sm text-brand-description">
+          <DialogDescription className="text-sm text-brand-description text-center">
             Manage your login credentials
           </DialogDescription>
         </DialogHeader>
 
         {/* Important notice */}
-        <div className="rounded-md border border-amber-300 bg-amber-50 px-4 py-3">
-          <p className="text-sm font-semibold text-amber-700">
+        <div className="rounded-md border border-[#F6E6C8] bg-[#FDFAF4] px-4 py-3">
+          <p className="text-sm font-semibold text-[#A86F1E]">
             Important notice
           </p>
-          <p className="text-sm text-amber-600">
+          <p className="text-sm text-[#A86F1E]">
             You&apos;ll have to sign in again after changing your password.
           </p>
         </div>
@@ -182,28 +158,7 @@ export function ChangePasswordDialog({
             />
 
             {/* Password validation checklist */}
-            <div className="space-y-1.5 pl-1">
-              {ruleResults.map((rule) => (
-                <div key={rule.label} className="flex items-center gap-2">
-                  <div
-                    className={`flex size-4 items-center justify-center rounded-full ${
-                      rule.passed
-                        ? "bg-green-100 text-green-600"
-                        : "bg-gray-100 text-gray-400"
-                    }`}
-                  >
-                    <Check className="size-3" />
-                  </div>
-                  <span
-                    className={`text-xs ${
-                      rule.passed ? "text-green-600" : "text-gray-500"
-                    }`}
-                  >
-                    {rule.label}
-                  </span>
-                </div>
-              ))}
-            </div>
+            <PasswordChecklist password={newPassword ?? ""} />
 
             {/* Confirm password */}
             <FormField
@@ -240,6 +195,7 @@ export function ChangePasswordDialog({
               <Button
                 type="button"
                 variant="ghost"
+                className="hover:text-brand-description"
                 onClick={() => {
                   onOpenChange(false);
                   form.reset();
@@ -247,7 +203,7 @@ export function ChangePasswordDialog({
               >
                 Cancel
               </Button>
-              <Button type="submit" className="px-10">
+              <Button size="lg" type="submit" className="px-10">
                 Submit
               </Button>
             </DialogFooter>
