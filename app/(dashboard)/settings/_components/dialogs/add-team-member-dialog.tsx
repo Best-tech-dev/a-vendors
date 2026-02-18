@@ -66,10 +66,10 @@ export function AddTeamMemberDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-120">
         <DialogHeader className="text-center">
-          <DialogTitle className="text-lg font-semibold">
+          <DialogTitle className="text-lg font-semibold text-center text-brand-primary">
             Add team member
           </DialogTitle>
-          <DialogDescription className="text-sm text-brand-description">
+          <DialogDescription className="text-sm text-center text-brand-description">
             Please fill out your team member&apos;s details
           </DialogDescription>
         </DialogHeader>
