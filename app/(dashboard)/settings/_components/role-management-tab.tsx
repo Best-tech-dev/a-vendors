@@ -95,63 +95,61 @@ export function RoleManagementTab() {
                 );
 
                 return (
-                  <Card key={role.id} className="bg-white">
-                    <>
-                      <CardHeader className="border-b pb-4!">
-                        <CardTitle>
-                          <h3 className="text-base font-semibold text-brand-title">
-                            {role.name}
-                          </h3>
-                        </CardTitle>
-                        <CardAction>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="size-8"
-                            >
-                              <SquarePen className="size-4 text-brand-description" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="size-8"
-                              onClick={() => toggleRole(role.id)}
-                            >
-                              {isExpanded ? (
-                                <ChevronDown className="size-4 text-brand-description" />
-                              ) : (
-                                <ChevronRight className="size-4 text-brand-description" />
-                              )}
-                            </Button>
-                          </div>
-                        </CardAction>
-                      </CardHeader>
+                  <Card key={role.id} className="bg-white py-0! gap-y-0!">
+                    <CardHeader className="border-b py-3! gap-0! items-center">
+                      <CardTitle>
+                        <h3 className="text-base font-semibold text-brand-title">
+                          {role.name}
+                        </h3>
+                      </CardTitle>
+                      <CardAction>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-8"
+                          >
+                            <SquarePen className="size-4 text-brand-description" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-8"
+                            onClick={() => toggleRole(role.id)}
+                          >
+                            {isExpanded ? (
+                              <ChevronDown className="size-4 text-brand-description" />
+                            ) : (
+                              <ChevronRight className="size-4 text-brand-description" />
+                            )}
+                          </Button>
+                        </div>
+                      </CardAction>
+                    </CardHeader>
 
-                      <CardContent className="px-6">
+                    {isExpanded && (
+                      <CardContent className="px-6 py-4">
                         {/* Permissions grid */}
-                        {isExpanded && (
-                          <div className="grid grid-cols-1 gap-x-12 gap-y-2 sm:grid-cols-2">
-                            <div className="space-y-2">
-                              {leftPermissions.map((perm) => (
-                                <PermissionBadge
-                                  key={perm.module}
-                                  permission={perm}
-                                />
-                              ))}
-                            </div>
-                            <div className="space-y-2">
-                              {rightPermissions.map((perm) => (
-                                <PermissionBadge
-                                  key={perm.module}
-                                  permission={perm}
-                                />
-                              ))}
-                            </div>
+                        <div className="grid grid-cols-1 gap-x-12 gap-y-2 sm:grid-cols-2">
+                          <div className="space-y-2">
+                            {leftPermissions.map((perm) => (
+                              <PermissionBadge
+                                key={perm.module}
+                                permission={perm}
+                              />
+                            ))}
                           </div>
-                        )}
+                          <div className="space-y-2">
+                            {rightPermissions.map((perm) => (
+                              <PermissionBadge
+                                key={perm.module}
+                                permission={perm}
+                              />
+                            ))}
+                          </div>
+                        </div>
                       </CardContent>
-                    </>
+                    )}
                   </Card>
                 );
               })}
