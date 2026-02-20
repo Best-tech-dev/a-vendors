@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -12,6 +13,7 @@ import {
   CreditCard,
   Settings,
 } from "lucide-react";
+import { SheetClose } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
@@ -31,9 +33,20 @@ const systemNavItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const rootRef = useRef<HTMLElement | null>(null);
+  const [inSheet, setInSheet] = useState(false);
+
+  useEffect(() => {
+    if (!rootRef.current) return;
+    const isInSheet = !!rootRef.current.closest('[data-slot="sheet-content"]');
+    setInSheet(isInSheet);
+  }, []);
 
   return (
-    <aside className="flex h-full w-65 flex-col bg-brand-primary text-white">
+    <aside
+      ref={rootRef}
+      className="flex h-full w-65 flex-col bg-brand-primary text-white"
+    >
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-6 py-6">
         <div className="flex items-center justify-center">
@@ -59,9 +72,8 @@ export function Sidebar() {
         </span>
         {mainNavItems.map((item) => {
           const isActive = pathname === item.href;
-          return (
+          const link = (
             <Link
-              key={item.href}
               href={item.href}
               className={cn(
                 "flex items-center gap-3 rounded-sm px-3 py-2.5 text-sm font-medium transition-colors",
@@ -74,6 +86,14 @@ export function Sidebar() {
               {item.label}
             </Link>
           );
+
+          return inSheet ? (
+            <SheetClose asChild key={item.href}>
+              {link}
+            </SheetClose>
+          ) : (
+            <React.Fragment key={item.href}>{link}</React.Fragment>
+          );
         })}
 
         {/* System */}
@@ -82,9 +102,8 @@ export function Sidebar() {
         </span>
         {systemNavItems.map((item) => {
           const isActive = pathname === item.href;
-          return (
+          const link = (
             <Link
-              key={item.href}
               href={item.href}
               className={cn(
                 "flex items-center gap-3 rounded-sm px-3 py-2.5 text-sm font-medium transition-colors",
@@ -96,6 +115,14 @@ export function Sidebar() {
               <item.icon className="size-4.5" />
               {item.label}
             </Link>
+          );
+
+          return inSheet ? (
+            <SheetClose asChild key={item.href}>
+              {link}
+            </SheetClose>
+          ) : (
+            <React.Fragment key={item.href}>{link}</React.Fragment>
           );
         })}
       </nav>
