@@ -34,7 +34,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <Card key={stat.label} className="bg-white">
             <CardContent className="px-5 py-0">
@@ -54,17 +54,29 @@ export default function DashboardPage() {
         <h2 className="text-lg font-semibold text-brand-title mb-3">
           Quick Actions
         </h2>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {quickActions.map((action) => (
             <Button
               key={action.label}
               size="lg"
-              className="h-12 w-full"
+              className="h-10 sm:h-12 w-full"
               asChild
             >
               <Link href={action.href}>
-                <Plus className="size-4" />
-                {action.label}
+                <Plus className="hidden sm:inline size-4" />
+                {action.label === "New Purchase Order" ? (
+                  <>
+                    <span className="inline sm:hidden">Add Order</span>
+                    <span className="hidden sm:inline">{action.label}</span>
+                  </>
+                ) : action.label === "Add Team Member" ? (
+                  <>
+                    <span className="inline sm:hidden">Add Member</span>
+                    <span className="hidden sm:inline">{action.label}</span>
+                  </>
+                ) : (
+                  action.label
+                )}
               </Link>
             </Button>
           ))}
