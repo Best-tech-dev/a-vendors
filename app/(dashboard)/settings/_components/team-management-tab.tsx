@@ -33,7 +33,7 @@ export function TeamManagementTab() {
     <>
       <Card className="overflow-hidden p-0 gap-0">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2 px-6 py-4">
           <div>
             <h2 className="text-lg font-semibold text-brand-title">
               Team management

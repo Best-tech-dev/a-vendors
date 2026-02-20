@@ -67,7 +67,7 @@ export function RoleManagementTab() {
     <>
       <div className="space-y-4">
         <Card className="bg-white">
-          <CardHeader className="border-b items-center">
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2 border-b px-6 py-4">
             <div>
               <h2 className="text-lg font-semibold text-brand-title">
                 Permission management
