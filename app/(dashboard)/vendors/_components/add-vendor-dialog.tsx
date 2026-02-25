@@ -53,17 +53,20 @@ export function AddVendorDialog({ open, onOpenChange }: AddVendorDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="items-center text-center">
-          <DialogTitle className="text-lg font-semibold">
+          <DialogTitle className="text-lg font-semibold text-brand-title">
             Add New Vendor
           </DialogTitle>
-          <DialogDescription className="text-sm text-gray-500">
+          <DialogDescription className="text-sm text-brand-description">
             Fill in the details below to get your supplier into the system.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-5 pt-2">
           <div className="space-y-2">
-            <Label htmlFor="vendor-name" className="text-sm font-medium">
+            <Label
+              htmlFor="vendor-name"
+              className="text-sm font-medium text-brand-description"
+            >
               Vendor Company Name
             </Label>
             <Input
@@ -75,7 +78,9 @@ export function AddVendorDialog({ open, onOpenChange }: AddVendorDialogProps) {
           </div>
 
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Category</Label>
+            <Label className="text-sm font-medium text-brand-description">
+              Category
+            </Label>
             <Select value={category} onValueChange={setCategory}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a category" />
@@ -91,7 +96,10 @@ export function AddVendorDialog({ open, onOpenChange }: AddVendorDialogProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="vendor-email" className="text-sm font-medium">
+            <Label
+              htmlFor="vendor-email"
+              className="text-sm font-medium text-brand-description"
+            >
               Contact Email
             </Label>
             <Input
