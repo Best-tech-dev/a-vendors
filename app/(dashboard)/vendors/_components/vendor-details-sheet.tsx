@@ -25,7 +25,7 @@ function StatusBadge({ status }: { status: "Active" | "Inactive" }) {
     <span
       className={`ml-2 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
         status === "Active"
-          ? "bg-green-100 text-green-700"
+          ? "bg-[#F0F8F5] text-[#008753]"
           : "bg-gray-100 text-gray-600"
       }`}
     >
@@ -37,8 +37,10 @@ function StatusBadge({ status }: { status: "Active" | "Inactive" }) {
 function DocStatusBadge({ status }: { status: DocStatus }) {
   return (
     <span
-      className={`text-sm font-medium ${
-        status === "Valid" ? "text-green-600" : "text-red-500"
+      className={`inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium ${
+        status === "Valid"
+          ? "bg-[#F0F8F5] text-[#008753]"
+          : "bg-[#CE030305] text-[#CE0303]"
       }`}
     >
       {status}
@@ -66,16 +68,18 @@ export function VendorDetailsSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-md">
-        <SheetHeader className="pb-4">
+      <SheetContent className="w-full overflow-y-auto p-8 sm:max-w-lg">
+        <SheetHeader className="p-0 pb-4">
           <div>
             <div className="flex items-center">
-              <SheetTitle className="text-xl font-bold text-gray-900">
+              <SheetTitle className="text-xl font-bold text-brand-title">
                 {vendor.name}
               </SheetTitle>
               <StatusBadge status={vendor.status} />
             </div>
-            <p className="mt-0.5 text-sm text-gray-500">{vendor.category}</p>
+            <p className="mt-0.5 text-sm text-brand-description">
+              {vendor.category}
+            </p>
           </div>
         </SheetHeader>
 
@@ -133,27 +137,31 @@ export function VendorDetailsSheet({
             </div>
 
             {/* Bank Details */}
-            <div className="rounded-lg bg-gray-50 p-5">
-              <h4 className="mb-4 text-sm font-semibold text-gray-900">
+            <div className="rounded-lg bg-[#F8FAFC] p-5">
+              <h4 className="mb-4 text-sm font-semibold text-brand-title">
                 Vendor Bank Details
               </h4>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-xs text-gray-500">Bank</span>
-                  <p className="mt-0.5 text-sm font-semibold text-gray-900">
+                  <span className="text-xs text-brand-description">Bank</span>
+                  <p className="mt-0.5 text-sm font-semibold text-brand-title">
                     {vendor.bankDetails.bank}
                   </p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">Account Number:</span>
-                  <p className="mt-0.5 text-sm font-semibold text-gray-900">
+                  <span className="text-xs text-brand-description">
+                    Account Number:
+                  </span>
+                  <p className="mt-0.5 text-sm font-semibold text-brand-title">
                     {vendor.bankDetails.accountNumber}
                   </p>
                 </div>
               </div>
               <div className="mt-3">
-                <span className="text-xs text-gray-500">Account Name:</span>
-                <p className="mt-0.5 text-sm font-semibold text-gray-900">
+                <span className="text-xs text-brand-description">
+                  Account Name:
+                </span>
+                <p className="mt-0.5 text-sm font-semibold text-brand-title">
                   {vendor.bankDetails.accountName}
                 </p>
               </div>
@@ -166,23 +174,27 @@ export function VendorDetailsSheet({
           <div className="flex flex-col">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">Rating:</span>
+                <span className="text-sm text-brand-description">Rating:</span>
                 <div className="flex items-center gap-1">
                   <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium text-brand-title">
                     {vendor.rating}
                   </span>
                 </div>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">Total Orders:</span>
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-sm text-brand-description">
+                  Total Orders:
+                </span>
+                <span className="text-sm font-medium text-brand-title">
                   {vendor.totalOrders}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">Total Spend:</span>
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-sm text-brand-description">
+                  Total Spend:
+                </span>
+                <span className="text-sm font-medium text-brand-title">
                   {formatCurrency(vendor.totalSpend)}
                 </span>
               </div>
@@ -190,40 +202,17 @@ export function VendorDetailsSheet({
 
             {/* Notes */}
             <div className="mt-6">
-              <span className="text-sm text-gray-500">Notes:</span>
+              <span className="text-sm text-brand-description">Notes:</span>
               {vendor.notes.length === 0 ? (
-                <div className="mt-8 flex flex-col items-center justify-center">
-                  <div className="rounded-full bg-indigo-50 p-4">
-                    <svg
-                      width="40"
-                      height="40"
-                      viewBox="0 0 40 40"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <circle
-                        cx="18"
-                        cy="18"
-                        r="10"
-                        stroke="#4338CA"
-                        strokeWidth="2"
-                        fill="none"
-                      />
-                      <path
-                        d="M26 26L32 32"
-                        stroke="#4338CA"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                      />
-                      <path
-                        d="M14 18h8M18 14v8"
-                        stroke="#6366F1"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </div>
-                  <p className="mt-3 text-sm text-gray-400">
+                <div className="mt-4 flex flex-col items-center justify-center">
+                  <Image
+                    src="/svgs/search_empty.svg"
+                    alt="No notes"
+                    width={100}
+                    height={50}
+                  />
+
+                  <p className="mt-3 text-sm text-brand-description">
                     No notes attached to this vendor yet
                   </p>
                 </div>
@@ -232,7 +221,7 @@ export function VendorDetailsSheet({
                   {vendor.notes.map((note, i) => (
                     <li
                       key={i}
-                      className="rounded-md bg-gray-50 p-3 text-sm text-gray-700"
+                      className="rounded-md bg-gray-50 p-3 text-sm text-brand-description"
                     >
                       {note}
                     </li>
@@ -242,7 +231,7 @@ export function VendorDetailsSheet({
             </div>
 
             <div className="mt-8">
-              <Button className="w-full bg-gray-900 hover:bg-gray-800">
+              <Button className="w-full bg-brand-primary hover:bg-brand-primary/90">
                 Add notes
               </Button>
             </div>
@@ -253,7 +242,7 @@ export function VendorDetailsSheet({
         {activeTab === "compliance" && (
           <div className="space-y-3">
             {vendor.documents.length === 0 ? (
-              <p className="py-12 text-center text-sm text-gray-400">
+              <p className="py-12 text-center text-sm text-brand-description">
                 No compliance documents uploaded
               </p>
             ) : (
@@ -264,7 +253,7 @@ export function VendorDetailsSheet({
                 >
                   <div className="h-14 w-14 shrink-0 overflow-hidden rounded-md bg-gray-100">
                     <Image
-                      src={doc.thumbnail || "/placeholder.svg"}
+                      src={doc.thumbnail || "/imgs/tin.jpg"}
                       alt={doc.name}
                       width={56}
                       height={56}
@@ -272,10 +261,10 @@ export function VendorDetailsSheet({
                     />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-semibold text-gray-900">
+                    <p className="text-sm font-semibold text-brand-title">
                       {doc.name}
                     </p>
-                    <p className="text-xs text-gray-500">{doc.type}</p>
+                    <p className="text-xs text-brand-description">{doc.type}</p>
                   </div>
                   <DocStatusBadge status={doc.status} />
                 </div>
