@@ -10,12 +10,13 @@ import { VendorDetailsSheet } from "./_components/vendor-details-sheet";
 import { AddVendorDialog } from "./_components/add-vendor-dialog";
 import { mockVendors } from "@/lib/mock/vendors";
 import type { Vendor } from "@/types/vendor";
+import Image from "next/image";
 
 type VendorFilter = "all" | "active" | "inactive";
 
 export default function VendorsPage() {
   // Toggle to `true` to preview the empty state
-  const [isEmpty] = useState(false);
+  const [isEmpty] = useState(true);
 
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -53,14 +54,14 @@ export default function VendorsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Vendors</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-brand-title">Vendors</h1>
+          <p className="text-sm text-brand-description">
             Manage vendor relationships and compliance
           </p>
         </div>
         <Button
           onClick={() => setDialogOpen(true)}
-          className="bg-gray-900 hover:bg-gray-800"
+          className="bg-brand-primary"
         >
           <Plus className="mr-2 h-4 w-4" />
           Add vendor
@@ -75,41 +76,12 @@ export default function VendorsPage() {
             actionLabel="Add vendor"
             onAction={() => setDialogOpen(true)}
             image={
-              <svg
-                width="80"
-                height="80"
-                viewBox="0 0 80 80"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <rect
-                  x="15"
-                  y="25"
-                  width="50"
-                  height="35"
-                  rx="4"
-                  stroke="#4338CA"
-                  strokeWidth="2"
-                  fill="none"
-                />
-                <circle
-                  cx="25"
-                  cy="55"
-                  r="5"
-                  stroke="#4338CA"
-                  strokeWidth="2"
-                  fill="none"
-                />
-                <path
-                  d="M20 25 L40 10 L60 25"
-                  stroke="#4338CA"
-                  strokeWidth="2"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <ellipse cx="40" cy="65" rx="25" ry="3" fill="#E0E7FF" />
-              </svg>
+              <Image
+                src="/svgs/empty-inbox-with-shadow.svg"
+                alt="No vendors"
+                width={100}
+                height={100}
+              />
             }
           />
         </div>

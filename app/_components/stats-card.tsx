@@ -16,10 +16,10 @@ export function StatsCard({
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-5">
       <div className="flex items-center justify-between">
-        <span className="text-2xl font-bold text-gray-900">{value}</span>
+        <span className="text-2xl font-bold text-brand-primary">{value}</span>
         {Icon && <Icon className={`h-5 w-5 ${iconColor}`} />}
       </div>
-      <p className="mt-1 text-sm text-gray-500">{label}</p>
+      <p className="mt-1 text-sm text-brand-description">{label}</p>
     </div>
   );
 }
