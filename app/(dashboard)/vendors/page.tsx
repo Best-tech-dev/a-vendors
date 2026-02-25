@@ -16,7 +16,7 @@ type VendorFilter = "all" | "active" | "inactive";
 
 export default function VendorsPage() {
   // Toggle to `true` to preview the empty state
-  const [isEmpty] = useState(true);
+  const [isEmpty] = useState(false);
 
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -113,7 +113,7 @@ export default function VendorsPage() {
           </div>
 
           {/* Filter Tabs */}
-          <div className="flex gap-1 rounded-lg border border-gray-200 bg-white p-1 w-fit">
+          <div className="flex gap-1 rounded-lg border border-gray-200 bg-brand-primary p-1 w-fit">
             {filterTabs.map((tab) => (
               <button
                 key={tab.key}
@@ -121,7 +121,7 @@ export default function VendorsPage() {
                 className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
                   filter === tab.key
                     ? "border border-gray-300 bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-700"
+                    : "text-brand-border hover:text-brand-border/90"
                 }`}
               >
                 {tab.label}

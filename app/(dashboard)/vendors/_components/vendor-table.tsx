@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { MoreVertical } from "lucide-react";
+import { MoreVertical, BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Vendor, ComplianceStatus } from "@/types/vendor";
 
@@ -20,22 +20,22 @@ interface VendorTableProps {
 function ComplianceBadge({ status }: { status: ComplianceStatus }) {
   const config: Record<
     ComplianceStatus,
-    { bg: string; text: string; dotColor: string }
+    { bg: string; text: string; iconColor: string }
   > = {
     Compliant: {
       bg: "bg-green-50 border border-green-200",
       text: "text-green-700",
-      dotColor: "bg-green-500",
+      iconColor: "text-green-500",
     },
     "Non-Compliant": {
       bg: "bg-red-50 border border-red-200",
       text: "text-red-700",
-      dotColor: "bg-red-500",
+      iconColor: "text-red-500",
     },
     Warning: {
       bg: "bg-yellow-50 border border-yellow-200",
       text: "text-yellow-700",
-      dotColor: "bg-yellow-500",
+      iconColor: "text-yellow-500",
     },
   };
 
@@ -45,7 +45,7 @@ function ComplianceBadge({ status }: { status: ComplianceStatus }) {
     <span
       className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${c.bg} ${c.text}`}
     >
-      <span className={`h-1.5 w-1.5 rounded-full ${c.dotColor}`} />
+      <BadgeCheck className={`h-3.5 w-3.5 ${c.iconColor}`} />
       {status}
     </span>
   );
@@ -55,7 +55,7 @@ export function VendorTable({ vendors, onSelectVendor }: VendorTableProps) {
   return (
     <Table>
       <TableHeader>
-        <TableRow className="border-gray-200">
+        <TableRow className="border-gray-200 bg-[#FAFBFC]">
           <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
             Vendor Name
           </TableHead>
@@ -80,7 +80,7 @@ export function VendorTable({ vendors, onSelectVendor }: VendorTableProps) {
         {vendors.map((vendor) => (
           <TableRow
             key={vendor.id}
-            className="cursor-pointer border-gray-100 hover:bg-gray-50"
+            className="cursor-pointer border-gray-100"
             onClick={() => onSelectVendor(vendor)}
           >
             <TableCell className="font-medium text-gray-900">
