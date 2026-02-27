@@ -33,7 +33,7 @@ export function InventoryTable({
     <div>
       <Table>
         <TableHeader>
-          <TableRow className="border-gray-200">
+          <TableRow className="border-gray-200 bg-[#FAFBFC]">
             <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
               Name
             </TableHead>
