@@ -40,35 +40,43 @@ export function AddCategoryDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="items-center text-center">
-          <DialogTitle className="text-lg font-semibold">
+          <DialogTitle className="text-lg font-semibold text-[#0F172A]">
             Add Category
           </DialogTitle>
-          <DialogDescription className="text-sm text-gray-500">
+          <DialogDescription className="text-sm text-brand-description">
             Create a new material category for your inventory
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-5 pt-2">
           <div className="space-y-2">
-            <Label htmlFor="cat-name" className="text-sm font-medium">
+            <Label
+              htmlFor="cat-name"
+              className="text-sm text-brand-description font-medium"
+            >
               Category Name
             </Label>
             <Input
               id="cat-name"
               placeholder="e.g., Raw materials"
               value={name}
+              className="placeholder:text-[#94A3B8]"
               onChange={(e) => setName(e.target.value)}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="cat-desc" className="text-sm font-medium">
+            <Label
+              htmlFor="cat-desc"
+              className="text-sm text-brand-description font-medium"
+            >
               Description
             </Label>
             <Textarea
               id="cat-desc"
               placeholder="Brief description of this category..."
               value={description}
+              className="placeholder:text-[#94A3B8]"
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
             />

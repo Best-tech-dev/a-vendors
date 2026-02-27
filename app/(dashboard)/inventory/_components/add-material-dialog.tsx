@@ -113,10 +113,10 @@ export function AddMaterialDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader className="items-center text-center">
-          <DialogTitle className="text-lg font-semibold">
+          <DialogTitle className="text-lg font-semibold text-[#0F172A]">
             Add material
           </DialogTitle>
-          <DialogDescription className="text-sm text-gray-500">
+          <DialogDescription className="text-sm text-brand-description">
             Add a new material to your inventory
           </DialogDescription>
         </DialogHeader>
@@ -124,12 +124,16 @@ export function AddMaterialDialog({
         <div className="space-y-5 pt-2">
           {/* Name */}
           <div className="space-y-2">
-            <Label htmlFor="mat-name" className="text-sm font-medium">
+            <Label
+              htmlFor="mat-name"
+              className="text-sm text-brand-description font-medium"
+            >
               Name
             </Label>
             <Input
               id="mat-name"
               placeholder="e.g., A4 paper"
+              className="placeholder:text-[#94A3B8]"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -138,7 +142,9 @@ export function AddMaterialDialog({
           {/* Category + Unit */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Category</Label>
+              <Label className="text-sm text-brand-description font-medium">
+                Category
+              </Label>
               <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
@@ -153,7 +159,9 @@ export function AddMaterialDialog({
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Unit of measure</Label>
+              <Label className="text-sm text-brand-description font-medium">
+                Unit of measure
+              </Label>
               <Select value={unit} onValueChange={setUnit}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select unit" />
@@ -171,12 +179,16 @@ export function AddMaterialDialog({
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="mat-desc" className="text-sm font-medium">
+            <Label
+              htmlFor="mat-desc"
+              className="text-sm text-brand-description font-medium"
+            >
               Description
             </Label>
             <Textarea
               id="mat-desc"
               placeholder="Brief description of this material..."
+              className="placeholder:text-[#94A3B8]"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
@@ -186,7 +198,10 @@ export function AddMaterialDialog({
           {/* Stock / Reorder / Price */}
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="mat-stock" className="text-sm font-medium">
+              <Label
+                htmlFor="mat-stock"
+                className="text-sm text-brand-description font-medium"
+              >
                 Stock
               </Label>
               <Input
@@ -194,12 +209,16 @@ export function AddMaterialDialog({
                 type="number"
                 min={0}
                 placeholder="0"
+                className="placeholder:text-[#94A3B8]"
                 value={stock}
                 onChange={(e) => setStock(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="mat-reorder" className="text-sm font-medium">
+              <Label
+                htmlFor="mat-reorder"
+                className="text-sm text-brand-description font-medium"
+              >
                 Reorder level
               </Label>
               <Input
@@ -207,17 +226,22 @@ export function AddMaterialDialog({
                 type="number"
                 min={0}
                 placeholder="10"
+                className="placeholder:text-[#94A3B8]"
                 value={reorderLevel}
                 onChange={(e) => setReorderLevel(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="mat-price" className="text-sm font-medium">
+              <Label
+                htmlFor="mat-price"
+                className="text-sm text-brand-description font-medium"
+              >
                 Price per unit
               </Label>
               <Input
                 id="mat-price"
                 placeholder="NGN 0.00"
+                className="placeholder:text-[#94A3B8]"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
               />
@@ -226,7 +250,9 @@ export function AddMaterialDialog({
 
           {/* File Upload Dropzone */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Attach image</Label>
+            <Label className="text-sm text-brand-description font-medium">
+              Attach image
+            </Label>
             {file ? (
               <div className="relative flex items-center gap-3 rounded-lg border border-gray-200 p-3">
                 {preview ? (
@@ -265,9 +291,8 @@ export function AddMaterialDialog({
                     : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
                 }`}
               >
-                <div className="rounded-full bg-gray-100 p-3">
-                  <Upload className="h-5 w-5 text-gray-500" />
-                </div>
+                <Upload className="h-5 w-5 text-[#1B2232]" />
+
                 <p className="mt-3 text-sm text-gray-600">
                   <span className="font-semibold text-gray-900">
                     Click to upload
