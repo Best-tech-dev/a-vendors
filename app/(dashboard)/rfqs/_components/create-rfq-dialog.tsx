@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Image from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +20,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Star, Trash2, Users } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon, Search, Star, Trash2 } from "lucide-react";
 import { selectableVendors } from "@/lib/mock/rfqs";
 import { mockCategories, mockUnits } from "@/lib/mock/inventory";
 
@@ -41,7 +48,8 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
 
   // Step 1 state
   const [title, setTitle] = useState("");
-  const [dueDate, setDueDate] = useState("");
+  const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
+  const [dueDateOpen, setDueDateOpen] = useState(false);
   const [currentMaterial, setCurrentMaterial] = useState("");
   const [currentQuantity, setCurrentQuantity] = useState("");
   const [currentUnit, setCurrentUnit] = useState("");
@@ -57,7 +65,8 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
 
   const canAddItem =
     currentMaterial && currentQuantity && currentUnit && currentBudget;
-  const canContinue = title.trim() && dueDate && items.length > 0;
+  const canContinue =
+    title.trim() && dueDate && (items.length > 0 || canAddItem);
   const canSendRequest = selectedVendorIds.size > 0 || sendToAll;
 
   const filteredVendors = useMemo(() => {
@@ -122,7 +131,8 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
   const resetForm = () => {
     setStep(1);
     setTitle("");
-    setDueDate("");
+    setDueDate(undefined);
+    setDueDateOpen(false);
     setCurrentMaterial("");
     setCurrentQuantity("");
     setCurrentUnit("");
@@ -154,7 +164,7 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
         onOpenChange(value);
       }}
     >
-      <DialogContent className="sm:max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
+      <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col overflow-visible">
         <DialogHeader>
           <DialogTitle className="text-center text-lg font-semibold">
             {step === 1 ? "Request a Quote" : "Select Vendors to Quote"}
@@ -166,19 +176,11 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
           </DialogDescription>
         </DialogHeader>
 
-        {/* Step indicator */}
-        <div className="flex items-center justify-center gap-2 py-1">
-          <div
-            className={`h-2 w-16 rounded-full ${step >= 1 ? "bg-gray-900" : "bg-gray-200"}`}
-          />
-          <div
-            className={`h-2 w-16 rounded-full ${step >= 2 ? "bg-gray-900" : "bg-gray-200"}`}
-          />
-        </div>
+        {/* Step indicator removed */}
 
         {/* ── STEP 1 ── */}
         {step === 1 && (
-          <div className="flex-1 overflow-y-auto space-y-5 min-h-0 pr-1">
+          <div className="flex-1 overflow-y-auto space-y-5 min-h-0 px-1">
             {/* RFQ Title */}
             <div className="space-y-2">
               <Label className="text-sm font-semibold text-gray-700">
@@ -196,12 +198,38 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
               <Label className="text-sm font-semibold text-gray-700">
                 Due date
               </Label>
-              <Input
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-                className="text-gray-600"
-              />
+              <Popover open={dueDateOpen} onOpenChange={setDueDateOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start font-normal text-gray-600"
+                  >
+                    <CalendarIcon className="mr-2 size-4 text-gray-400" />
+                    {dueDate
+                      ? dueDate.toLocaleDateString("en-US", {
+                          day: "2-digit",
+                          month: "long",
+                          year: "numeric",
+                        })
+                      : "Select date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-auto overflow-hidden p-0"
+                  align="start"
+                >
+                  <Calendar
+                    mode="single"
+                    selected={dueDate}
+                    defaultMonth={dueDate}
+                    captionLayout="dropdown"
+                    onSelect={(date) => {
+                      setDueDate(date);
+                      setDueDateOpen(false);
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
 
             {/* Items Required */}
@@ -219,7 +247,7 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
                 </Button>
               </div>
 
-              <div className="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
+              <div className="space-y-3">
                 {/* Material */}
                 <div className="space-y-1.5">
                   <Label className="text-xs font-semibold text-gray-600">
@@ -332,7 +360,13 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
               <Button variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button onClick={() => setStep(2)} disabled={!canContinue}>
+              <Button
+                onClick={() => {
+                  if (canAddItem) handleAddItem();
+                  setStep(2);
+                }}
+                disabled={!canContinue}
+              >
                 Continue
               </Button>
             </div>
@@ -341,7 +375,7 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
 
         {/* ── STEP 2 ── */}
         {step === 2 && (
-          <div className="flex-1 overflow-y-auto min-h-0 flex flex-col gap-4 pr-1">
+          <div className="flex-1 overflow-y-auto min-h-0 flex flex-col gap-4 px-1 pt-1">
             {/* Search */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
@@ -380,10 +414,14 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
                   {selectedVendorsList.map((vendor) => (
                     <div
                       key={vendor.id}
-                      className="flex items-center gap-3 rounded-lg p-3 bg-gray-50 border border-gray-100"
+                      className="flex items-center gap-3 rounded-lg p-3 bg-gray-50 border border-gray-100 cursor-pointer"
+                      onClick={() => {
+                        if (!sendToAll) toggleVendor(vendor.id);
+                      }}
                     >
                       <Checkbox
                         checked
+                        onClick={(e) => e.stopPropagation()}
                         onCheckedChange={() => {
                           if (!sendToAll) toggleVendor(vendor.id);
                         }}
@@ -423,6 +461,7 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
                     >
                       <Checkbox
                         checked={false}
+                        onClick={(e) => e.stopPropagation()}
                         onCheckedChange={() => toggleVendor(vendor.id)}
                       />
                       <div className="flex-1 min-w-0">
@@ -449,9 +488,13 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
             {selectedVendorsList.length === 0 &&
               unselectedVendorsList.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-12">
-                  <div className="rounded-full bg-gray-100 p-4 mb-3">
-                    <Users className="size-8 text-gray-400" />
-                  </div>
+                  <Image
+                    src="/svgs/search_empty.svg"
+                    alt="No results"
+                    width={60}
+                    height={60}
+                    className="mb-3"
+                  />
                   <p className="text-sm text-gray-500">
                     No vendors match your search
                   </p>

@@ -47,7 +47,10 @@ export default function RFQsPage() {
             Request quotes and compare vendor pricing
           </p>
         </div>
-        <Button onClick={() => setDialogOpen(true)}>
+        <Button
+          onClick={() => setDialogOpen(true)}
+          className="bg-[#1B2232] hover:bg-[#0F172A] text-white border-0"
+        >
           <Plus className="mr-2 h-4 w-4" />
           Request a Quote
         </Button>
