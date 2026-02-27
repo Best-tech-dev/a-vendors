@@ -5,6 +5,7 @@ import { Plus, Users, ClipboardList, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatsCard } from "@/app/_components/stats-card";
 import { EmptyState } from "@/app/_components/empty-state";
+import Image from "next/image";
 import { RFQListTable } from "./_components/rfq-list-table";
 import { CreateRFQDialog } from "./_components/create-rfq-dialog";
 import { mockRFQs, rfqStats } from "@/lib/mock/rfqs";
@@ -60,56 +61,12 @@ export default function RFQsPage() {
             actionLabel="Request a Quote"
             onAction={() => setDialogOpen(true)}
             image={
-              <svg
-                width="80"
-                height="80"
-                viewBox="0 0 80 80"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <rect
-                  x="18"
-                  y="12"
-                  width="44"
-                  height="52"
-                  rx="4"
-                  stroke="#4338CA"
-                  strokeWidth="2"
-                  fill="none"
-                />
-                <path
-                  d="M28 28h24"
-                  stroke="#4338CA"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M28 38h24"
-                  stroke="#4338CA"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M28 48h16"
-                  stroke="#4338CA"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-                <circle
-                  cx="56"
-                  cy="56"
-                  r="12"
-                  fill="#E0E7FF"
-                  stroke="#4338CA"
-                  strokeWidth="2"
-                />
-                <path
-                  d="M52 56h8M56 52v8"
-                  stroke="#4338CA"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
+              <Image
+                src="/svgs/empty-inbox-with-shadow.svg"
+                alt="No RFQs"
+                width={100}
+                height={100}
+              />
             }
           />
         </div>

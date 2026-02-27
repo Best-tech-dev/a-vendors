@@ -65,7 +65,7 @@ export function InventoryTable({
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md bg-gray-100">
                       <Image
-                        src={material.thumbnail || "/placeholder.svg"}
+                        src={material.thumbnail || "/imgs/tin.jpg"}
                         alt={material.name}
                         width={40}
                         height={40}

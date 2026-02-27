@@ -10,7 +10,7 @@ export const mockMaterials: Material[] = [
     reorderLevel: 50,
     unitPrice: 4200,
     description: "Standard A4 80gsm printing paper",
-    thumbnail: "/placeholder.svg",
+    thumbnail: "/imgs/tin.jpg",
   },
   {
     id: "m2",
@@ -21,7 +21,7 @@ export const mockMaterials: Material[] = [
     reorderLevel: 50,
     unitPrice: 850,
     description: "Large corrugated cardboard shipping boxes",
-    thumbnail: "/placeholder.svg",
+    thumbnail: "/imgs/tin.jpg",
   },
   {
     id: "m3",
@@ -32,7 +32,7 @@ export const mockMaterials: Material[] = [
     reorderLevel: 20,
     unitPrice: 12500,
     description: "High-grade industrial lubricant for machinery",
-    thumbnail: "/placeholder.svg",
+    thumbnail: "/imgs/tin.jpg",
   },
   {
     id: "m4",
@@ -43,7 +43,7 @@ export const mockMaterials: Material[] = [
     reorderLevel: 30,
     unitPrice: 2200,
     description: "Braided USB-C to USB-C cables, 2 meter",
-    thumbnail: "/placeholder.svg",
+    thumbnail: "/imgs/tin.jpg",
   },
   {
     id: "m5",
@@ -54,7 +54,7 @@ export const mockMaterials: Material[] = [
     reorderLevel: 15,
     unitPrice: 6800,
     description: "Standard bubble wrap rolls for fragile item packaging",
-    thumbnail: "/placeholder.svg",
+    thumbnail: "/imgs/tin.jpg",
   },
   {
     id: "m6",
@@ -65,7 +65,7 @@ export const mockMaterials: Material[] = [
     reorderLevel: 20,
     unitPrice: 1500,
     description: "Box of 50 blue ballpoint pens",
-    thumbnail: "/placeholder.svg",
+    thumbnail: "/imgs/tin.jpg",
   },
   {
     id: "m7",
@@ -76,7 +76,7 @@ export const mockMaterials: Material[] = [
     reorderLevel: 100,
     unitPrice: 980,
     description: "6mm diameter steel reinforcement rods",
-    thumbnail: "/placeholder.svg",
+    thumbnail: "/imgs/tin.jpg",
   },
   {
     id: "m8",
@@ -87,7 +87,7 @@ export const mockMaterials: Material[] = [
     reorderLevel: 25,
     unitPrice: 3500,
     description: "High-speed HDMI 2.0 cables, 1.5 meter",
-    thumbnail: "/placeholder.svg",
+    thumbnail: "/imgs/tin.jpg",
   },
 ];
 

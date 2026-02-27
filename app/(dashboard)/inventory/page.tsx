@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatsCard } from "@/app/_components/stats-card";
 import { EmptyState } from "@/app/_components/empty-state";
+import Image from "next/image";
 import { InventoryTable } from "./_components/inventory-table";
 import { AddCategoryDialog } from "./_components/add-category-dialog";
 import { AddMaterialDialog } from "./_components/add-material-dialog";
@@ -77,40 +78,12 @@ export default function InventoryPage() {
             actionLabel="Add material"
             onAction={() => setMaterialDialogOpen(true)}
             image={
-              <svg
-                width="80"
-                height="80"
-                viewBox="0 0 80 80"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <rect
-                  x="15"
-                  y="20"
-                  width="50"
-                  height="40"
-                  rx="4"
-                  stroke="#4338CA"
-                  strokeWidth="2"
-                  fill="none"
-                />
-                <path d="M15 30h50" stroke="#4338CA" strokeWidth="2" />
-                <circle
-                  cx="30"
-                  cy="50"
-                  r="6"
-                  stroke="#4338CA"
-                  strokeWidth="2"
-                  fill="none"
-                />
-                <path
-                  d="M30 47v6M27 50h6"
-                  stroke="#4338CA"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-                <ellipse cx="40" cy="67" rx="25" ry="3" fill="#E0E7FF" />
-              </svg>
+              <Image
+                src="/svgs/empty-inbox-with-shadow.svg"
+                alt="No materials"
+                width={100}
+                height={100}
+              />
             }
           />
         </div>
