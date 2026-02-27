@@ -1,4 +1,4 @@
-import { Vendor } from "@/types/vendor";
+import { TopVendor } from "@/types/vendor";
 
 export const stats = [
   { label: "Total Vendors", value: 5 },
@@ -44,7 +44,7 @@ const locations = [
 
 // Generates a realistic-feeling list of vendors. Uses non-cryptographic randomness
 // so the data looks dynamic but keeps the Vendor shape expected by the UI.
-export function getTopVendors(count = 8): Vendor[] {
+export function getTopVendors(count = 8): TopVendor[] {
   return Array.from({ length: count }).map((_, i) => {
     const company = sampleCompanies[i % sampleCompanies.length];
     const industry = industries[i % industries.length];
@@ -58,6 +58,6 @@ export function getTopVendors(count = 8): Vendor[] {
       industry,
       rating,
       location,
-    } as Vendor;
+    };
   });
 }

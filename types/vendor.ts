@@ -16,6 +16,15 @@ export interface VendorBankDetails {
   accountName: string;
 }
 
+export interface TopVendor {
+  id: number;
+  name: string;
+  status: VendorStatus;
+  industry: string;
+  rating: number;
+  location: string;
+}
+
 export interface Vendor {
   id: string;
   name: string;

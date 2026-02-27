@@ -1,10 +1,10 @@
 import { Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Vendor } from "@/types/vendor";
+import { TopVendor } from "@/types/vendor";
 
 interface VendorCardProps {
-  vendor: Vendor;
+  vendor: TopVendor;
 }
 
 export function VendorCard({ vendor }: VendorCardProps) {

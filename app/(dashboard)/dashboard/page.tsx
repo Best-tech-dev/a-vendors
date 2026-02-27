@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { VendorCard } from "@/components/dashboard/vendor-card";
-import { Vendor } from "@/types/vendor";
+import { TopVendor } from "@/types/vendor";
 import {
   stats,
   quickActions,
@@ -12,7 +12,7 @@ import {
 
 // ─── Mock Data (moved to components/dashboard/mock-data/top-vendors.ts) ───
 
-const topVendors: Vendor[] = getTopVendors(6);
+const topVendors: TopVendor[] = getTopVendors(6);
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
