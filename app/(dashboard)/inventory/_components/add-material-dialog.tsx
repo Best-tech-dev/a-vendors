@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Upload, X } from "lucide-react";
 import Image from "next/image";
+import { toast } from "sonner";
 import { mockCategories, mockUnits } from "@/lib/mock/inventory";
 
 interface AddMaterialDialogProps {
@@ -49,7 +50,18 @@ export function AddMaterialDialog({
   const handleFile = (f: File) => {
     const maxSize = 10 * 1024 * 1024;
     const allowedTypes = ["image/png", "image/jpeg", "application/pdf"];
-    if (!allowedTypes.includes(f.type) || f.size > maxSize) return;
+    if (!allowedTypes.includes(f.type)) {
+      toast.error("Unsupported file type", {
+        description: "Only PNG, JPG, and PDF files are allowed.",
+      });
+      return;
+    }
+    if (f.size > maxSize) {
+      toast.error("File too large", {
+        description: `"${f.name}" exceeds the 10 MB limit. Please upload a smaller file.`,
+      });
+      return;
+    }
     setFile(f);
     if (f.type.startsWith("image/")) {
       const reader = new FileReader();
