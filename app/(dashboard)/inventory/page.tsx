@@ -1,13 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Plus,
-  Package,
-  TrendingDown,
-  PackageX,
-  DollarSign,
-} from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatsCard } from "@/app/_components/stats-card";
 import { EmptyState } from "@/app/_components/empty-state";
@@ -51,19 +45,23 @@ export default function InventoryPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Inventory</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-[#0F172A]">Inventory</h1>
+          <p className="text-sm text-brand-description">
             Manage materials and stock levels
           </p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" onClick={() => setCategoryDialogOpen(true)}>
+          <Button
+            className="bg-[#F6F6F8] hover:bg-[#EDEDEE] border-0 text-[#1B2232]"
+            variant="outline"
+            onClick={() => setCategoryDialogOpen(true)}
+          >
             <Plus className="mr-2 h-4 w-4" />
             Add category
           </Button>
           <Button
             onClick={() => setMaterialDialogOpen(true)}
-            className="bg-gray-900 hover:bg-gray-800"
+            className="bg-[#1B2232] hover:bg-[#0F172A] text-white border-0"
           >
             <Plus className="mr-2 h-4 w-4" />
             Add material
@@ -120,28 +118,13 @@ export default function InventoryPage() {
         <>
           {/* Stats */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatsCard
-              value={totalMaterials}
-              label="Total Materials"
-              icon={Package}
-            />
+            <StatsCard value={totalMaterials} label="Total Materials" />
             <StatsCard
               value={formatCurrency(inventoryValue)}
               label="Inventory Value"
-              icon={DollarSign}
             />
-            <StatsCard
-              value={lowStock}
-              label="Low Stock"
-              icon={TrendingDown}
-              iconColor="text-yellow-500"
-            />
-            <StatsCard
-              value={outOfStock}
-              label="Out of Stock"
-              icon={PackageX}
-              iconColor="text-red-500"
-            />
+            <StatsCard value={lowStock} label="Low Stock" />
+            <StatsCard value={outOfStock} label="Out of Stock" />
           </div>
 
           {/* Table */}
