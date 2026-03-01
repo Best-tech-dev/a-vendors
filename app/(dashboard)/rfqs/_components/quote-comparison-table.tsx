@@ -22,8 +22,8 @@ function TagBadge({ tag }: { tag: VendorTag }) {
     { bg: string; text: string; icon?: React.ReactNode }
   > = {
     "Best price": {
-      bg: "bg-green-50 border border-green-200",
-      text: "text-green-700",
+      bg: "bg-[#F0F8F5] border border-[#008753]/20",
+      text: "text-[#008753]",
       icon: <Check className="size-3" />,
     },
     Competitive: {
@@ -60,7 +60,7 @@ export function QuoteComparisonTable({ quotes }: QuoteComparisonTableProps) {
   return (
     <Table>
       <TableHeader>
-        <TableRow className="border-gray-200">
+        <TableRow className="border-gray-200 bg-[#FAFBFC]">
           <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
             Vendor
           </TableHead>

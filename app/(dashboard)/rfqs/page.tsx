@@ -97,7 +97,7 @@ export default function RFQsPage() {
           </div>
 
           {/* Filter tabs */}
-          <div className="flex gap-1 rounded-lg border border-gray-200 bg-white p-1 w-fit overflow-x-auto">
+          <div className="flex gap-1 rounded-lg border border-gray-200 bg-brand-primary p-1 w-fit overflow-x-auto">
             {filterTabs.map((tab) => (
               <button
                 key={tab.key}
@@ -108,7 +108,7 @@ export default function RFQsPage() {
                 className={`rounded-md px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
                   filter === tab.key
                     ? "border border-gray-300 bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-700"
+                    : "text-brand-border hover:text-brand-border/90"
                 }`}
               >
                 {tab.label}{" "}

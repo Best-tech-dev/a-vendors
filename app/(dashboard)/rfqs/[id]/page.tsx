@@ -47,15 +47,15 @@ export default function RFQDetailsPage() {
       </div>
 
       {/* Item Tabs */}
-      <div className="flex gap-1 rounded-lg border border-gray-200 bg-white p-1 w-fit overflow-x-auto max-w-full">
+      <div className="flex gap-1 rounded-lg border border-gray-200 bg-brand-primary p-1 w-fit overflow-x-auto max-w-full">
         {detail.items.map((item, index) => (
           <button
             key={item.itemName}
             onClick={() => setActiveItemIndex(index)}
             className={`rounded-md px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
               activeItemIndex === index
-                ? "bg-gray-900 text-white"
-                : "text-gray-500 hover:text-gray-700"
+                ? "border border-gray-300 bg-white text-gray-900 shadow-sm"
+                : "text-brand-border hover:text-brand-border/90"
             }`}
           >
             {item.itemName}

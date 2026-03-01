@@ -23,8 +23,8 @@ interface RFQListTableProps {
 function StatusBadge({ status }: { status: RFQStatus }) {
   const config: Record<RFQStatus, { bg: string; text: string }> = {
     Awarded: {
-      bg: "bg-green-50 border border-green-200",
-      text: "text-green-700",
+      bg: "bg-[#F0F8F5] border border-[#008753]/20",
+      text: "text-[#008753]",
     },
     Draft: {
       bg: "bg-gray-100 border border-gray-200",
@@ -67,7 +67,7 @@ export function RFQListTable({
     <div>
       <Table>
         <TableHeader>
-          <TableRow className="border-gray-200">
+          <TableRow className="border-gray-200 bg-[#FAFBFC]">
             <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
               RFQ ID
             </TableHead>
