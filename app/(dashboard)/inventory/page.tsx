@@ -44,16 +44,16 @@ export default function InventoryPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#0F172A]">Inventory</h1>
+          <h1 className="text-2xl font-bold text-brand-title">Inventory</h1>
           <p className="text-sm text-brand-description">
             Manage materials and stock levels
           </p>
         </div>
         <div className="flex gap-3">
           <Button
-            className="bg-[#F6F6F8] hover:bg-[#EDEDEE] border-0 text-[#1B2232]"
+            className="bg-[#F6F6F8] hover:bg-[#EDEDEE] border-0 text-brand-title"
             variant="outline"
             onClick={() => setCategoryDialogOpen(true)}
           >
@@ -62,7 +62,7 @@ export default function InventoryPage() {
           </Button>
           <Button
             onClick={() => setMaterialDialogOpen(true)}
-            className="bg-[#1B2232] hover:bg-[#0F172A] text-white border-0"
+            className="bg-brand-primary hover:bg-brand-primary/90 text-white border-0"
           >
             <Plus className="mr-2 h-4 w-4" />
             Add material

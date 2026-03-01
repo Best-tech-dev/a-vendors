@@ -84,15 +84,15 @@ export function VendorDetailsSheet({
         </SheetHeader>
 
         {/* Tab Switcher */}
-        <div className="mb-6 flex rounded-lg bg-gray-900 p-1">
+        <div className="mb-6 flex rounded-lg bg-brand-primary p-1">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                 activeTab === tab.key
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-300 hover:text-white"
+                  ? "bg-white text-brand-title shadow-sm"
+                  : "text-brand-border hover:text-white"
               }`}
             >
               {tab.label}
@@ -105,32 +105,32 @@ export function VendorDetailsSheet({
           <div className="space-y-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">Joined:</span>
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-sm text-brand-description">Joined:</span>
+                <span className="text-sm font-medium text-brand-title">
                   {vendor.joinedDate}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">Email:</span>
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-sm text-brand-description">Email:</span>
+                <span className="text-sm font-medium text-brand-title">
                   {vendor.email}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">Phone:</span>
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-sm text-brand-description">Phone:</span>
+                <span className="text-sm font-medium text-brand-title">
                   {vendor.phone}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">City:</span>
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-sm text-brand-description">City:</span>
+                <span className="text-sm font-medium text-brand-title">
                   {vendor.city}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">Country:</span>
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-sm text-brand-description">Country:</span>
+                <span className="text-sm font-medium text-brand-title">
                   {vendor.country}
                 </span>
               </div>

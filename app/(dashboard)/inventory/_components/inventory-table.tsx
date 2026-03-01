@@ -34,22 +34,22 @@ export function InventoryTable({
       <Table>
         <TableHeader>
           <TableRow className="border-gray-200 bg-[#FAFBFC]">
-            <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
               Name
             </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
               Category
             </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
               Unit
             </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
               Stock
             </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
               Reorder Level
             </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
               Unit Price
             </TableHead>
           </TableRow>
@@ -72,19 +72,21 @@ export function InventoryTable({
                         className="h-full w-full object-cover"
                       />
                     </div>
-                    <span className="font-medium text-gray-900">
+                    <span className="font-medium text-brand-title">
                       {material.name}
                     </span>
                   </div>
                 </TableCell>
-                <TableCell className="text-gray-600">
+                <TableCell className="text-brand-description">
                   {material.category}
                 </TableCell>
-                <TableCell className="text-gray-600">{material.unit}</TableCell>
+                <TableCell className="text-brand-description">
+                  {material.unit}
+                </TableCell>
                 <TableCell>
                   <span
                     className={
-                      isOut ? "font-medium text-red-600" : "text-gray-900"
+                      isOut ? "font-medium text-badge-red" : "text-brand-title"
                     }
                   >
                     {material.stock}
@@ -92,24 +94,24 @@ export function InventoryTable({
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-900">
+                    <span className="text-brand-title">
                       {material.reorderLevel}
                     </span>
                     {isLow && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-badge-red-accent px-2 py-0.5 text-xs font-medium text-badge-red">
                         <AlertTriangle className="h-3 w-3" />
                         Low
                       </span>
                     )}
                     {isOut && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-badge-red-accent px-2 py-0.5 text-xs font-medium text-badge-red">
                         <AlertTriangle className="h-3 w-3" />
                         Out
                       </span>
                     )}
                   </div>
                 </TableCell>
-                <TableCell className="font-medium text-gray-900">
+                <TableCell className="font-medium text-brand-title">
                   {formatPrice(material.unitPrice)}
                 </TableCell>
               </TableRow>
@@ -120,21 +122,21 @@ export function InventoryTable({
 
       {/* Pagination */}
       <div className="flex items-center justify-between border-t border-gray-200 px-6 py-4">
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-brand-description">
           Page {page} of {totalPages}
         </p>
         <div className="flex gap-2">
           <button
             onClick={() => onPageChange(page - 1)}
             disabled={page === 1}
-            className="rounded-md border border-gray-200 px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-md border border-gray-200 px-4 py-2 text-sm font-medium text-brand-description hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
           >
             Previous
           </button>
           <button
             onClick={() => onPageChange(page + 1)}
             disabled={page === totalPages}
-            className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-md bg-brand-primary px-4 py-2 text-sm font-medium text-white hover:bg-brand-primary/90 disabled:cursor-not-allowed disabled:opacity-40"
           >
             Next
           </button>

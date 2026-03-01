@@ -23,23 +23,23 @@ interface RFQListTableProps {
 function StatusBadge({ status }: { status: RFQStatus }) {
   const config: Record<RFQStatus, { bg: string; text: string }> = {
     Awarded: {
-      bg: "bg-[#F0F8F5] border border-[#008753]/20",
-      text: "text-[#008753]",
+      bg: "bg-badge-green-accent",
+      text: "text-badge-green",
     },
     Draft: {
-      bg: "bg-gray-100 border border-gray-200",
-      text: "text-gray-600",
+      bg: "bg-gray-100",
+      text: "text-brand-description",
     },
     Sent: {
-      bg: "bg-blue-50 border border-blue-200",
+      bg: "bg-blue-50",
       text: "text-blue-700",
     },
     "Awaiting Quotes": {
-      bg: "bg-yellow-50 border border-yellow-200",
-      text: "text-yellow-700",
+      bg: "bg-badge-yellow-accent",
+      text: "text-badge-yellow",
     },
     "Awaiting Selection": {
-      bg: "bg-purple-50 border border-purple-200",
+      bg: "bg-purple-50",
       text: "text-purple-700",
     },
   };
@@ -68,19 +68,19 @@ export function RFQListTable({
       <Table>
         <TableHeader>
           <TableRow className="border-gray-200 bg-[#FAFBFC]">
-            <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
               RFQ ID
             </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
               Title
             </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
               Deadline
             </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
               Status
             </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500 text-right">
+            <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted text-right">
               Action
             </TableHead>
           </TableRow>
@@ -92,11 +92,15 @@ export function RFQListTable({
               className="cursor-pointer border-gray-100 hover:bg-gray-50"
               onClick={() => router.push(`/rfqs/${rfq.id}`)}
             >
-              <TableCell className="font-medium text-gray-600">
+              <TableCell className="font-medium text-brand-description">
                 RFQ-2024-00{(page - 1) * 5 + index + 1}Q1
               </TableCell>
-              <TableCell className="text-gray-600">{rfq.title}</TableCell>
-              <TableCell className="text-gray-600">{rfq.deadline}</TableCell>
+              <TableCell className="text-brand-description">
+                {rfq.title}
+              </TableCell>
+              <TableCell className="text-brand-description">
+                {rfq.deadline}
+              </TableCell>
               <TableCell>
                 <StatusBadge status={rfq.status} />
               </TableCell>
@@ -107,7 +111,7 @@ export function RFQListTable({
                   className="h-8 w-8"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <MoreVertical className="h-4 w-4 text-gray-400" />
+                  <MoreVertical className="h-4 w-4 text-brand-muted" />
                 </Button>
               </TableCell>
             </TableRow>
@@ -117,7 +121,7 @@ export function RFQListTable({
 
       {/* Pagination */}
       <div className="flex items-center justify-between border-t border-gray-200 px-6 py-4">
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-brand-description">
           Page {page} of {totalPages}
         </p>
         <div className="flex gap-2">

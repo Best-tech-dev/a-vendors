@@ -23,19 +23,19 @@ function ComplianceBadge({ status }: { status: ComplianceStatus }) {
     { bg: string; text: string; iconColor: string }
   > = {
     Compliant: {
-      bg: "bg-green-50 border border-green-200",
-      text: "text-green-700",
-      iconColor: "text-green-500",
+      bg: "bg-badge-green-accent",
+      text: "text-badge-green",
+      iconColor: "text-badge-green",
     },
     "Non-Compliant": {
-      bg: "bg-red-50 border border-red-200",
-      text: "text-red-700",
-      iconColor: "text-red-500",
+      bg: "bg-badge-red-accent",
+      text: "text-badge-red",
+      iconColor: "text-badge-red",
     },
     Warning: {
-      bg: "bg-yellow-50 border border-yellow-200",
-      text: "text-yellow-700",
-      iconColor: "text-yellow-500",
+      bg: "bg-badge-yellow-accent",
+      text: "text-badge-yellow",
+      iconColor: "text-badge-yellow",
     },
   };
 
@@ -56,22 +56,22 @@ export function VendorTable({ vendors, onSelectVendor }: VendorTableProps) {
     <Table>
       <TableHeader>
         <TableRow className="border-gray-200 bg-[#FAFBFC]">
-          <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
             Vendor Name
           </TableHead>
-          <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
             Category
           </TableHead>
-          <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
             Email
           </TableHead>
-          <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
             Location
           </TableHead>
-          <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
             Compliance
           </TableHead>
-          <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
             Action
           </TableHead>
         </TableRow>
@@ -83,12 +83,16 @@ export function VendorTable({ vendors, onSelectVendor }: VendorTableProps) {
             className="cursor-pointer border-gray-100"
             onClick={() => onSelectVendor(vendor)}
           >
-            <TableCell className="font-medium text-gray-900">
+            <TableCell className="font-medium text-brand-title">
               {vendor.name}
             </TableCell>
-            <TableCell className="text-gray-600">{vendor.category}</TableCell>
-            <TableCell className="text-gray-600">{vendor.email}</TableCell>
-            <TableCell className="text-gray-600">
+            <TableCell className="text-brand-description">
+              {vendor.category}
+            </TableCell>
+            <TableCell className="text-brand-description">
+              {vendor.email}
+            </TableCell>
+            <TableCell className="text-brand-description">
               {vendor.city}, {vendor.country}
             </TableCell>
             <TableCell>
@@ -101,7 +105,7 @@ export function VendorTable({ vendors, onSelectVendor }: VendorTableProps) {
                 className="h-8 w-8"
                 onClick={(e) => e.stopPropagation()}
               >
-                <MoreVertical className="h-4 w-4 text-gray-400" />
+                <MoreVertical className="h-4 w-4 text-brand-muted" />
               </Button>
             </TableCell>
           </TableRow>

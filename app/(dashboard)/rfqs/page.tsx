@@ -38,18 +38,18 @@ export default function RFQsPage() {
   return (
     <div className="space-y-6">
       {/* Page header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-brand-title">
             Request for Quotes
           </h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <p className="text-sm text-brand-description mt-0.5">
             Request quotes and compare vendor pricing
           </p>
         </div>
         <Button
           onClick={() => setDialogOpen(true)}
-          className="bg-[#1B2232] hover:bg-[#0F172A] text-white border-0"
+          className="w-fit bg-brand-primary hover:bg-brand-primary/90 text-white border-0"
         >
           <Plus className="mr-2 h-4 w-4" />
           Request a Quote
@@ -97,7 +97,7 @@ export default function RFQsPage() {
           </div>
 
           {/* Filter tabs */}
-          <div className="flex gap-1 rounded-lg border border-gray-200 bg-brand-primary p-1 w-fit overflow-x-auto">
+          <div className="flex gap-1 rounded-lg border border-gray-200 bg-brand-primary p-1 w-fit overflow-x-auto max-w-full">
             {filterTabs.map((tab) => (
               <button
                 key={tab.key}

@@ -12,16 +12,16 @@ const variantStyles: Record<
   { wrapper: string; title: string }
 > = {
   success: {
-    wrapper: "border-green-200 bg-green-50",
-    title: "text-green-800",
+    wrapper: "border-badge-green/20 bg-badge-green-accent",
+    title: "text-badge-green",
   },
   neutral: {
     wrapper: "border-gray-200 bg-white",
-    title: "text-gray-900",
+    title: "text-brand-title",
   },
   danger: {
-    wrapper: "border-red-200 bg-red-50",
-    title: "text-red-800",
+    wrapper: "border-badge-red/20 bg-badge-red-accent",
+    title: "text-badge-red",
   },
 };
 
@@ -38,7 +38,7 @@ export function AnalysisCard({
       <h4 className={`text-sm font-bold ${styles.title}`}>
         {label}: {vendorName}
       </h4>
-      <p className="mt-1 text-sm text-gray-600">{description}</p>
+      <p className="mt-1 text-sm text-brand-description">{description}</p>
     </div>
   );
 }

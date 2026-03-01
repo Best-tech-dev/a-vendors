@@ -22,21 +22,21 @@ function TagBadge({ tag }: { tag: VendorTag }) {
     { bg: string; text: string; icon?: React.ReactNode }
   > = {
     "Best price": {
-      bg: "bg-[#F0F8F5] border border-[#008753]/20",
-      text: "text-[#008753]",
+      bg: "bg-badge-green-accent",
+      text: "text-badge-green",
       icon: <Check className="size-3" />,
     },
     Competitive: {
-      bg: "bg-gray-100 border border-gray-200",
-      text: "text-gray-600",
+      bg: "bg-gray-100",
+      text: "text-brand-description",
     },
     Review: {
-      bg: "bg-yellow-50 border border-yellow-200",
-      text: "text-yellow-700",
+      bg: "bg-badge-yellow-accent",
+      text: "text-badge-yellow",
     },
     "Above budget": {
-      bg: "bg-red-50 border border-red-200",
-      text: "text-red-700",
+      bg: "bg-badge-red-accent",
+      text: "text-badge-red",
     },
   };
 
@@ -61,25 +61,25 @@ export function QuoteComparisonTable({ quotes }: QuoteComparisonTableProps) {
     <Table>
       <TableHeader>
         <TableRow className="border-gray-200 bg-[#FAFBFC]">
-          <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
             Vendor
           </TableHead>
-          <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
             Unit Price
           </TableHead>
-          <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
             Total Price
           </TableHead>
-          <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
             Quality
           </TableHead>
-          <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
             Delivery
           </TableHead>
-          <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+          <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
             Deviation
           </TableHead>
-          <TableHead className="text-xs font-semibold uppercase tracking-wider text-gray-500 text-right">
+          <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted text-right">
             Action
           </TableHead>
         </TableRow>
@@ -90,19 +90,21 @@ export function QuoteComparisonTable({ quotes }: QuoteComparisonTableProps) {
           const deviationAbs = Math.abs(quote.deviation);
           const deviationFormatted = `${deviationAbs.toFixed(1)}%`;
           const priceColor =
-            quote.tag === "Above budget" ? "text-red-600" : "text-green-700";
+            quote.tag === "Above budget"
+              ? "text-badge-red"
+              : "text-badge-green";
 
           return (
             <TableRow key={quote.id} className="border-gray-100">
               <TableCell>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm font-medium text-brand-title">
                     {quote.vendorName}
                   </p>
                   <div className="mt-1 flex items-center gap-2">
                     <div className="flex items-center gap-1">
                       <Star className="size-3.5 fill-amber-400 text-amber-400" />
-                      <span className="text-xs font-medium text-gray-700">
+                      <span className="text-xs font-medium text-brand-title">
                         {quote.rating}
                       </span>
                     </div>
@@ -110,26 +112,28 @@ export function QuoteComparisonTable({ quotes }: QuoteComparisonTableProps) {
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="text-gray-600">
+              <TableCell className="text-brand-description">
                 {formatCurrency(quote.unitPrice)}
               </TableCell>
               <TableCell className={`font-semibold ${priceColor}`}>
                 {formatCurrency(quote.totalPrice)}
               </TableCell>
-              <TableCell className="text-gray-600">{quote.quality}%</TableCell>
-              <TableCell className="text-gray-600">
+              <TableCell className="text-brand-description">
+                {quote.quality}%
+              </TableCell>
+              <TableCell className="text-brand-description">
                 {quote.deliveryDays} days
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-brand-description">
                     ₦{(quote.unitPrice + 30).toLocaleString("en-NG")}
                   </span>
                   <span
                     className={`inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-medium ${
                       isNegativeDeviation
-                        ? "bg-green-50 text-green-600"
-                        : "bg-red-50 text-red-600"
+                        ? "bg-badge-green-accent text-badge-green"
+                        : "bg-badge-red-accent text-badge-red"
                     }`}
                   >
                     {isNegativeDeviation ? (

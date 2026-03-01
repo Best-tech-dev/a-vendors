@@ -24,24 +24,26 @@ export default function RFQDetailsPage() {
       {/* Back link */}
       <button
         onClick={() => router.push("/rfqs")}
-        className="inline-flex items-center gap-1 text-sm text-green-700 hover:text-green-900 font-medium"
+        className="inline-flex items-center gap-1 text-sm text-badge-green hover:text-badge-green/80 font-medium"
       >
         <ChevronLeft className="size-4" />
         Back to RFQs
       </button>
 
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-center gap-3 flex-wrap">
-          <h1 className="text-2xl font-bold text-gray-900">{detail.title}</h1>
+          <h1 className="text-2xl font-bold text-brand-title">
+            {detail.title}
+          </h1>
           <Badge
             variant="outline"
-            className="text-xs text-gray-500 border-gray-300"
+            className="text-xs text-brand-description border-0"
           >
             {detail.rfqId}
           </Badge>
         </div>
-        <span className="text-sm text-gray-500 shrink-0">
+        <span className="text-sm text-brand-description shrink-0">
           Items: {detail.totalItems}
         </span>
       </div>
@@ -65,36 +67,36 @@ export default function RFQDetailsPage() {
 
       {/* Summary Row */}
       <div className="rounded-lg border border-gray-200 bg-white">
-        <div className="grid grid-cols-2 gap-6 p-6 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 p-4 sm:gap-6 sm:p-6 sm:grid-cols-4">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-gray-400">
+            <p className="text-xs font-medium uppercase tracking-wider text-brand-muted">
               Quantity
             </p>
-            <p className="mt-1.5 text-xl font-bold text-gray-900">
+            <p className="mt-1.5 text-xl font-bold text-brand-title">
               {currentItem.quantity.toLocaleString()} {currentItem.unit}
             </p>
           </div>
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-gray-400">
+            <p className="text-xs font-medium uppercase tracking-wider text-brand-muted">
               Budget
             </p>
-            <p className="mt-1.5 text-xl font-bold text-gray-900">
+            <p className="mt-1.5 text-xl font-bold text-brand-title">
               {formatCurrency(currentItem.budget)}
             </p>
           </div>
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-gray-400">
+            <p className="text-xs font-medium uppercase tracking-wider text-brand-muted">
               Best price
             </p>
-            <p className="mt-1.5 text-xl font-bold text-gray-900">
+            <p className="mt-1.5 text-xl font-bold text-brand-title">
               {formatCurrency(currentItem.bestPrice)}
             </p>
           </div>
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-gray-400">
+            <p className="text-xs font-medium uppercase tracking-wider text-brand-muted">
               Average price
             </p>
-            <p className="mt-1.5 text-xl font-bold text-gray-900">
+            <p className="mt-1.5 text-xl font-bold text-brand-title">
               {formatCurrency(currentItem.averagePrice)}
             </p>
           </div>
@@ -108,7 +110,7 @@ export default function RFQDetailsPage() {
 
       {/* Analysis & Recommendations */}
       <div>
-        <h2 className="text-lg font-bold text-gray-900 mb-4">
+        <h2 className="text-lg font-bold text-brand-title mb-4">
           Analysis & Recommendations
         </h2>
         <div className="space-y-3">

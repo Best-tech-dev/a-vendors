@@ -35,6 +35,14 @@
   --color-brand-description: var(--brand-description);
   --color-brand-muted: var(--brand-muted);
 
+  /* Badge Status Colors */
+  --color-badge-green: var(--badge-green);
+  --color-badge-green-accent: var(--badge-green-accent);
+  --color-badge-red: var(--badge-red);
+  --color-badge-red-accent: var(--badge-red-accent);
+  --color-badge-yellow: var(--badge-yellow);
+  --color-badge-yellow-accent: var(--badge-yellow-accent);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -71,6 +79,12 @@
   --brand-description: #475569;
   --brand-muted: #94a3b8;
   --brand-disabled: #e9eef6;
+  --badge-green: #008753;
+  --badge-green-accent: #f0f8f5;
+  --badge-red: #991b1b;
+  --badge-red-accent: #fee2e2;
+  --badge-yellow: #92400e;
+  --badge-yellow-accent: #fee2e2;
 }
 
 .dark {
@@ -89,6 +103,12 @@
   --brand-description: #475569;
   --brand-muted: #94a3b8;
   --brand-disabled: #e9eef6;
+  --badge-green: #008753;
+  --badge-green-accent: #f0f8f5;
+  --badge-red: #991b1b;
+  --badge-red-accent: #fee2e2;
+  --badge-yellow: #92400e;
+  --badge-yellow-accent: #fee2e2;
 }
 
 @layer base {
