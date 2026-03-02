@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signInSchema, type SignInFormValues } from "@/lib/validations/auth";
@@ -17,6 +18,7 @@ import {
 } from "@/components/ui/form";
 
 export default function SignInPage() {
+  const router = useRouter();
   const form = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -30,6 +32,7 @@ export default function SignInPage() {
 
   function onSubmit(data: SignInFormValues) {
     console.log("Sign in:", data);
+    router.push("/dashboard");
   }
 
   return (
