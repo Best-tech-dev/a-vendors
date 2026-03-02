@@ -88,7 +88,7 @@ export default function VendorsPage() {
       ) : (
         <>
           {/* Stats */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatsCard
               value={totalVendors}
               label="Total vendors"
@@ -113,12 +113,12 @@ export default function VendorsPage() {
           </div>
 
           {/* Filter Tabs */}
-          <div className="flex gap-1 rounded-lg border border-gray-200 bg-brand-primary p-1 w-fit overflow-x-auto max-w-full">
+          <div className="flex gap-1 rounded-lg border border-gray-200 bg-brand-primary p-1 w-full overflow-x-auto max-w-full">
             {filterTabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setFilter(tab.key)}
-                className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                className={`rounded-md px-4 py-2 text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                   filter === tab.key
                     ? "border border-gray-300 bg-white text-gray-900 shadow-sm"
                     : "text-brand-border hover:text-brand-border/90"
