@@ -152,7 +152,7 @@ export function AddMaterialDialog({
           </div>
 
           {/* Category + Unit */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label className="text-sm text-brand-description font-medium">
                 Category
@@ -208,7 +208,7 @@ export function AddMaterialDialog({
           </div>
 
           {/* Stock / Reorder / Price */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label
                 htmlFor="mat-stock"
@@ -297,7 +297,7 @@ export function AddMaterialDialog({
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onClick={() => fileInputRef.current?.click()}
-                className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed px-6 py-8 transition-colors ${
+                className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed sm:px-6 py-8 transition-colors ${
                   isDragging
                     ? "border-blue-400 bg-blue-50"
                     : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
@@ -305,13 +305,13 @@ export function AddMaterialDialog({
               >
                 <Upload className="h-5 w-5 text-[#1B2232]" />
 
-                <p className="mt-3 text-sm text-gray-600">
-                  <span className="font-semibold text-gray-900">
+                <p className="mt-3 text-sm text-brand-title">
+                  <span className="font-semibold text-brand-title">
                     Click to upload
                   </span>{" "}
                   or drag and drop
                 </p>
-                <p className="mt-1 text-xs text-gray-400">
+                <p className="mt-1 text-xs text-brand-description">
                   PNG, JPG, PDF up to 10MB
                 </p>
                 <input
