@@ -166,10 +166,10 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
     >
       <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col overflow-visible">
         <DialogHeader>
-          <DialogTitle className="text-center text-lg font-semibold">
+          <DialogTitle className="text-center text-lg font-semibold text-brand-title">
             {step === 1 ? "Request a Quote" : "Select Vendors to Quote"}
           </DialogTitle>
-          <DialogDescription className="text-center text-sm text-gray-500">
+          <DialogDescription className="text-center text-sm text-brand-description">
             {step === 1
               ? "Fill in the details and add items for your RFQ."
               : "Search and select vendors to send this RFQ to."}
@@ -183,7 +183,7 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
           <div className="flex-1 overflow-y-auto space-y-5 min-h-0 px-1">
             {/* RFQ Title */}
             <div className="space-y-2">
-              <Label className="text-sm font-semibold text-gray-700">
+              <Label className="text-sm font-semibold text-brand-description">
                 RFQ Title
               </Label>
               <Input
@@ -195,7 +195,7 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
 
             {/* Due date */}
             <div className="space-y-2">
-              <Label className="text-sm font-semibold text-gray-700">
+              <Label className="text-sm font-semibold text-brand-description">
                 Due date
               </Label>
               <Popover open={dueDateOpen} onOpenChange={setDueDateOpen}>
@@ -235,7 +235,7 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
             {/* Items Required */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <Label className="text-sm font-semibold text-gray-700">
+                <Label className="text-sm font-semibold text-brand-description">
                   Items Required
                 </Label>
                 <Button
@@ -250,7 +250,7 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
               <div className="space-y-3">
                 {/* Material */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-gray-600">
+                  <Label className="text-xs font-semibold text-brand-description">
                     Material
                   </Label>
                   <Select
@@ -271,9 +271,9 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
                 </div>
 
                 {/* Quantity / Unit / Budget */}
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold text-gray-600">
+                    <Label className="text-xs font-semibold text-brand-description">
                       Quantity
                     </Label>
                     <Input
@@ -286,7 +286,7 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold text-gray-600">
+                    <Label className="text-xs font-semibold text-brand-description">
                       Unit
                     </Label>
                     <Select value={currentUnit} onValueChange={setCurrentUnit}>
@@ -303,7 +303,7 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
                     </Select>
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold text-gray-600">
+                    <Label className="text-xs font-semibold text-brand-description">
                       Budget
                     </Label>
                     <Input
@@ -321,10 +321,10 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
             {items.length > 0 && (
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <Label className="text-sm font-semibold text-gray-700">
+                  <Label className="text-sm font-semibold text-brand-description">
                     Items added
                   </Label>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-brand-description">
                     {items.length} item{items.length !== 1 ? "s" : ""}
                   </span>
                 </div>
@@ -335,10 +335,10 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
                       className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-3"
                     >
                       <div>
-                        <p className="text-sm font-semibold text-gray-800">
+                        <p className="text-sm font-semibold text-brand-description">
                           {item.material}
                         </p>
-                        <p className="text-xs text-gray-500 mt-0.5">
+                        <p className="text-xs text-brand-description mt-0.5">
                           Qty: {item.quantity} &nbsp;·&nbsp; Unit: {item.unit}{" "}
                           &nbsp;·&nbsp; Budget: {formatCurrency(item.budget)}
                         </p>
