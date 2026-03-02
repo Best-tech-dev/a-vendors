@@ -68,7 +68,7 @@ export function VendorDetailsSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full overflow-y-auto p-8 sm:max-w-lg">
+      <SheetContent className="w-full overflow-y-auto p-4 sm:p-8 sm:max-w-lg">
         <SheetHeader className="p-0 pb-4">
           <div>
             <div className="flex items-center">
@@ -84,12 +84,12 @@ export function VendorDetailsSheet({
         </SheetHeader>
 
         {/* Tab Switcher */}
-        <div className="mb-6 flex rounded-lg bg-brand-primary p-1">
+        <div className="mb-6 flex flex-nowrap rounded-lg bg-brand-primary p-1 overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap shrink-0 sm:flex-1 ${
                 activeTab === tab.key
                   ? "bg-white text-brand-title shadow-sm"
                   : "text-brand-border hover:text-white"
