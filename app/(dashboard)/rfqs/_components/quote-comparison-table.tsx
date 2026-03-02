@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Star, TrendingDown, TrendingUp, Check } from "lucide-react";
+import { Star, ArrowDown, ArrowUp, Check } from "lucide-react";
 import type { VendorQuote, VendorTag } from "@/types/rfq";
 
 interface QuoteComparisonTableProps {
@@ -137,9 +137,9 @@ export function QuoteComparisonTable({ quotes }: QuoteComparisonTableProps) {
                     }`}
                   >
                     {isNegativeDeviation ? (
-                      <TrendingDown className="size-3" />
+                      <ArrowDown className="size-3" />
                     ) : (
-                      <TrendingUp className="size-3" />
+                      <ArrowUp className="size-3" />
                     )}
                     {deviationFormatted}
                   </span>
@@ -149,7 +149,7 @@ export function QuoteComparisonTable({ quotes }: QuoteComparisonTableProps) {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="text-sm font-medium"
+                  className="text-sm font-medium bg-[#1E22540A] hover:bg-[#1E22540A] border-0 text-brand-title"
                 >
                   Select
                 </Button>
