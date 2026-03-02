@@ -1,6 +1,7 @@
 "use client";
 
 import { useForm, useWatch } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   createPasswordSchema,
@@ -19,6 +20,8 @@ import {
 } from "@/components/ui/form";
 
 export default function ResetPasswordPage() {
+  const router = useRouter();
+
   const form = useForm<CreatePasswordFormValues>({
     resolver: zodResolver(createPasswordSchema),
     defaultValues: {
@@ -33,6 +36,7 @@ export default function ResetPasswordPage() {
 
   function onSubmit(data: CreatePasswordFormValues) {
     console.log("Reset password:", data);
+    router.push("/sign-in");
   }
 
   return (

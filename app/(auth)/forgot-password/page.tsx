@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -19,6 +20,7 @@ import {
 } from "@/components/ui/form";
 
 export default function ForgotPasswordPage() {
+  const router = useRouter();
   const form = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
@@ -31,6 +33,7 @@ export default function ForgotPasswordPage() {
 
   function onSubmit(data: ForgotPasswordFormValues) {
     console.log("Forgot password:", data);
+    router.push("/reset-password");
   }
 
   return (

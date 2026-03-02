@@ -4,6 +4,7 @@ import { Bell, ChevronDown, Menu, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +21,11 @@ import {
 import { Sidebar } from "./sidebar";
 
 export function Header() {
+  const router = useRouter();
+
+  const handleLogout = () => {
+    router.push("/sign-in");
+  };
   return (
     <header className="flex h-16 shrink-0 items-center gap-4 border-b border-brand-border bg-white px-4 md:px-6">
       {/* Mobile menu trigger */}
@@ -75,7 +81,10 @@ export function Header() {
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Account Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem
+              className="text-destructive"
+              onClick={handleLogout}
+            >
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
