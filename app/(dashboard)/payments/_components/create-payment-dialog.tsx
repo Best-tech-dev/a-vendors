@@ -1,0 +1,326 @@
+"use client";
+
+import { useState, useCallback, useRef } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Upload, X } from "lucide-react";
+import Image from "next/image";
+import { toast } from "sonner";
+import {
+  mockVendorOptions,
+  mockPurchaseOrders,
+  mockInvoiceReferences,
+} from "@/lib/mock/payments";
+
+interface CreatePaymentDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+const currencies = [
+  { code: "NGN", flag: "🇳🇬" },
+  { code: "USD", flag: "🇺🇸" },
+  { code: "GBP", flag: "🇬🇧" },
+  { code: "EUR", flag: "🇪🇺" },
+];
+
+export function CreatePaymentDialog({
+  open,
+  onOpenChange,
+}: CreatePaymentDialogProps) {
+  const [vendor, setVendor] = useState("");
+  const [purchaseOrder, setPurchaseOrder] = useState("");
+  const [invoice, setInvoice] = useState("");
+  const [currency, setCurrency] = useState("NGN");
+  const [amount, setAmount] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const isValid = vendor && purchaseOrder && invoice && amount;
+
+  const selectedCurrency = currencies.find((c) => c.code === currency)!;
+
+  const handleFile = (f: File) => {
+    const maxSize = 10 * 1024 * 1024;
+    const allowedTypes = ["image/png", "image/jpeg", "application/pdf"];
+    if (!allowedTypes.includes(f.type)) {
+      toast.error("Unsupported file type", {
+        description: "Only PNG, JPG, and PDF files are allowed.",
+      });
+      return;
+    }
+    if (f.size > maxSize) {
+      toast.error("File too large", {
+        description: `"${f.name}" exceeds the 10 MB limit. Please upload a smaller file.`,
+      });
+      return;
+    }
+    setFile(f);
+    if (f.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (e) => setPreview(e.target?.result as string);
+      reader.readAsDataURL(f);
+    } else {
+      setPreview(null);
+    }
+  };
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const dropped = e.dataTransfer.files[0];
+    if (dropped) handleFile(dropped);
+  }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback(() => setIsDragging(false), []);
+
+  const removeFile = () => {
+    setFile(null);
+    setPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const resetForm = () => {
+    setVendor("");
+    setPurchaseOrder("");
+    setInvoice("");
+    setCurrency("NGN");
+    setAmount("");
+    setFile(null);
+    setPreview(null);
+  };
+
+  const handleSubmit = () => {
+    if (!isValid) return;
+    // TODO: submit payment to backend
+    console.log({ vendor, purchaseOrder, invoice, currency, amount, file });
+    resetForm();
+    onOpenChange(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
+        <DialogHeader className="items-center text-center">
+          <DialogTitle className="text-lg font-semibold text-brand-title">
+            Create payment
+          </DialogTitle>
+          <DialogDescription className="text-sm text-brand-description">
+            Add payment details
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-5 pt-2">
+          {/* Vendor */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-brand-description">
+              Vendor
+            </Label>
+            <Select value={vendor} onValueChange={setVendor}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select vendor" />
+              </SelectTrigger>
+              <SelectContent>
+                {mockVendorOptions.map((v) => (
+                  <SelectItem key={v} value={v}>
+                    {v}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Purchase Order */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-brand-description">
+              Purchase order
+            </Label>
+            <Select value={purchaseOrder} onValueChange={setPurchaseOrder}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select PO number" />
+              </SelectTrigger>
+              <SelectContent>
+                {mockPurchaseOrders.map((po) => (
+                  <SelectItem key={po} value={po}>
+                    {po}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Invoice */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-brand-description">
+              Invoice
+            </Label>
+            <Select value={invoice} onValueChange={setInvoice}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select reference number" />
+              </SelectTrigger>
+              <SelectContent>
+                {mockInvoiceReferences.map((inv) => (
+                  <SelectItem key={inv} value={inv}>
+                    {inv}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Amount with Currency Prefix */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-brand-description">
+              Amount
+            </Label>
+            <div className="flex items-center rounded-md border border-gray-200 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+              {/* Currency Selector */}
+              <div className="relative">
+                <Select value={currency} onValueChange={setCurrency}>
+                  <SelectTrigger className="h-10 w-27.5 gap-1 rounded-none rounded-l-md border-0 border-r border-gray-200 bg-transparent shadow-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0">
+                    <span className="flex items-center gap-1.5 text-sm">
+                      <span>{selectedCurrency.flag}</span>
+                      <span className="font-medium">
+                        {selectedCurrency.code}
+                      </span>
+                    </span>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {currencies.map((c) => (
+                      <SelectItem key={c.code} value={c.code}>
+                        <span className="flex items-center gap-2">
+                          <span>{c.flag}</span>
+                          <span>{c.code}</span>
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Amount Input */}
+              <Input
+                type="number"
+                min={0}
+                step="0.01"
+                placeholder="0.00"
+                className="flex-1 rounded-none rounded-r-md border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* File Upload Dropzone */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-brand-description">
+              Attach payment proof
+            </Label>
+            {file ? (
+              <div className="relative flex items-center gap-3 rounded-lg border border-gray-200 p-3">
+                {preview ? (
+                  <Image
+                    src={preview}
+                    alt="Preview"
+                    width={48}
+                    height={48}
+                    className="h-12 w-12 rounded-md object-cover"
+                  />
+                ) : (
+                  <div className="flex h-12 w-12 items-center justify-center rounded-md bg-gray-100 text-xs font-medium text-gray-500">
+                    PDF
+                  </div>
+                )}
+                <div className="flex-1 truncate text-sm text-gray-700">
+                  {file.name}
+                </div>
+                <button
+                  type="button"
+                  onClick={removeFile}
+                  className="rounded-full p-1 hover:bg-gray-100"
+                >
+                  <X className="h-4 w-4 text-gray-400" />
+                </button>
+              </div>
+            ) : (
+              <div
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onClick={() => fileInputRef.current?.click()}
+                className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed py-8 transition-colors ${
+                  isDragging
+                    ? "border-blue-400 bg-blue-50"
+                    : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+                }`}
+              >
+                <Upload className="h-5 w-5 text-[#1B2232]" />
+                <p className="mt-3 text-sm text-brand-title">
+                  <span className="font-semibold text-brand-title">
+                    Click to upload
+                  </span>{" "}
+                  or drag and drop
+                </p>
+                <p className="mt-1 text-xs text-brand-description">
+                  Supports PNG, PDF, JPEG up to 10MB
+                </p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".png,.jpg,.jpeg,.pdf"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleFile(f);
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <Button
+              variant="ghost"
+              onClick={() => {
+                resetForm();
+                onOpenChange(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={!isValid}
+              className="bg-gray-900 hover:bg-gray-800 disabled:opacity-50"
+            >
+              Save
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
