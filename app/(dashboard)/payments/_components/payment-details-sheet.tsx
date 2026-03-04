@@ -99,7 +99,7 @@ export function PaymentDetailsSheet({
 
         {/* Details Grid */}
         <div className="rounded-lg border border-gray-200 p-5">
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <span className="text-xs text-brand-description">Vendor</span>
               <p className="mt-0.5 text-sm font-semibold text-brand-title">
@@ -121,7 +121,7 @@ export function PaymentDetailsSheet({
               </p>
             </div>
           </div>
-          <div className="mt-4 grid grid-cols-3 gap-4">
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <span className="text-xs text-brand-description">
                 Invoice reference
@@ -172,7 +172,7 @@ export function PaymentDetailsSheet({
                         className="gap-1.5 text-sm"
                         onClick={() => fileInputRef.current?.click()}
                       >
-                        <Plus className="h-4 w-4" />
+                        <Plus className="hidden sm:inline-block h-4 w-4" />
                         Attach payment proof
                       </Button>
                     )}
@@ -221,17 +221,6 @@ export function PaymentDetailsSheet({
               </p>
             </div>
           )}
-        </div>
-
-        {/* Bottom Upload Button */}
-        <div className="mt-8">
-          <Button
-            className="w-full bg-brand-primary hover:bg-brand-primary/90"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Upload payment proof
-          </Button>
         </div>
 
         {/* Hidden file input */}
