@@ -37,7 +37,7 @@ export default function OrderDetailsPage() {
       {/* Back link */}
       <button
         onClick={() => router.push("/orders")}
-        className="inline-flex items-center gap-1 text-sm text-badge-green hover:text-badge-green/80 font-medium"
+        className="inline-flex items-center gap-1 text-sm text-brand-muted hover:text-brand-primary font-medium"
       >
         <ChevronLeft className="size-4" />
         Go back
@@ -63,26 +63,30 @@ export default function OrderDetailsPage() {
 
       {/* Tabs */}
       <Tabs defaultValue="details" className="w-full">
-        <TabsList className="w-full justify-start rounded-none border-b border-gray-200 bg-transparent p-0">
-          <TabsTrigger
-            value="details"
-            className="rounded-none border-b-2 border-transparent px-4 py-3 text-sm font-medium text-brand-description data-[state=active]:border-brand-primary data-[state=active]:text-brand-title data-[state=active]:shadow-none"
-          >
-            Order details
-          </TabsTrigger>
-          <TabsTrigger
-            value="status"
-            className="rounded-none border-b-2 border-transparent px-4 py-3 text-sm font-medium text-brand-description data-[state=active]:border-brand-primary data-[state=active]:text-brand-title data-[state=active]:shadow-none"
-          >
-            Order status
-          </TabsTrigger>
-          <TabsTrigger
-            value="grn"
-            className="rounded-none border-b-2 border-transparent px-4 py-3 text-sm font-medium text-brand-description data-[state=active]:border-brand-primary data-[state=active]:text-brand-title data-[state=active]:shadow-none"
-          >
-            Goods received notes (GRN)
-          </TabsTrigger>
-        </TabsList>
+        <div className="rounded-lg border border-gray-200 overflow-hidden">
+          <div className="overflow-x-auto bg-brand-primary p-1">
+            <TabsList className="flex h-auto! w-max min-w-full gap-1 border-0 bg-transparent p-0">
+              <TabsTrigger
+                value="details"
+                className="h-auto! shrink-0 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium transition-colors text-brand-border hover:text-brand-border/90 data-[state=active]:border data-[state=active]:border-gray-300 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+              >
+                Order details
+              </TabsTrigger>
+              <TabsTrigger
+                value="status"
+                className="h-auto! shrink-0 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium transition-colors text-brand-border hover:text-brand-border/90 data-[state=active]:border data-[state=active]:border-gray-300 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+              >
+                Order status
+              </TabsTrigger>
+              <TabsTrigger
+                value="grn"
+                className="h-auto! shrink-0 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium transition-colors text-brand-border hover:text-brand-border/90 data-[state=active]:border data-[state=active]:border-gray-300 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm"
+              >
+                Goods received notes (GRN)
+              </TabsTrigger>
+            </TabsList>
+          </div>
+        </div>
 
         <TabsContent value="details" className="mt-6">
           <OrderDetailsTab order={order} />

@@ -22,32 +22,43 @@ export function OrderStatusTimeline({ order }: OrderStatusTimelineProps) {
 
             return (
               <div key={index} className="relative flex gap-6">
-                {/* Left column: dot + connector line */}
-                <div className="flex flex-col items-center">
+                {/* Left column: dot + connector line (hidden on small screens) */}
+                <div className="flex-col items-center hidden sm:flex">
                   {/* Dot */}
                   {step.status === "completed" ? (
-                    <div className="z-10 h-3.5 w-3.5 shrink-0 rounded-full bg-brand-primary" />
+                    <div className="z-10 h-3.5 w-3.5 border-3 border-white shrink-0 rounded-full bg-brand-primary" />
                   ) : step.status === "active" ? (
                     <div className="z-10 h-3.5 w-3.5 shrink-0 rounded-full border-2 border-brand-primary bg-white" />
                   ) : (
-                    <div className="z-10 h-3.5 w-3.5 shrink-0 rounded-full bg-gray-300" />
+                    <div className="z-10 h-3.5 w-3.5 border-2 border-white shrink-0 rounded-full bg-gray-300" />
                   )}
 
-                  {/* Connecting line */}
+                  {/* Connecting line (only visible on sm and up) */}
                   {!isLast && (
                     <div
-                      className={`w-px flex-1 min-h-12 ${
+                      className={`w-0.5 flex-1 min-h-12 ${
                         step.status === "completed"
-                          ? "bg-brand-primary"
+                          ? "bg-brand-border"
                           : "bg-gray-200"
                       }`}
                     />
                   )}
                 </div>
 
-                {/* Right column: content */}
+                {/* Right column: content. On small screens this stacks; a small dot is shown above the content */}
                 <div className={`flex-1 pb-8 ${isLast ? "pb-0" : ""}`}>
-                  <div className="flex items-start justify-between -mt-0.5">
+                  {/* Mobile dot (visible only on small screens) */}
+                  <div className="sm:hidden mb-2">
+                    {step.status === "completed" ? (
+                      <div className="inline-block h-3.5 w-3.5 rounded-full bg-brand-primary mr-2 align-middle" />
+                    ) : step.status === "active" ? (
+                      <div className="inline-block h-3.5 w-3.5 rounded-full border-2 border-brand-primary bg-white mr-2 align-middle" />
+                    ) : (
+                      <div className="inline-block h-3.5 w-3.5 rounded-full bg-gray-300 mr-2 align-middle" />
+                    )}
+                  </div>
+
+                  <div className="sm:flex items-start justify-between -mt-0.5">
                     <div>
                       <p
                         className={`text-sm font-semibold ${
@@ -71,8 +82,8 @@ export function OrderStatusTimeline({ order }: OrderStatusTimelineProps) {
                       </p>
                     </div>
 
-                    {/* Timestamp or Action */}
-                    <div className="shrink-0 text-right ml-4">
+                    {/* Timestamp or Action: stacks below on small screens */}
+                    <div className="sm:shrink-0 sm:text-right sm:ml-4 mt-2 sm:mt-0">
                       {step.timestamp && (
                         <p className="text-sm text-brand-description">
                           {step.timestamp}
@@ -80,9 +91,8 @@ export function OrderStatusTimeline({ order }: OrderStatusTimelineProps) {
                       )}
                       {step.status === "active" && (
                         <Button
-                          variant="outline"
                           size="sm"
-                          className="mt-1 rounded-full border-brand-primary text-brand-title text-xs"
+                          className="mt-1 bg-brand-primary rounded-full text-xs"
                         >
                           Update status
                           <ChevronDown className="ml-1 h-3 w-3" />
@@ -98,7 +108,7 @@ export function OrderStatusTimeline({ order }: OrderStatusTimelineProps) {
       </div>
 
       {/* Bottom Action Card */}
-      <div className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-lg border border-gray-200 bg-gray-50 p-6">
         <div>
           <h3 className="text-base font-bold text-brand-title">
             Ready to Create GRN
@@ -108,7 +118,9 @@ export function OrderStatusTimeline({ order }: OrderStatusTimelineProps) {
             with invoicing.
           </p>
         </div>
-        <Button className="shrink-0 bg-brand-primary">Create GRN</Button>
+        <Button className="shrink-0 bg-brand-primary mt-3 sm:mt-0 w-full sm:w-auto">
+          Create GRN
+        </Button>
       </div>
     </div>
   );

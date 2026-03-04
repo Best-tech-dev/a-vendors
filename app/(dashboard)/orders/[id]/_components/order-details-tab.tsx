@@ -31,7 +31,7 @@ export function OrderDetailsTab({ order }: OrderDetailsTabProps) {
         <h2 className="text-lg font-bold text-brand-title mb-4">
           {order.title}
         </h2>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
           <div>
             <p className="text-xs font-medium uppercase tracking-wider text-brand-muted">
               Total items
@@ -68,10 +68,10 @@ export function OrderDetailsTab({ order }: OrderDetailsTabProps) {
       </div>
 
       {/* Ordered Items Table */}
-      <div className="rounded-lg border border-gray-200 bg-white">
-        <div className="px-6 pt-5 pb-3">
-          <h3 className="text-base font-bold text-brand-title">Ordered item</h3>
-        </div>
+      <div className="px-6 pt-5">
+        <h3 className="text-base font-bold text-brand-title">Ordered item</h3>
+      </div>
+      <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow className="border-gray-200 bg-[#FAFBFC]">
