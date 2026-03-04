@@ -64,7 +64,7 @@ export default function OrderDetailsPage() {
       {/* Tabs */}
       <Tabs defaultValue="details" className="w-full">
         <div className="rounded-lg border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto bg-brand-primary p-1">
+          <div className="overflow-x-auto no-scrollbar bg-brand-primary p-1">
             <TabsList className="flex h-auto! w-max min-w-full gap-1 border-0 bg-transparent p-0">
               <TabsTrigger
                 value="details"
