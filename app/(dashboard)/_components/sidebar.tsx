@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
+  ScrollText,
   Users,
   PackagePlus,
   FileText,
@@ -19,6 +20,7 @@ import Image from "next/image";
 
 const mainNavItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Expenses", href: "/expenses", icon: ScrollText },
   { label: "Vendors", href: "/vendors", icon: Users },
   { label: "Inventory", href: "/inventory", icon: PackagePlus },
   { label: "RFQs", href: "/rfqs", icon: FileText },
