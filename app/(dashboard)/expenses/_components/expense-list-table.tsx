@@ -16,6 +16,7 @@ import {
   PaginationPrevious,
   PaginationNext,
 } from "@/components/ui/pagination";
+import { BadgeCheck } from "lucide-react";
 import type { Expense, ExpenseStatus } from "@/types/expense";
 import { formatCurrency } from "@/lib/utils";
 
@@ -31,8 +32,9 @@ function StatusBadge({ status }: { status: ExpenseStatus }) {
   const c = config[status];
   return (
     <span
-      className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${c.bg} ${c.text}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${c.bg} ${c.text}`}
     >
+      <BadgeCheck className="h-3.5 w-3.5 shrink-0" />
       {status}
     </span>
   );

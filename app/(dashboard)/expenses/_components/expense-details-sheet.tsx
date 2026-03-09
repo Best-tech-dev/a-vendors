@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, Check, X, SquarePen } from "lucide-react";
+import { BadgeCheck, Download, Check, X, SquarePen } from "lucide-react";
 import Image from "next/image";
 import type { Expense, ExpenseStatus, FooterAction, TimelineStep } from "@/types/expense";
 import { formatCurrency } from "@/lib/utils";
@@ -29,8 +29,9 @@ function StatusBadge({ status }: { status: ExpenseStatus }) {
   const c = config[status];
   return (
     <span
-      className={`ml-2 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${c.bg} ${c.text}`}
+      className={`ml-2 inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium ${c.bg} ${c.text}`}
     >
+      <BadgeCheck className="h-3.5 w-3.5 shrink-0" />
       {status}
     </span>
   );

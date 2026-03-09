@@ -11,7 +11,7 @@ export const mockExpenses: Expense[] = [
     status: "Pending",
     date: "Today",
     description:
-      "Client meeting with XYZ Corporation in San Francisco. Includes roundtrip flight from New York and 2 nights hotel accommodation.",
+      "Client meeting with Dangote Industries in Lagos. Includes roundtrip flight from Abuja and 2 nights hotel accommodation.",
     receipt: {
       id: "r1",
       fileName: "image.png",
@@ -19,8 +19,8 @@ export const mockExpenses: Expense[] = [
       thumbnail: "/imgs/tin.jpg",
     },
     hodNote:
-      "Client meeting with XYZ Corporation in San Francisco. Includes roundtrip flight from New York and 2 nights hotel accommodation.",
-    hodReviewer: "Jane Doe (Sales HOD)",
+      "Client meeting with Dangote Industries in Lagos. Includes roundtrip flight from Abuja and 2 nights hotel accommodation.",
+    hodReviewer: "Chiamaka Okonkwo (Sales HOD)",
     timeline: [
       {
         id: "t1",
@@ -32,14 +32,14 @@ export const mockExpenses: Expense[] = [
         id: "t2",
         title: "HOD Review",
         date: "Feb 4, 2026 at 2:37 PM",
-        reviewedBy: "Jane Doe (Sales HOD)",
+        reviewedBy: "Chiamaka Okonkwo (Sales HOD)",
         completed: true,
       },
       {
         id: "t3",
         title: "Audit Team Review",
         date: "Feb 4, 2026 at 2:37 PM",
-        reviewedBy: "Jane Doe (Auditor)",
+        reviewedBy: "Ifeoma Nwosu (Auditor)",
         completed: true,
       },
       {
@@ -63,7 +63,7 @@ export const mockExpenses: Expense[] = [
     currency: "NGN",
     status: "Pending",
     date: "Yesterday",
-    description: "Bulk order for office stationery, printer cartridges, and cleaning supplies for Q1 2026.",
+    description: "Bulk order for office stationery, printer cartridges, and cleaning supplies for Lagos head office, Q1 2026.",
     timeline: [
       {
         id: "t1",
@@ -102,7 +102,7 @@ export const mockExpenses: Expense[] = [
     currency: "NGN",
     status: "Pending",
     date: "Today",
-    description: "Catering services for the quarterly team building event. 50 attendees.",
+    description: "Catering services for the quarterly team building event at Lagos office. 50 attendees.",
     timeline: [
       {
         id: "t1",
@@ -141,7 +141,7 @@ export const mockExpenses: Expense[] = [
     currency: "NGN",
     status: "Pending",
     date: "Today",
-    description: "Client meeting with ABC Corp. Includes return flights and 1 night hotel stay.",
+    description: "Client meeting with MTN Nigeria in Port Harcourt. Includes return flights from Lagos and 1 night hotel stay.",
     timeline: [
       {
         id: "t1",
@@ -226,7 +226,7 @@ export const mockExpenses: Expense[] = [
       fileSize: "12.3 KB",
     },
     hodNote: "Approved. Essential for operations continuity.",
-    hodReviewer: "Mike Ross (IT HOD)",
+    hodReviewer: "Emeka Okafor (IT HOD)",
     timeline: [
       {
         id: "t1",
@@ -238,28 +238,28 @@ export const mockExpenses: Expense[] = [
         id: "t2",
         title: "HOD Review",
         date: "Feb 2, 2026 at 2:00 PM",
-        reviewedBy: "Mike Ross (IT HOD)",
+        reviewedBy: "Emeka Okafor (IT HOD)",
         completed: true,
       },
       {
         id: "t3",
         title: "Audit Team Review",
         date: "Feb 3, 2026 at 10:00 AM",
-        reviewedBy: "Sarah Connor (Auditor)",
+        reviewedBy: "Amara Eze (Auditor)",
         completed: true,
       },
       {
         id: "t4",
         title: "CFO Decision",
         date: "Feb 3, 2026 at 3:00 PM",
-        reviewedBy: "David Kim (CFO)",
+        reviewedBy: "Adebayo Adeyemi (CFO)",
         completed: true,
       },
       {
         id: "t5",
         title: "MD Decision",
         date: "Feb 4, 2026 at 9:00 AM",
-        reviewedBy: "Alex Johnson (MD)",
+        reviewedBy: "Oluwaseun Balogun (MD)",
         completed: true,
       },
     ],
@@ -273,7 +273,7 @@ export const mockExpenses: Expense[] = [
     currency: "NGN",
     status: "Rejected",
     date: "3 days ago",
-    description: "Registration fees for 3 team members to attend the annual marketing summit.",
+    description: "Registration fees for 3 team members to attend the Lagos Business Summit.",
     timeline: [
       {
         id: "t1",
@@ -285,7 +285,7 @@ export const mockExpenses: Expense[] = [
         id: "t2",
         title: "HOD Review",
         date: "Feb 1, 2026 at 4:00 PM",
-        reviewedBy: "Lisa Park (Marketing HOD)",
+        reviewedBy: "Funke Adebayo (Marketing HOD)",
         completed: true,
       },
       {
@@ -314,7 +314,7 @@ export const mockExpenses: Expense[] = [
     currency: "NGN",
     status: "Pending",
     date: "Today",
-    description: "Emergency repair of forklift and conveyor belt in Warehouse B.",
+    description: "Emergency repair of forklift and conveyor belt at Aja Industrial Estate, Lagos.",
     timeline: [
       {
         id: "t1",
@@ -353,7 +353,7 @@ export const mockExpenses: Expense[] = [
     currency: "NGN",
     status: "Pending",
     date: "Yesterday",
-    description: "Professional development training for 10 new hires. Includes materials and instructor fees.",
+    description: "Professional development training for 10 new hires at Abuja branch. Includes materials and instructor fees.",
     timeline: [
       {
         id: "t1",
@@ -392,14 +392,14 @@ export const mockExpenses: Expense[] = [
     currency: "NGN",
     status: "Approved",
     date: "3 days ago",
-    description: "Quarterly server maintenance and monitoring contract with TechCare Solutions.",
+    description: "Quarterly server maintenance and monitoring contract with MainOne Technologies.",
     receipt: {
       id: "r3",
       fileName: "maintenance_contract.pdf",
       fileSize: "28.1 KB",
     },
     hodNote: "Approved. Critical infrastructure maintenance.",
-    hodReviewer: "Mike Ross (IT HOD)",
+    hodReviewer: "Emeka Okafor (IT HOD)",
     timeline: [
       {
         id: "t1",
@@ -411,28 +411,28 @@ export const mockExpenses: Expense[] = [
         id: "t2",
         title: "HOD Review",
         date: "Feb 1, 2026 at 3:00 PM",
-        reviewedBy: "Mike Ross (IT HOD)",
+        reviewedBy: "Emeka Okafor (IT HOD)",
         completed: true,
       },
       {
         id: "t3",
         title: "Audit Team Review",
         date: "Feb 2, 2026 at 9:30 AM",
-        reviewedBy: "Sarah Connor (Auditor)",
+        reviewedBy: "Amara Eze (Auditor)",
         completed: true,
       },
       {
         id: "t4",
         title: "CFO Decision",
         date: "Feb 2, 2026 at 2:00 PM",
-        reviewedBy: "David Kim (CFO)",
+        reviewedBy: "Adebayo Adeyemi (CFO)",
         completed: true,
       },
       {
         id: "t5",
         title: "MD Decision",
         date: "Feb 3, 2026 at 10:00 AM",
-        reviewedBy: "Alex Johnson (MD)",
+        reviewedBy: "Oluwaseun Balogun (MD)",
         completed: true,
       },
     ],
