@@ -21,7 +21,6 @@ export interface Expense {
   id: string;
   expenseId: string;
   title: string;
-  submittedBy: string;
   department: string;
   amount: number;
   currency: string;

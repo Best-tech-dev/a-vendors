@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Download, Check, X, SquarePen } from "lucide-react";
 import Image from "next/image";
 import type { Expense, ExpenseStatus, FooterAction, TimelineStep } from "@/types/expense";
+import { formatCurrency } from "@/lib/utils";
 
 // ---------------------------------------------------------------------------
 // Status Badge
@@ -278,28 +279,15 @@ export function ExpenseDetailsSheet({
 // ---------------------------------------------------------------------------
 
 function GeneralInfoView({ expense }: { expense: Expense }) {
-  const formatAmount = (value: number) =>
-    new Intl.NumberFormat("en-NG", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-    }).format(value);
-
   return (
     <div className="space-y-6">
       {/* Info Grid */}
       <div className="rounded-lg border border-gray-200 p-5">
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <span className="text-xs text-brand-description">Amount</span>
             <p className="mt-0.5 text-sm font-semibold text-brand-title">
-              {formatAmount(expense.amount)}
-            </p>
-          </div>
-          <div>
-            <span className="text-xs text-brand-description">Submitted By</span>
-            <p className="mt-0.5 text-sm font-semibold text-brand-title">
-              {expense.submittedBy}
+              {formatCurrency(expense.amount)}
             </p>
           </div>
           <div>
@@ -403,28 +391,15 @@ function AmendmentView({
   note: string;
   onNoteChange: (v: string) => void;
 }) {
-  const formatAmount = (value: number) =>
-    new Intl.NumberFormat("en-NG", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-    }).format(value);
-
   return (
     <div className="space-y-6">
       {/* Condensed Info */}
       <div className="rounded-lg border border-gray-200 p-5">
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <span className="text-xs text-brand-description">Amount</span>
             <p className="mt-0.5 text-sm font-semibold text-brand-title">
-              {formatAmount(expense.amount)}
-            </p>
-          </div>
-          <div>
-            <span className="text-xs text-brand-description">Submitted By</span>
-            <p className="mt-0.5 text-sm font-semibold text-brand-title">
-              {expense.submittedBy}
+              {formatCurrency(expense.amount)}
             </p>
           </div>
           <div>

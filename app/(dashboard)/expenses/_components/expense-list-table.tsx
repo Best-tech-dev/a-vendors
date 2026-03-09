@@ -17,17 +17,9 @@ import {
   PaginationNext,
 } from "@/components/ui/pagination";
 import type { Expense, ExpenseStatus } from "@/types/expense";
+import { formatCurrency } from "@/lib/utils";
 
 const ITEMS_PER_PAGE = 5;
-
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-NG", {
-    style: "currency",
-    currency: "NGN",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-}
 
 function StatusBadge({ status }: { status: ExpenseStatus }) {
   const config: Record<ExpenseStatus, { bg: string; text: string }> = {
@@ -73,9 +65,6 @@ export function ExpenseListTable({
               Title
             </TableHead>
             <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
-              Submitted By
-            </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
               Department
             </TableHead>
             <TableHead className="text-xs font-semibold uppercase tracking-wider text-brand-muted">
@@ -97,9 +86,6 @@ export function ExpenseListTable({
             <TableRow key={expense.id} className="border-gray-100">
               <TableCell className="font-medium text-brand-title">
                 {expense.title}
-              </TableCell>
-              <TableCell className="text-brand-description">
-                {expense.submittedBy}
               </TableCell>
               <TableCell className="text-brand-description">
                 {expense.department}
