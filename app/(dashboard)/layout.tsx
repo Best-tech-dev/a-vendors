@@ -1,3 +1,8 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/lib/stores/auth-store";
 import { Sidebar } from "./_components/sidebar";
 import { Header } from "./_components/header";
 
@@ -6,6 +11,19 @@ export default function DashboardGroupLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
+  const token = useAuthStore((state) => state.token);
+  const hasHydrated = useAuthStore((state) => state._hasHydrated);
+
+  useEffect(() => {
+    if (hasHydrated && !token) {
+      router.replace("/sign-in");
+    }
+  }, [hasHydrated, token, router]);
+
+  if (!hasHydrated) return null;
+  if (!token) return null;
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Desktop sidebar */}

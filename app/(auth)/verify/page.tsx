@@ -49,13 +49,6 @@ export default function VerifyPage() {
 
   const isValid = form.formState.isValid;
 
-  // Redirect if no pending email (user navigated directly)
-  useEffect(() => {
-    if (!pendingEmail) {
-      router.replace("/sign-in");
-    }
-  }, [pendingEmail, router]);
-
   // Countdown timer for resend
   useEffect(() => {
     if (countdown <= 0) {
@@ -100,7 +93,7 @@ export default function VerifyPage() {
 
       const { token, user } = res.data.data ?? res.data;
       setAuth(token, user);
-      toast.success("Verification successful");
+      toast.success("Verification successful. Redirrecting...");
       router.push("/dashboard");
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
@@ -112,8 +105,6 @@ export default function VerifyPage() {
       setIsLoading(false);
     }
   }
-
-  if (!pendingEmail) return null;
 
   return (
     <div className="flex flex-col gap-8">
@@ -139,7 +130,7 @@ export default function VerifyPage() {
                 <Mail className="size-4 text-muted-foreground" />
               </InputGroupAddon>
               <InputGroupInput
-                value={pendingEmail}
+                value={pendingEmail ?? ""}
                 readOnly
                 className="cursor-default text-muted-foreground"
               />
