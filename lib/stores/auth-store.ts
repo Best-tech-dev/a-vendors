@@ -33,6 +33,14 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "auth-storage",
+      merge: (persisted, current) => ({
+        ...current,
+        ...(persisted as Partial<AuthState>),
+        // Keep in-memory token/user if persisted state has none (prevents hydration overwrite)
+        token:
+          current.token ?? (persisted as Partial<AuthState>)?.token ?? null,
+        user: current.user ?? (persisted as Partial<AuthState>)?.user ?? null,
+      }),
       onRehydrateStorage: () => (state) => {
         if (state) state.setHasHydrated(true);
       },

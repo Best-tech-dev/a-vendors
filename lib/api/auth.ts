@@ -7,5 +7,6 @@ export const authApi = {
   verifyOtp: (data: { email: string; otp: string }) =>
     api.post("/auth/admin-verify-login-otp", data),
 
-  resendOtp: (data: { email: string }) => api.post("/auth/sign-in", data),
+  resendOtp: (data: { email: string }) =>
+    api.post("/auth/resend-login-otp", data),
 };

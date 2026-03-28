@@ -34,10 +34,18 @@ const RESEND_COOLDOWN = 30;
 export default function VerifyPage() {
   const router = useRouter();
   const pendingEmail = useAuthStore((state) => state.pendingEmail);
+  const hasHydrated = useAuthStore((state) => state._hasHydrated);
   const setAuth = useAuthStore((state) => state.setAuth);
   const [isLoading, setIsLoading] = useState(false);
   const [countdown, setCountdown] = useState(RESEND_COOLDOWN);
   const [canResend, setCanResend] = useState(false);
+
+  // Redirect to sign-in if no pending email after hydration
+  useEffect(() => {
+    if (hasHydrated && !pendingEmail) {
+      router.replace("/sign-in");
+    }
+  }, [hasHydrated, pendingEmail, router]);
 
   const form = useForm<VerifyOtpFormValues>({
     resolver: zodResolver(verifyOtpSchema),
@@ -93,7 +101,7 @@ export default function VerifyPage() {
 
       const { token, user } = res.data.data ?? res.data;
       setAuth(token, user);
-      toast.success("Verification successful. Redirrecting...");
+      toast.success("Verification successful. Redirecting...");
       router.push("/dashboard");
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
