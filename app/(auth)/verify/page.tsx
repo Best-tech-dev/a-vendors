@@ -35,17 +35,18 @@ export default function VerifyPage() {
   const router = useRouter();
   const pendingEmail = useAuthStore((state) => state.pendingEmail);
   const hasHydrated = useAuthStore((state) => state._hasHydrated);
+  const token = useAuthStore((state) => state.token);
   const setAuth = useAuthStore((state) => state.setAuth);
   const [isLoading, setIsLoading] = useState(false);
   const [countdown, setCountdown] = useState(RESEND_COOLDOWN);
   const [canResend, setCanResend] = useState(false);
 
-  // Redirect to sign-in if no pending email after hydration
+  // Redirect to sign-in if no pending email after hydration (and not authenticated)
   useEffect(() => {
-    if (hasHydrated && !pendingEmail) {
+    if (hasHydrated && !pendingEmail && !token) {
       router.replace("/sign-in");
     }
-  }, [hasHydrated, pendingEmail, router]);
+  }, [hasHydrated, pendingEmail, token, router]);
 
   const form = useForm<VerifyOtpFormValues>({
     resolver: zodResolver(verifyOtpSchema),
@@ -99,8 +100,15 @@ export default function VerifyPage() {
         otp: data.otp,
       });
 
-      const { token, user } = res.data.data ?? res.data;
-      setAuth(token, user);
+      const responseData = res.data.data ?? res.data;
+      const accessToken = responseData.access_token ?? responseData.token;
+      const user = responseData.user ?? {
+        id: "",
+        email: pendingEmail,
+        name: "",
+        role: responseData.role ?? "",
+      };
+      setAuth(accessToken, user);
       toast.success("Verification successful. Redirecting...");
       router.push("/dashboard");
     } catch (error) {
