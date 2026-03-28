@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/lib/stores/auth-store";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,9 +23,11 @@ import { Sidebar } from "./sidebar";
 
 export function Header() {
   const router = useRouter();
+  const clearAuth = useAuthStore((state) => state.clearAuth);
 
   const handleLogout = () => {
-    router.push("/sign-in");
+    clearAuth();
+    router.replace("/sign-in");
   };
   return (
     <header className="flex h-16 shrink-0 items-center gap-4 border-b border-brand-border bg-white px-4 md:px-6">
@@ -85,7 +88,7 @@ export function Header() {
               className="text-destructive"
               onClick={handleLogout}
             >
-              Log out
+              Log Out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
