@@ -49,7 +49,15 @@ export const createPasswordSchema = z
     path: ["confirmPassword"],
   });
 
+export const verifyOtpSchema = z.object({
+  otp: z
+    .string()
+    .min(1, "OTP is required")
+    .min(4, "OTP must be at least 4 characters"),
+});
+
 export type SignInFormValues = z.infer<typeof signInSchema>;
 export type SignUpFormValues = z.infer<typeof signUpSchema>;
 export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 export type CreatePasswordFormValues = z.infer<typeof createPasswordSchema>;
+export type VerifyOtpFormValues = z.infer<typeof verifyOtpSchema>;

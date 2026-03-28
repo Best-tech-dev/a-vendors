@@ -1,10 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AxiosError } from "axios";
+import { toast } from "sonner";
 import { signInSchema, type SignInFormValues } from "@/lib/validations/auth";
+import { authApi } from "@/lib/api/auth";
+import { useAuthStore } from "@/lib/stores/auth-store";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
@@ -19,6 +24,9 @@ import {
 
 export default function SignInPage() {
   const router = useRouter();
+  const setPendingEmail = useAuthStore((state) => state.setPendingEmail);
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -30,9 +38,22 @@ export default function SignInPage() {
 
   const isValid = form.formState.isValid;
 
-  function onSubmit(data: SignInFormValues) {
-    console.log("Sign in:", data);
-    router.push("/dashboard");
+  async function onSubmit(data: SignInFormValues) {
+    setIsLoading(true);
+    try {
+      await authApi.signIn(data);
+      setPendingEmail(data.email);
+      toast.success("OTP sent to your email");
+      router.push("/verify");
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      const message =
+        axiosError.response?.data?.message ||
+        "Unable to sign in. Please check your credentials and try again.";
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -88,8 +109,12 @@ export default function SignInPage() {
             )}
           />
 
-          <Button type="submit" className="mt-4 w-full" disabled={!isValid}>
-            Sign in
+          <Button
+            type="submit"
+            className="mt-4 w-full"
+            disabled={!isValid || isLoading}
+          >
+            {isLoading ? "Signing in..." : "Sign in"}
           </Button>
         </form>
       </Form>
