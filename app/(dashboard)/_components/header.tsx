@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/stores/auth-store";
+import { useMemo } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +25,17 @@ import { Sidebar } from "./sidebar";
 export function Header() {
   const router = useRouter();
   const clearAuth = useAuthStore((state) => state.clearAuth);
+  const profile = useAuthStore((state) => state.profile);
+
+  const { displayName, initials } = useMemo(() => {
+    if (!profile) return { displayName: "", initials: "" };
+    const fullName = `${profile.first_name} ${profile.last_name}`;
+    const clipped =
+      fullName.length > 12 ? `${fullName.slice(0, 12)}...` : fullName;
+    const ini =
+      `${profile.first_name.charAt(0)}${profile.last_name.charAt(0)}`.toUpperCase();
+    return { displayName: clipped, initials: ini };
+  }, [profile]);
 
   const handleLogout = () => {
     clearAuth();
@@ -69,12 +81,12 @@ export function Header() {
             <button className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-gray-100 focus:outline-none">
               <Avatar size="default">
                 <AvatarFallback className="bg-brand-primary text-xs font-semibold text-white">
-                  AO
+                  {initials || "—"}
                 </AvatarFallback>
               </Avatar>
               <div className="hidden text-left md:block">
                 <p className="max-w-30 truncate text-sm font-medium text-brand-title">
-                  Akindele Oluw...
+                  {displayName}
                 </p>
               </div>
               <ChevronDown className="hidden size-4 text-brand-muted md:block" />

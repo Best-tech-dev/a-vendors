@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { UserProfile } from "@/types/profile";
 
 interface AuthUser {
   id: string;
@@ -11,9 +12,11 @@ interface AuthUser {
 interface AuthState {
   token: string | null;
   user: AuthUser | null;
+  profile: UserProfile | null;
   pendingEmail: string | null;
   _hasHydrated: boolean;
   setAuth: (token: string, user: AuthUser) => void;
+  setProfile: (profile: UserProfile) => void;
   setPendingEmail: (email: string) => void;
   clearAuth: () => void;
   setHasHydrated: (value: boolean) => void;
@@ -24,11 +27,14 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       token: null,
       user: null,
+      profile: null,
       pendingEmail: null,
       _hasHydrated: false,
       setAuth: (token, user) => set({ token, user, pendingEmail: null }),
+      setProfile: (profile) => set({ profile }),
       setPendingEmail: (email) => set({ pendingEmail: email }),
-      clearAuth: () => set({ token: null, user: null, pendingEmail: null }),
+      clearAuth: () =>
+        set({ token: null, user: null, profile: null, pendingEmail: null }),
       setHasHydrated: (value) => set({ _hasHydrated: value }),
     }),
     {

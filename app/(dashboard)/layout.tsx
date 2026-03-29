@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/stores/auth-store";
+import { profileApi } from "@/lib/api/profile";
 import { Sidebar } from "./_components/sidebar";
 import { Header } from "./_components/header";
 
@@ -14,12 +15,23 @@ export default function DashboardGroupLayout({
   const router = useRouter();
   const token = useAuthStore((state) => state.token);
   const hasHydrated = useAuthStore((state) => state._hasHydrated);
+  const setProfile = useAuthStore((state) => state.setProfile);
 
   useEffect(() => {
     if (hasHydrated && !token) {
       router.replace("/sign-in");
     }
   }, [hasHydrated, token, router]);
+
+  useEffect(() => {
+    if (!token) return;
+    profileApi
+      .get()
+      .then(({ data: res }) => setProfile(res.data))
+      .catch(() => {
+        // Profile fetch failure is non-blocking; header will show empty state
+      });
+  }, [token, setProfile]);
 
   if (!hasHydrated) return null;
   if (!token) return null;
