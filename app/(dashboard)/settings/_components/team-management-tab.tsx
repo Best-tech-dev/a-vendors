@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +14,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { teamMembers } from "../_data/mock-data";
+import { usersApi } from "@/lib/api/profile";
+import type { TeamUser, PaginationMeta } from "@/types/profile";
+import { AxiosError } from "axios";
+import { toast } from "sonner";
 import { AddTeamMemberDialog } from "./dialogs/add-team-member-dialog";
 
 const PAGE_SIZE = 5;
@@ -22,12 +25,35 @@ const PAGE_SIZE = 5;
 export function TeamManagementTab() {
   const [addOpen, setAddOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [users, setUsers] = useState<TeamUser[]>([]);
+  const [meta, setMeta] = useState<PaginationMeta | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const totalPages = Math.ceil(teamMembers.length / PAGE_SIZE);
-  const paginatedMembers = teamMembers.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE,
-  );
+  const fetchUsers = useCallback(async (page: number) => {
+    setIsLoading(true);
+    try {
+      const { data: res } = await usersApi.getAll({
+        page,
+        limit: PAGE_SIZE,
+      });
+      setUsers(res.data);
+      setMeta(res.meta);
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      const message =
+        axiosError.response?.data?.message ||
+        "Failed to load team members. Please try again.";
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUsers(currentPage);
+  }, [currentPage, fetchUsers]);
+
+  const totalPages = meta?.totalPages ?? 1;
 
   return (
     <>
@@ -69,32 +95,57 @@ export function TeamManagementTab() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedMembers.map((member) => (
-              <TableRow key={member.id}>
-                <TableCell className="text-brand-description">
-                  {member.name}
-                </TableCell>
-                <TableCell className="text-brand-description">
-                  {member.email}
-                </TableCell>
-                <TableCell className="text-brand-description">
-                  {member.role}
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant="outline"
-                    className="bg-[#F0F8F5] text-[#008753] border-0"
-                  >
-                    {member.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="size-8">
-                    <MoreVertical className="size-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
+            {isLoading
+              ? Array.from({ length: PAGE_SIZE }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <span className="block h-4 w-28 animate-pulse rounded bg-gray-200" />
+                    </TableCell>
+                    <TableCell>
+                      <span className="block h-4 w-40 animate-pulse rounded bg-gray-200" />
+                    </TableCell>
+                    <TableCell>
+                      <span className="block h-4 w-24 animate-pulse rounded bg-gray-200" />
+                    </TableCell>
+                    <TableCell>
+                      <span className="block h-4 w-16 animate-pulse rounded bg-gray-200" />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <span className="block ml-auto h-4 w-6 animate-pulse rounded bg-gray-200" />
+                    </TableCell>
+                  </TableRow>
+                ))
+              : users.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell className="text-brand-description">
+                      {user.first_name} {user.last_name}
+                    </TableCell>
+                    <TableCell className="text-brand-description">
+                      {user.email}
+                    </TableCell>
+                    <TableCell className="text-brand-description capitalize">
+                      {user.role}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className={
+                          user.status === "active"
+                            ? "bg-[#F0F8F5] text-[#008753] border-0"
+                            : "bg-gray-100 text-gray-600 border-0"
+                        }
+                      >
+                        {user.status.charAt(0).toUpperCase() +
+                          user.status.slice(1)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" className="size-8">
+                        <MoreVertical className="size-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
           </TableBody>
         </Table>
 
@@ -109,14 +160,14 @@ export function TeamManagementTab() {
             <Button
               variant="outline"
               size="sm"
-              disabled={currentPage === 1}
+              disabled={!meta?.hasPrevPage}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             >
               Previous
             </Button>
             <Button
               size="sm"
-              disabled={currentPage === totalPages}
+              disabled={!meta?.hasNextPage}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             >
               Next

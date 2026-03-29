@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { currentUser } from "../../_data/mock-data";
+import { useAuthStore } from "@/lib/stores/auth-store";
 
 const editProfileSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -41,13 +41,15 @@ export function EditProfileDialog({
   open,
   onOpenChange,
 }: EditProfileDialogProps) {
+  const profile = useAuthStore((s) => s.profile);
+
   const form = useForm<EditProfileValues>({
     resolver: zodResolver(editProfileSchema),
     defaultValues: {
-      name: currentUser.name,
-      email: currentUser.email,
-      phone: currentUser.phone,
-      role: currentUser.role,
+      name: profile ? `${profile.first_name} ${profile.last_name}` : "",
+      email: profile?.email ?? "",
+      phone: profile?.phone_number ?? "",
+      role: profile?.role ?? "",
     },
   });
 

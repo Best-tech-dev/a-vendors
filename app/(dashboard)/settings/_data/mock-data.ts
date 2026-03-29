@@ -1,4 +1,4 @@
-import type { SettingsStat, TeamMember, Role } from "@/types/settings";
+import type { SettingsStat, Role } from "@/types/settings";
 
 export const settingsStats: SettingsStat[] = [
   { label: "Total team members", value: 5 },
@@ -6,14 +6,6 @@ export const settingsStats: SettingsStat[] = [
   { label: "Finance managers", value: 2 },
   { label: "Production managers", value: 3 },
 ];
-
-export const teamMembers: TeamMember[] = Array.from({ length: 23 }, (_, i) => ({
-  id: `member-${i + 1}`,
-  name: "Jane Doe",
-  email: "janedoe@gmail",
-  role: "Managing Director",
-  status: "Active" as const,
-}));
 
 export const roles: Role[] = [
   {
@@ -82,10 +74,3 @@ export const roles: Role[] = [
     ],
   },
 ];
-
-export const currentUser = {
-  name: "Jane Doe",
-  email: "janedoe@gmail.com",
-  phone: "",
-  role: "CFO",
-};

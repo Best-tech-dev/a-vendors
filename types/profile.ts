@@ -19,3 +19,35 @@ export interface UserProfileResponse {
   data: UserProfile;
   statusCode: number;
 }
+
+export interface TeamUser {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  username: string | null;
+  phone_number: string | null;
+  display_picture: string | null;
+  company_position: string | null;
+  role: string;
+  status: string;
+  is_active: boolean;
+}
+
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+export interface TeamUsersResponse {
+  success: boolean;
+  message: string;
+  data: TeamUser[];
+  length: number;
+  meta: PaginationMeta;
+  statusCode: number;
+}
