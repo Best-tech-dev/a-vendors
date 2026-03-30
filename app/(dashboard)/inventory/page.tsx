@@ -69,8 +69,7 @@ export default function InventoryPage() {
     fetchMaterials(page);
   };
 
-  const formatCurrency = (value: number) =>
-    `₦${value.toLocaleString("en-NG")}`;
+  const formatCurrency = (value: number) => `₦${value.toLocaleString("en-NG")}`;
 
   return (
     <div className="space-y-6">
