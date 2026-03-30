@@ -5,6 +5,9 @@ import type {
   CategoriesListResponse,
   CreateMaterialRequest,
   CreateMaterialResponse,
+  MaterialsListResponse,
+  MaterialsListParams,
+  SingleCategoryResponse,
 } from "@/types/inventory";
 
 export const inventoryApi = {
@@ -13,6 +16,12 @@ export const inventoryApi = {
 
   getCategories: () =>
     api.get<CategoriesListResponse>("avendor/inventory/categories"),
+
+  getCategoryById: (id: string) =>
+    api.get<SingleCategoryResponse>(`avendor/inventory/categories/${id}`),
+
+  getMaterials: (params?: MaterialsListParams) =>
+    api.get<MaterialsListResponse>("avendor/inventory/materials", { params }),
 
   createMaterial: (payload: CreateMaterialRequest) => {
     const formData = new FormData();

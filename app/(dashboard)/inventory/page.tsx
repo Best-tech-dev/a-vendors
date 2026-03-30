@@ -1,45 +1,76 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatsCard } from "@/app/_components/stats-card";
 import { EmptyState } from "@/app/_components/empty-state";
 import Image from "next/image";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
 import { InventoryTable } from "./_components/inventory-table";
 import { AddCategoryDialog } from "./_components/add-category-dialog";
 import { AddMaterialDialog } from "./_components/add-material-dialog";
-import { mockMaterials } from "@/lib/mock/inventory";
+import { inventoryApi } from "@/lib/api/inventory";
+import type { Material, MaterialsAnalysis } from "@/types/inventory";
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 20;
 
 export default function InventoryPage() {
-  // Toggle to `true` to preview the empty state
-  const [isEmpty] = useState(false);
-
   const [page, setPage] = useState(1);
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
   const [materialDialogOpen, setMaterialDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const materials = isEmpty ? [] : mockMaterials;
+  const [materials, setMaterials] = useState<Material[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [analysis, setAnalysis] = useState<MaterialsAnalysis>({
+    totalMaterials: 0,
+    inventoryValue: 0,
+    lowStockCount: 0,
+    outOfStockCount: 0,
+  });
 
-  const totalMaterials = materials.length;
-  const inventoryValue = materials.reduce(
-    (sum, m) => sum + m.stock * m.unitPrice,
-    0,
-  );
-  const lowStock = materials.filter(
-    (m) => m.stock > 0 && m.stock <= m.reorderLevel,
-  ).length;
-  const outOfStock = materials.filter((m) => m.stock === 0).length;
+  const fetchMaterials = useCallback(async (pageNum: number) => {
+    setLoading(true);
+    try {
+      const res = await inventoryApi.getMaterials({
+        page: pageNum,
+        limit: ITEMS_PER_PAGE,
+      });
+      const { analysis, items, meta } = res.data.data;
+      setAnalysis(analysis);
+      setMaterials(items);
+      setTotalPages(meta.totalPages || 1);
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      if (!axiosError.response) {
+        toast.error("Network error — please check your connection and retry.");
+      } else {
+        toast.error(
+          axiosError.response.data?.message ??
+            "Could not load inventory. Please try again.",
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  const totalPages = Math.max(1, Math.ceil(materials.length / ITEMS_PER_PAGE));
-  const paginatedMaterials = materials.slice(
-    (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE,
-  );
+  useEffect(() => {
+    fetchMaterials(page);
+  }, [page, fetchMaterials]);
 
-  const formatCurrency = (value: number) => `₦${value.toLocaleString("en-NG")}`;
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleMutationSuccess = () => {
+    fetchMaterials(page);
+  };
+
+  const formatCurrency = (value: number) =>
+    `₦${value.toLocaleString("en-NG")}`;
 
   return (
     <div className="space-y-6">
@@ -70,7 +101,7 @@ export default function InventoryPage() {
         </div>
       </div>
 
-      {materials.length === 0 ? (
+      {!loading && materials.length === 0 ? (
         <div className="rounded-lg border border-gray-200 bg-white">
           <EmptyState
             title="No materials found"
@@ -91,22 +122,26 @@ export default function InventoryPage() {
         <>
           {/* Stats */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatsCard value={totalMaterials} label="Total Materials" />
             <StatsCard
-              value={formatCurrency(inventoryValue)}
+              value={analysis.totalMaterials}
+              label="Total Materials"
+            />
+            <StatsCard
+              value={formatCurrency(analysis.inventoryValue)}
               label="Inventory Value"
             />
-            <StatsCard value={lowStock} label="Low Stock" />
-            <StatsCard value={outOfStock} label="Out of Stock" />
+            <StatsCard value={analysis.lowStockCount} label="Low Stock" />
+            <StatsCard value={analysis.outOfStockCount} label="Out of Stock" />
           </div>
 
           {/* Table */}
           <div className="rounded-lg border border-gray-200 bg-white">
             <InventoryTable
-              materials={paginatedMaterials}
+              materials={materials}
               page={page}
               totalPages={totalPages}
-              onPageChange={setPage}
+              onPageChange={handlePageChange}
+              loading={loading}
             />
           </div>
         </>
@@ -115,10 +150,12 @@ export default function InventoryPage() {
       <AddCategoryDialog
         open={categoryDialogOpen}
         onOpenChange={setCategoryDialogOpen}
+        onSuccess={handleMutationSuccess}
       />
       <AddMaterialDialog
         open={materialDialogOpen}
         onOpenChange={setMaterialDialogOpen}
+        onSuccess={handleMutationSuccess}
       />
     </div>
   );

@@ -17,6 +17,7 @@ interface InventoryTableProps {
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  loading?: boolean;
 }
 
 function formatPrice(value: number) {
@@ -28,6 +29,7 @@ export function InventoryTable({
   page,
   totalPages,
   onPageChange,
+  loading,
 }: InventoryTableProps) {
   return (
     <div>
@@ -65,7 +67,7 @@ export function InventoryTable({
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md bg-gray-100">
                       <Image
-                        src={material.thumbnail || "/imgs/tin.jpg"}
+                        src={material.imageUrl || "/imgs/tin.jpg"}
                         alt={material.name}
                         width={40}
                         height={40}
@@ -78,7 +80,7 @@ export function InventoryTable({
                   </div>
                 </TableCell>
                 <TableCell className="text-brand-description">
-                  {material.category}
+                  {material.category.name}
                 </TableCell>
                 <TableCell className="text-brand-description">
                   {material.unit}
@@ -112,7 +114,7 @@ export function InventoryTable({
                   </div>
                 </TableCell>
                 <TableCell className="font-medium text-brand-title">
-                  {formatPrice(material.unitPrice)}
+                  {formatPrice(material.pricePerUnit)}
                 </TableCell>
               </TableRow>
             );
