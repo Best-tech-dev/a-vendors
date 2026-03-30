@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -22,16 +22,21 @@ import {
 import { Upload, X } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
-import { mockCategories, mockUnits } from "@/lib/mock/inventory";
+import { AxiosError } from "axios";
+import { mockUnits } from "@/lib/mock/inventory";
+import { inventoryApi } from "@/lib/api/inventory";
+import type { MaterialCategory } from "@/types/inventory";
 
 interface AddMaterialDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
 export function AddMaterialDialog({
   open,
   onOpenChange,
+  onSuccess,
 }: AddMaterialDialogProps) {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
@@ -43,7 +48,33 @@ export function AddMaterialDialog({
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Categories from backend
+  const [categories, setCategories] = useState<MaterialCategory[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    setCategoriesLoading(true);
+    inventoryApi
+      .getCategories()
+      .then((res) => {
+        if (!cancelled) setCategories(res.data.data);
+      })
+      .catch(() => {
+        if (!cancelled)
+          toast.error("Could not load categories. Please try again.");
+      })
+      .finally(() => {
+        if (!cancelled) setCategoriesLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
 
   const isValid = name.trim() && category && unit;
 
@@ -104,21 +135,47 @@ export function AddMaterialDialog({
     setPreview(null);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!isValid) return;
-    // TODO: submit material to backend
-    console.log({
-      name,
-      category,
-      unit,
-      description,
-      stock,
-      reorderLevel,
-      price,
-      file,
-    });
-    resetForm();
-    onOpenChange(false);
+    setIsSubmitting(true);
+    try {
+      await inventoryApi.createMaterial({
+        name,
+        categoryId: category,
+        unit,
+        description: description || undefined,
+        stock: stock ? Number(stock) : undefined,
+        reorderLevel: reorderLevel ? Number(reorderLevel) : undefined,
+        pricePerUnit: price ? Number(price) : undefined,
+        image: file ?? undefined,
+      });
+      toast.success("Material added successfully");
+      resetForm();
+      onOpenChange(false);
+      onSuccess?.();
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      const status = axiosError.response?.status;
+      const serverMessage = axiosError.response?.data?.message;
+
+      if (status === 409) {
+        toast.error("A material with this name already exists.");
+      } else if (status === 400 || status === 422) {
+        toast.error(serverMessage ?? "Please check your inputs and try again.");
+      } else if (status === 403) {
+        toast.error("You don't have permission to add materials.");
+      } else if (status === 413) {
+        toast.error(
+          "The uploaded image is too large. Please use a smaller file.",
+        );
+      } else if (!axiosError.response) {
+        toast.error("Network error — please check your connection and retry.");
+      } else {
+        toast.error(serverMessage ?? "Something went wrong. Please try again.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -159,12 +216,16 @@ export function AddMaterialDialog({
               </Label>
               <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue
+                    placeholder={
+                      categoriesLoading ? "Loading…" : "Select category"
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  {mockCategories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {cat}
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.id}>
+                      {cat.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -332,6 +393,7 @@ export function AddMaterialDialog({
           <div className="flex items-center justify-end gap-3 pt-2">
             <Button
               variant="ghost"
+              disabled={isSubmitting}
               onClick={() => {
                 resetForm();
                 onOpenChange(false);
@@ -341,10 +403,10 @@ export function AddMaterialDialog({
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={!isValid}
+              disabled={!isValid || isSubmitting}
               className="bg-gray-900 hover:bg-gray-800 disabled:opacity-50"
             >
-              Continue
+              {isSubmitting ? "Submitting..." : "Continue"}
             </Button>
           </div>
         </div>
