@@ -57,68 +57,96 @@ export function InventoryTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {materials.map((material) => {
-            const isLow =
-              material.stock > 0 && material.stock <= material.reorderLevel;
-            const isOut = material.stock === 0;
-            return (
-              <TableRow key={material.id} className="border-gray-100">
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md bg-gray-100">
-                      <Image
-                        src={material.imageUrl || "/imgs/tin.jpg"}
-                        alt={material.name}
-                        width={40}
-                        height={40}
-                        className="h-full w-full object-cover"
-                      />
+          {loading
+            ? Array.from({ length: 8 }).map((_, i) => (
+                <TableRow key={i} className="border-gray-100">
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 shrink-0 rounded-md bg-gray-200 animate-pulse" />
+                      <span className="block h-4 w-28 animate-pulse rounded bg-gray-200" />
                     </div>
-                    <span className="font-medium text-brand-title">
-                      {material.name}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell className="text-brand-description">
-                  {material.category.name}
-                </TableCell>
-                <TableCell className="text-brand-description">
-                  {material.unit}
-                </TableCell>
-                <TableCell>
-                  <span
-                    className={
-                      isOut ? "font-medium text-badge-red" : "text-brand-title"
-                    }
-                  >
-                    {material.stock}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <span className="text-brand-title">
-                      {material.reorderLevel}
-                    </span>
-                    {isLow && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-badge-red-accent px-2 py-0.5 text-xs font-medium text-badge-red">
-                        <AlertTriangle className="h-3 w-3" />
-                        Low
+                  </TableCell>
+                  <TableCell>
+                    <span className="block h-4 w-20 animate-pulse rounded bg-gray-200" />
+                  </TableCell>
+                  <TableCell>
+                    <span className="block h-4 w-12 animate-pulse rounded bg-gray-200" />
+                  </TableCell>
+                  <TableCell>
+                    <span className="block h-4 w-12 animate-pulse rounded bg-gray-200" />
+                  </TableCell>
+                  <TableCell>
+                    <span className="block h-4 w-16 animate-pulse rounded bg-gray-200" />
+                  </TableCell>
+                  <TableCell>
+                    <span className="block h-4 w-20 animate-pulse rounded bg-gray-200" />
+                  </TableCell>
+                </TableRow>
+              ))
+            : materials.map((material) => {
+                const isLow =
+                  material.stock > 0 && material.stock <= material.reorderLevel;
+                const isOut = material.stock === 0;
+                return (
+                  <TableRow key={material.id} className="border-gray-100">
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md bg-gray-100">
+                          <Image
+                            src={material.imageUrl || "/imgs/tin.jpg"}
+                            alt={material.name}
+                            width={40}
+                            height={40}
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
+                        <span className="font-medium text-brand-title">
+                          {material.name}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-brand-description">
+                      {material.category.name}
+                    </TableCell>
+                    <TableCell className="text-brand-description">
+                      {material.unit}
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={
+                          isOut
+                            ? "font-medium text-badge-red"
+                            : "text-brand-title"
+                        }
+                      >
+                        {material.stock}
                       </span>
-                    )}
-                    {isOut && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-badge-red-accent px-2 py-0.5 text-xs font-medium text-badge-red">
-                        <AlertTriangle className="h-3 w-3" />
-                        Out
-                      </span>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell className="font-medium text-brand-title">
-                  {formatPrice(material.pricePerUnit)}
-                </TableCell>
-              </TableRow>
-            );
-          })}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <span className="text-brand-title">
+                          {material.reorderLevel}
+                        </span>
+                        {isLow && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-badge-red-accent px-2 py-0.5 text-xs font-medium text-badge-red">
+                            <AlertTriangle className="h-3 w-3" />
+                            Low
+                          </span>
+                        )}
+                        {isOut && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-badge-red-accent px-2 py-0.5 text-xs font-medium text-badge-red">
+                            <AlertTriangle className="h-3 w-3" />
+                            Out
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium text-brand-title">
+                      {formatPrice(material.pricePerUnit)}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
         </TableBody>
       </Table>
 

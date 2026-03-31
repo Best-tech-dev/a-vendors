@@ -122,15 +122,25 @@ export default function InventoryPage() {
           {/* Stats */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatsCard
+              loading={loading}
               value={analysis.totalMaterials}
               label="Total Materials"
             />
             <StatsCard
+              loading={loading}
               value={formatCurrency(analysis.inventoryValue)}
               label="Inventory Value"
             />
-            <StatsCard value={analysis.lowStockCount} label="Low Stock" />
-            <StatsCard value={analysis.outOfStockCount} label="Out of Stock" />
+            <StatsCard
+              loading={loading}
+              value={analysis.lowStockCount}
+              label="Low Stock"
+            />
+            <StatsCard
+              loading={loading}
+              value={analysis.outOfStockCount}
+              label="Out of Stock"
+            />
           </div>
 
           {/* Table */}
