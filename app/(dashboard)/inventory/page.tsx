@@ -8,6 +8,7 @@ import { EmptyState } from "@/app/_components/empty-state";
 import Image from "next/image";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
+import { useSearchParams } from "next/navigation";
 import { InventoryTable } from "./_components/inventory-table";
 import { AddCategoryDialog } from "./_components/add-category-dialog";
 import { AddMaterialDialog } from "./_components/add-material-dialog";
@@ -17,6 +18,9 @@ import type { Material, MaterialsAnalysis } from "@/types/inventory";
 const ITEMS_PER_PAGE = 20;
 
 export default function InventoryPage() {
+  const searchParams = useSearchParams();
+  const search = searchParams.get("search") ?? "";
+
   const [page, setPage] = useState(1);
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
   const [materialDialogOpen, setMaterialDialogOpen] = useState(false);
@@ -31,42 +35,53 @@ export default function InventoryPage() {
     outOfStockCount: 0,
   });
 
-  const fetchMaterials = useCallback(async (pageNum: number) => {
-    setLoading(true);
-    try {
-      const res = await inventoryApi.getMaterials({
-        page: pageNum,
-        limit: ITEMS_PER_PAGE,
-      });
-      const { analysis, items, meta } = res.data.data;
-      setAnalysis(analysis);
-      setMaterials(items);
-      setTotalPages(meta.totalPages || 1);
-    } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
-      if (!axiosError.response) {
-        toast.error("Network error — please check your connection and retry.");
-      } else {
-        toast.error(
-          axiosError.response.data?.message ??
-            "Could not load inventory. Please try again.",
-        );
+  const fetchMaterials = useCallback(
+    async (pageNum: number, searchQuery: string) => {
+      setLoading(true);
+      try {
+        const res = await inventoryApi.getMaterials({
+          page: pageNum,
+          limit: ITEMS_PER_PAGE,
+          search: searchQuery || undefined,
+        });
+        const { analysis, items, meta } = res.data.data;
+        setAnalysis(analysis);
+        setMaterials(items);
+        setTotalPages(meta.totalPages || 1);
+      } catch (error) {
+        const axiosError = error as AxiosError<{ message: string }>;
+        if (!axiosError.response) {
+          toast.error(
+            "Network error — please check your connection and retry.",
+          );
+        } else {
+          toast.error(
+            axiosError.response.data?.message ??
+              "Could not load inventory. Please try again.",
+          );
+        }
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    [],
+  );
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
 
   useEffect(() => {
-    fetchMaterials(page);
-  }, [page, fetchMaterials]);
+    fetchMaterials(page, search);
+  }, [page, search, fetchMaterials]);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
   };
 
   const handleMutationSuccess = () => {
-    fetchMaterials(page);
+    fetchMaterials(page, search);
   };
 
   const formatCurrency = (value: number) => `₦${value.toLocaleString("en-NG")}`;

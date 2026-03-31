@@ -4,9 +4,9 @@ import { Bell, ChevronDown, Menu, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/lib/stores/auth-store";
-import { useMemo } from "react";
+import { useMemo, useState, useRef, useCallback } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,10 +22,66 @@ import {
 } from "@/components/ui/sheet";
 import { Sidebar } from "./sidebar";
 
+const PLACEHOLDER_MAP: Record<string, string> = {
+  "/inventory": "Search inventory...",
+  "/vendors": "Search vendors...",
+  "/orders": "Search orders...",
+  "/rfqs": "Search RFQs...",
+  "/payments": "Search payments...",
+  "/expenses": "Search expenses...",
+};
+
+function getPlaceholder(pathname: string): string {
+  for (const [route, placeholder] of Object.entries(PLACEHOLDER_MAP)) {
+    if (pathname.startsWith(route)) return placeholder;
+  }
+  return "Search...";
+}
+
 export function Header() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const profile = useAuthStore((state) => state.profile);
+
+  const [searchValue, setSearchValue] = useState(
+    searchParams.get("search") ?? "",
+  );
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [prevPathname, setPrevPathname] = useState(pathname);
+
+  // Sync input when navigating to a different page (state-during-render pattern)
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
+    const urlSearch = searchParams.get("search") ?? "";
+    if (searchValue !== urlSearch) {
+      setSearchValue(urlSearch);
+    }
+  }
+
+  const pushSearch = useCallback(
+    (value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (value) {
+        params.set("search", value);
+      } else {
+        params.delete("search");
+      }
+      // Reset to page 1 on new search
+      params.delete("page");
+      router.replace(`${pathname}?${params.toString()}`);
+    },
+    [pathname, router, searchParams],
+  );
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchValue(value);
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => pushSearch(value), 400);
+  };
 
   const { displayName, initials } = useMemo(() => {
     if (!profile) return { displayName: "", initials: "" };
@@ -62,7 +118,9 @@ export function Header() {
         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-brand-muted" />
         <Input
           type="search"
-          placeholder="Search for vendors, quotes or invoices"
+          placeholder={getPlaceholder(pathname)}
+          value={searchValue}
+          onChange={handleSearchChange}
           className="h-10 border-brand-border bg-gray-50/50 pl-9 text-sm placeholder:text-brand-muted focus-visible:ring-brand-primary/20"
         />
       </div>
