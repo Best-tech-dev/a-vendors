@@ -29,9 +29,15 @@ export interface TeamUser {
   phone_number: string | null;
   display_picture: string | null;
   company_position: string | null;
+  is_a_vendor: boolean;
   role: string;
   status: string;
   is_active: boolean;
+  usertype: string | null;
+  allowed_platforms: string[];
+  allowed_platforms_for_user: string[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PaginationMeta {
