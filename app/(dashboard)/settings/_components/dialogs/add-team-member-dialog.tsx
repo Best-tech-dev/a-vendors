@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -28,7 +29,8 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { roles } from "../../_data/mock-data";
+import { permissionsApi } from "@/lib/api/permissions";
+import type { PermissionModule } from "@/types/settings";
 
 const addTeamMemberSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -47,6 +49,15 @@ export function AddTeamMemberDialog({
   open,
   onOpenChange,
 }: AddTeamMemberDialogProps) {
+  const [modules, setModules] = useState<PermissionModule[]>([]);
+
+  useEffect(() => {
+    permissionsApi
+      .getModuleCatalog()
+      .then(({ data }) => setModules(data.data.modules))
+      .catch(() => {});
+  }, []);
+
   const form = useForm<AddTeamMemberValues>({
     resolver: zodResolver(addTeamMemberSchema),
     defaultValues: {
@@ -124,9 +135,9 @@ export function AddTeamMemberDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {roles.map((role) => (
-                        <SelectItem key={role.id} value={role.name}>
-                          {role.name}
+                      {modules.map((mod) => (
+                        <SelectItem key={mod.key} value={mod.label}>
+                          {mod.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
