@@ -3,8 +3,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SettingsStats } from "./_components/settings-stats";
 import { PersonalDetailsTab } from "./_components/personal-details-tab";
-import { TeamManagementTab } from "./_components/team-management-tab";
+import { AdminManagementTab } from "./_components/team-management-tab";
 import { RoleManagementTab } from "./_components/role-management-tab";
+import { UserManagementTab } from "./_components/user-management-tab";
 
 export default function SettingsPage() {
   return (
@@ -34,13 +35,19 @@ export default function SettingsPage() {
               value="team"
               className="rounded-sm px-2 py-4 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-[#1B2559] data-[state=inactive]:text-white/80 cursor-pointer"
             >
-              Team management
+              Admin management
+            </TabsTrigger>
+            <TabsTrigger
+              value="users"
+              className="rounded-sm px-2 py-4 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-[#1B2559] data-[state=inactive]:text-white/80 cursor-pointer"
+            >
+              User management
             </TabsTrigger>
             <TabsTrigger
               value="roles"
               className="rounded-sm px-2 py-4 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-[#1B2559] data-[state=inactive]:text-white/80 cursor-pointer"
             >
-              Role management
+              Permission management
             </TabsTrigger>
           </TabsList>
         </div>
@@ -50,7 +57,11 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="team" className="mt-6">
-          <TeamManagementTab />
+          <AdminManagementTab />
+        </TabsContent>
+
+        <TabsContent value="users" className="mt-6">
+          <UserManagementTab />
         </TabsContent>
 
         <TabsContent value="roles" className="mt-6">

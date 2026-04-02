@@ -22,7 +22,7 @@ import { AddTeamMemberDialog } from "./dialogs/add-team-member-dialog";
 
 const PAGE_SIZE = 5;
 
-export function TeamManagementTab() {
+export function AdminManagementTab() {
   const [addOpen, setAddOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [users, setUsers] = useState<TeamUser[]>([]);
@@ -32,7 +32,7 @@ export function TeamManagementTab() {
   const fetchUsers = useCallback(async (page: number) => {
     setIsLoading(true);
     try {
-      const { data: res } = await usersApi.getAll({
+      const { data: res } = await usersApi.getAdmins({
         page,
         limit: PAGE_SIZE,
       });
@@ -42,7 +42,7 @@ export function TeamManagementTab() {
       const axiosError = error as AxiosError<{ message: string }>;
       const message =
         axiosError.response?.data?.message ||
-        "Failed to load team members. Please try again.";
+        "Failed to load admins. Please try again.";
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -62,10 +62,10 @@ export function TeamManagementTab() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-2 px-6 py-4">
           <div>
             <h2 className="text-lg font-semibold text-brand-title">
-              Team management
+              Admin management
             </h2>
             <p className="text-sm text-brand-description">
-              Manage team access and permissions
+              Manage admin access and permissions
             </p>
           </div>
           <Button onClick={() => setAddOpen(true)}>+ Add team member</Button>

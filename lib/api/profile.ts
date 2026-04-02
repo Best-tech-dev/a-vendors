@@ -6,9 +6,11 @@ export const profileApi = {
 };
 
 export const usersApi = {
-  getAll: (params?: { page?: number; limit?: number }) =>
+  getAdmins: (params?: { page?: number; limit?: number }) =>
     api.get<TeamUsersResponse>(
       "https://access-seller-prod.onrender.com/api/v1/avendor/user-management/users/avendor-admins",
       { params },
     ),
+  getAll: (params?: { page?: number; limit?: number }) =>
+    api.get<TeamUsersResponse>("/avendor/user-management/users", { params }),
 };
