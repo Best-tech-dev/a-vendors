@@ -21,18 +21,23 @@ import { toast } from "sonner";
 
 const PAGE_SIZE = 5;
 
-export function UserManagementTab() {
+interface UserManagementTabProps {
+  search: string;
+}
+
+export function UserManagementTab({ search }: UserManagementTabProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [users, setUsers] = useState<TeamUser[]>([]);
   const [meta, setMeta] = useState<PaginationMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchUsers = useCallback(async (page: number) => {
+  const fetchUsers = useCallback(async (page: number, searchQuery: string) => {
     setIsLoading(true);
     try {
       const { data: res } = await usersApi.getAll({
         page,
         limit: PAGE_SIZE,
+        search: searchQuery || undefined,
       });
       setUsers(res.data);
       setMeta(res.meta);
@@ -47,9 +52,14 @@ export function UserManagementTab() {
     }
   }, []);
 
+  // Reset to page 1 when search changes
   useEffect(() => {
-    fetchUsers(currentPage);
-  }, [currentPage, fetchUsers]);
+    setCurrentPage(1);
+  }, [search]);
+
+  useEffect(() => {
+    fetchUsers(currentPage, search);
+  }, [currentPage, search, fetchUsers]);
 
   const totalPages = meta?.totalPages ?? 1;
 

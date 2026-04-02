@@ -6,8 +6,30 @@ import { PersonalDetailsTab } from "./_components/personal-details-tab";
 import { AdminManagementTab } from "./_components/team-management-tab";
 import { RoleManagementTab } from "./_components/role-management-tab";
 import { UserManagementTab } from "./_components/user-management-tab";
+import { useRouter, useSearchParams } from "next/navigation";
+
+const VALID_TABS = ["personal", "team", "users", "roles"] as const;
+type SettingsTab = (typeof VALID_TABS)[number];
 
 export default function SettingsPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const rawTab = searchParams.get("tab");
+  const activeTab: SettingsTab = VALID_TABS.includes(rawTab as SettingsTab)
+    ? (rawTab as SettingsTab)
+    : "personal";
+
+  const search = searchParams.get("search") ?? "";
+
+  const handleTabChange = (value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", value);
+    // Clear search when switching tabs
+    params.delete("search");
+    router.replace(`/settings?${params.toString()}`);
+  };
+
   return (
     <div className="space-y-6">
       {/* Page header */}
@@ -22,7 +44,11 @@ export default function SettingsPage() {
       <SettingsStats />
 
       {/* Tabs */}
-      <Tabs defaultValue="personal" className="w-full mt-10">
+      <Tabs
+        value={activeTab}
+        onValueChange={handleTabChange}
+        className="w-full mt-10"
+      >
         <div className="overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
           <TabsList className="bg-brand-primary text-white rounded-sm py-5.5 px-1.5 flex w-max space-x-2">
             <TabsTrigger
@@ -57,11 +83,11 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="team" className="mt-6">
-          <AdminManagementTab />
+          <AdminManagementTab search={search} />
         </TabsContent>
 
         <TabsContent value="users" className="mt-6">
-          <UserManagementTab />
+          <UserManagementTab search={search} />
         </TabsContent>
 
         <TabsContent value="roles" className="mt-6">

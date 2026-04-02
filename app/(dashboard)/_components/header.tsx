@@ -29,6 +29,7 @@ const PLACEHOLDER_MAP: Record<string, string> = {
   "/rfqs": "Search RFQs...",
   "/payments": "Search payments...",
   "/expenses": "Search expenses...",
+  "/settings": "Search users...",
 };
 
 function getPlaceholder(pathname: string): string {

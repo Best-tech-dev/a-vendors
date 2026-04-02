@@ -22,19 +22,24 @@ import { AddTeamMemberDialog } from "./dialogs/add-team-member-dialog";
 
 const PAGE_SIZE = 5;
 
-export function AdminManagementTab() {
+interface AdminManagementTabProps {
+  search: string;
+}
+
+export function AdminManagementTab({ search }: AdminManagementTabProps) {
   const [addOpen, setAddOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [users, setUsers] = useState<TeamUser[]>([]);
   const [meta, setMeta] = useState<PaginationMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchUsers = useCallback(async (page: number) => {
+  const fetchUsers = useCallback(async (page: number, searchQuery: string) => {
     setIsLoading(true);
     try {
       const { data: res } = await usersApi.getAdmins({
         page,
         limit: PAGE_SIZE,
+        search: searchQuery || undefined,
       });
       setUsers(res.data);
       setMeta(res.meta);
@@ -49,9 +54,14 @@ export function AdminManagementTab() {
     }
   }, []);
 
+  // Reset to page 1 when search changes
   useEffect(() => {
-    fetchUsers(currentPage);
-  }, [currentPage, fetchUsers]);
+    setCurrentPage(1);
+  }, [search]);
+
+  useEffect(() => {
+    fetchUsers(currentPage, search);
+  }, [currentPage, search, fetchUsers]);
 
   const totalPages = meta?.totalPages ?? 1;
 
