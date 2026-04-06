@@ -23,6 +23,13 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",
+  /* Raise the default assertion timeout.
+   * The default 5 000 ms is too short when the Next.js dev server compiles a
+   * page on first access under concurrent test load (e.g. /verify being hit by
+   * multiple browser workers simultaneously). 10 000 ms gives the compiler
+   * enough headroom without masking genuine failures. */
+  expect: { timeout: 10_000 },
+
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */

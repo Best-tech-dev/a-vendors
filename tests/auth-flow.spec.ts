@@ -192,16 +192,22 @@ test.describe("Auth Flow — Error States", () => {
     page,
   }) => {
     /**
-     * Register a 401 response for the sign-in endpoint only.
-     * No other mocks are needed — we never leave /sign-in in this test.
+     * WHY 400 NOT 401
+     * ---------------
+     * The axios instance in lib/api/axios.ts has a response interceptor that
+     * calls `clearAuth()` + `window.location.href = "/sign-in"` on every 401.
+     * That hard-reload destroys all React state (including the queued Sonner
+     * toast) before Playwright can observe the DOM element.
      *
-     * The sign-in page catches the AxiosError and calls:
-     *   toast.error(axiosError.response?.data?.message || fallback)
+     * A 400 (Bad Request) is the correct status for wrong credentials at a
+     * login endpoint (401 is semantically "session expired" / "not authenticated"
+     * for already-authenticated users). Using 400 keeps the error inside the
+     * sign-in page's own try/catch, which calls toast.error() as expected.
      */
     await page.route("**/auth/sign-in", async (route) => {
       if (route.request().method() === "POST") {
         await route.fulfill({
-          status: 401,
+          status: 400,
           contentType: "application/json",
           body: JSON.stringify({
             success: false,
@@ -218,13 +224,16 @@ test.describe("Auth Flow — Error States", () => {
     await loginPage.submitCredentials(MOCK_CREDENTIALS.email, "wrong-password");
 
     /**
-     * Sonner (the toast library in use) renders each notification as an
-     * <li data-sonner-toast> element inside its toaster portal.
-     * We target that attribute to assert the error message text.
+     * TOAST SELECTOR STRATEGY
+     * -----------------------
+     * Sonner renders each notification as <li data-sonner-toast data-type="error|success|...">
+     * We filter to data-type="error" to target only the error notification,
+     * avoiding a strict-mode violation if a prior step's success toast is
+     * still visible in the same test session.
      */
-    await expect(page.locator("[data-sonner-toast]")).toContainText(
-      "Invalid email or password",
-    );
+    await expect(
+      page.locator("[data-sonner-toast][data-type='error']"),
+    ).toContainText("Invalid email or password");
     // The URL must not have changed — user stays on the sign-in page.
     await expect(page).toHaveURL(/\/sign-in/);
   });
@@ -266,9 +275,19 @@ test.describe("Auth Flow — Error States", () => {
     // Submit a deliberately incorrect OTP; the mock returns 400.
     await otpPage.enterAndSubmit("000000");
 
-    await expect(page.locator("[data-sonner-toast]")).toContainText(
-      "Invalid OTP",
-    );
+    /**
+     * At this point two Sonner toasts may be simultaneously visible:
+     *   1. The success "OTP sent to your email" toast from the sign-in step.
+     *   2. The error "Invalid OTP..." toast from the failed verification.
+     *
+     * Using the plain [data-sonner-toast] locator would violate Playwright's
+     * strict mode (multiple elements). Filtering on data-type="error" ensures
+     * we target only the error notification regardless of how many toasts are
+     * currently in the DOM.
+     */
+    await expect(
+      page.locator("[data-sonner-toast][data-type='error']"),
+    ).toContainText("Invalid OTP");
     // The user must remain on the verify page — no redirect to dashboard.
     await expect(page).toHaveURL(/\/verify/);
   });
