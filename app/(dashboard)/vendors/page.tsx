@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Plus, Users, UserCheck, UserX, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatsCard } from "@/app/_components/stats-card";
@@ -8,35 +8,92 @@ import { EmptyState } from "@/app/_components/empty-state";
 import { VendorTable } from "./_components/vendor-table";
 import { VendorDetailsSheet } from "./_components/vendor-details-sheet";
 import { AddVendorDialog } from "./_components/add-vendor-dialog";
-import { mockVendors } from "@/lib/mock/vendors";
-import type { Vendor } from "@/types/vendor";
+import { vendorsApi } from "@/lib/api/vendors";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
+import { useSearchParams } from "next/navigation";
+import type { Vendor, VendorsAnalysis } from "@/types/vendor";
 import Image from "next/image";
+
+const ITEMS_PER_PAGE = 20;
 
 type VendorFilter = "all" | "active" | "inactive";
 
 export default function VendorsPage() {
-  // Toggle to `true` to preview the empty state
-  const [isEmpty] = useState(false);
+  const searchParams = useSearchParams();
+  const search = searchParams.get("search") ?? "";
 
+  const [page, setPage] = useState(1);
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [filter, setFilter] = useState<VendorFilter>("all");
+  const [loading, setLoading] = useState(true);
 
-  const vendors = isEmpty ? [] : mockVendors;
-
-  const totalVendors = vendors.length;
-  const activeVendors = vendors.filter((v) => v.status === "Active").length;
-  const inactiveVendors = vendors.filter((v) => v.status === "Inactive").length;
-  const complianceRisk = vendors.filter(
-    (v) => v.compliance !== "Compliant",
-  ).length;
-
-  const filteredVendors = vendors.filter((v) => {
-    if (filter === "active") return v.status === "Active";
-    if (filter === "inactive") return v.status === "Inactive";
-    return true;
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [analysis, setAnalysis] = useState<VendorsAnalysis>({
+    totalVendors: 0,
+    activeVendors: 0,
+    inactiveVendors: 0,
+    complianceRiskCount: 0,
   });
+
+  const fetchVendors = useCallback(
+    async (
+      pageNum: number,
+      searchQuery: string,
+      statusFilter: VendorFilter,
+    ) => {
+      setLoading(true);
+      try {
+        const res = await vendorsApi.getAll({
+          page: pageNum,
+          limit: ITEMS_PER_PAGE,
+          search: searchQuery || undefined,
+          status: statusFilter !== "all" ? statusFilter : undefined,
+          sortBy: "createdAt",
+          sortOrder: "desc",
+        });
+        const { analysis, items, meta } = res.data.data;
+        setAnalysis(analysis);
+        setVendors(items);
+        setTotalPages(meta.totalPages || 1);
+      } catch (error) {
+        const axiosError = error as AxiosError<{ message: string }>;
+        if (!axiosError.response) {
+          toast.error(
+            "Network error — please check your connection and retry.",
+          );
+        } else {
+          toast.error(
+            axiosError.response.data?.message ??
+              "Could not load vendors. Please try again.",
+          );
+        }
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  // Reset to page 1 when search or filter changes
+  useEffect(() => {
+    setPage(1);
+  }, [search, filter]);
+
+  useEffect(() => {
+    fetchVendors(page, search, filter);
+  }, [page, search, filter, fetchVendors]);
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleMutationSuccess = () => {
+    fetchVendors(page, search, filter);
+  };
 
   const handleSelectVendor = (vendor: Vendor) => {
     setSelectedVendor(vendor);
@@ -68,7 +125,7 @@ export default function VendorsPage() {
         </Button>
       </div>
 
-      {vendors.length === 0 ? (
+      {!loading && vendors.length === 0 && !search ? (
         <div className="rounded-lg border border-gray-200 bg-white">
           <EmptyState
             title="No vendors found"
@@ -90,22 +147,26 @@ export default function VendorsPage() {
           {/* Stats */}
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatsCard
-              value={totalVendors}
+              loading={loading}
+              value={analysis.totalVendors}
               label="Total vendors"
               icon={Users}
             />
             <StatsCard
-              value={activeVendors}
+              loading={loading}
+              value={analysis.activeVendors}
               label="Active vendors"
               icon={UserCheck}
             />
             <StatsCard
-              value={inactiveVendors}
+              loading={loading}
+              value={analysis.inactiveVendors}
               label="Inactive vendors"
               icon={UserX}
             />
             <StatsCard
-              value={complianceRisk}
+              loading={loading}
+              value={analysis.complianceRiskCount}
               label="Compliance risk"
               icon={AlertTriangle}
               iconColor="text-red-500"
@@ -132,8 +193,12 @@ export default function VendorsPage() {
           {/* Table */}
           <div className="rounded-lg border border-gray-200 bg-white">
             <VendorTable
-              vendors={filteredVendors}
+              vendors={vendors}
               onSelectVendor={handleSelectVendor}
+              page={page}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              loading={loading}
             />
           </div>
         </>
@@ -144,7 +209,11 @@ export default function VendorsPage() {
         open={sheetOpen}
         onOpenChange={setSheetOpen}
       />
-      <AddVendorDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+      <AddVendorDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSuccess={handleMutationSuccess}
+      />
     </div>
   );
 }
