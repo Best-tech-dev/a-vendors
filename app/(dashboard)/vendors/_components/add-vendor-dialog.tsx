@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
   DialogContent,
@@ -10,7 +12,14 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
@@ -21,6 +30,10 @@ import {
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { vendorsApi } from "@/lib/api/vendors";
+import {
+  createVendorSchema,
+  type CreateVendorFormValues,
+} from "@/lib/validations/vendor";
 import type { VendorCategory } from "@/types/vendor";
 
 interface AddVendorDialogProps {
@@ -34,14 +47,20 @@ export function AddVendorDialog({
   onOpenChange,
   onSuccess,
 }: AddVendorDialogProps) {
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [city, setCity] = useState("");
-  const [country, setCountry] = useState("");
-  const [status, setStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const form = useForm<CreateVendorFormValues>({
+    resolver: zodResolver(createVendorSchema),
+    defaultValues: {
+      name: "",
+      category: "",
+      email: "",
+      phone: "",
+      city: "",
+      country: "",
+      status: "",
+    },
+  });
 
   // Categories from backend
   const [categories, setCategories] = useState<VendorCategory[]>([]);
@@ -68,40 +87,12 @@ export function AddVendorDialog({
     };
   }, [open]);
 
-  const isValid =
-    name.trim() &&
-    category &&
-    email.trim() &&
-    phone.trim() &&
-    city.trim() &&
-    country.trim() &&
-    status;
-
-  const resetForm = () => {
-    setName("");
-    setCategory("");
-    setEmail("");
-    setPhone("");
-    setCity("");
-    setCountry("");
-    setStatus("");
-  };
-
-  const handleSubmit = async () => {
-    if (!isValid) return;
+  const handleSubmit = async (values: CreateVendorFormValues) => {
     setIsSubmitting(true);
     try {
-      await vendorsApi.create({
-        name,
-        category,
-        email,
-        phone,
-        city,
-        country,
-        status,
-      });
+      await vendorsApi.create(values);
       toast.success("Vendor created successfully");
-      resetForm();
+      form.reset();
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
@@ -137,149 +128,173 @@ export function AddVendorDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-5 pt-2">
-          {/* Name */}
-          <div className="space-y-2">
-            <Label
-              htmlFor="vendor-name"
-              className="text-sm font-medium text-brand-description"
-            >
-              Vendor Company Name
-            </Label>
-            <Input
-              id="vendor-name"
-              placeholder="e.g., Global Pallet Solutions"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+        <Form formState={form.formState}>
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-5 pt-2"
+          >
+            {/* Name */}
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Vendor Company Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="e.g., Global Pallet Solutions"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          {/* Category */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-brand-description">
-              Category
-            </Label>
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger>
-                <SelectValue
-                  placeholder={
-                    categoriesLoading ? "Loading…" : "Select a category"
-                  }
-                />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.name}>
-                    {cat.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Email */}
-          <div className="space-y-2">
-            <Label
-              htmlFor="vendor-email"
-              className="text-sm font-medium text-brand-description"
-            >
-              Contact Email
-            </Label>
-            <Input
-              id="vendor-email"
-              type="email"
-              placeholder="e.g., globalpallet@solutions.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+            {/* Category */}
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={
+                            categoriesLoading ? "Loading…" : "Select a category"
+                          }
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.name}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          {/* Phone */}
-          <div className="space-y-2">
-            <Label
-              htmlFor="vendor-phone"
-              className="text-sm font-medium text-brand-description"
-            >
-              Phone Number
-            </Label>
-            <Input
-              id="vendor-phone"
-              type="tel"
-              placeholder="e.g., +2348161252897"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+            {/* Email */}
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Contact Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="e.g., globalpallet@solutions.com"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          {/* City & Country */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label
-                htmlFor="vendor-city"
-                className="text-sm font-medium text-brand-description"
-              >
-                City
-              </Label>
-              <Input
-                id="vendor-city"
-                placeholder="e.g., Lagos"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
+            {/* Phone */}
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone Number</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="tel"
+                      placeholder="e.g., 08161252897"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* City & Country */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="city"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>City</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Lagos" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Country</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Nigeria" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
-            <div className="space-y-2">
-              <Label
-                htmlFor="vendor-country"
-                className="text-sm font-medium text-brand-description"
+
+            {/* Status */}
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Actions */}
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={isSubmitting}
+                onClick={() => {
+                  form.reset();
+                  onOpenChange(false);
+                }}
               >
-                Country
-              </Label>
-              <Input
-                id="vendor-country"
-                placeholder="e.g., Nigeria"
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-              />
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-gray-900 hover:bg-gray-800 disabled:opacity-50"
+              >
+                {isSubmitting ? "Submitting..." : "Add vendor"}
+              </Button>
             </div>
-          </div>
-
-          {/* Status */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-brand-description">
-              Status
-            </Label>
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center justify-end gap-3 pt-2">
-            <Button
-              variant="ghost"
-              disabled={isSubmitting}
-              onClick={() => {
-                resetForm();
-                onOpenChange(false);
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSubmit}
-              disabled={!isValid || isSubmitting}
-              className="bg-gray-900 hover:bg-gray-800 disabled:opacity-50"
-            >
-              {isSubmitting ? "Submitting..." : "Add vendor"}
-            </Button>
-          </div>
-        </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

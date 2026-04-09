@@ -10,7 +10,7 @@ export const createVendorSchema = z.object({
   phone: z
     .string()
     .min(1, "Phone number is required")
-    .max(20, "Phone number is too long"),
+    .max(11, "Phone number must be at most 11 digits"),
   city: z.string().min(1, "City is required"),
   country: z.string().min(1, "Country is required"),
   status: z.string().min(1, "Please select a status"),

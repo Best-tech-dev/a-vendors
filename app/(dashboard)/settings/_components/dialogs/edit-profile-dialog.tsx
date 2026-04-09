@@ -26,7 +26,10 @@ import { useAuthStore } from "@/lib/stores/auth-store";
 const editProfileSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email(),
-  phone: z.string().optional(),
+  phone: z
+    .string()
+    .max(11, "Phone number must be at most 11 digits")
+    .optional(),
   role: z.string(),
 });
 
@@ -112,7 +115,7 @@ export function EditProfileDialog({
                 <FormItem>
                   <FormLabel>Phone number</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter phone number" {...field} />
+                    <Input placeholder="e.g., 08161252897" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
