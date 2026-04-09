@@ -1,5 +1,6 @@
 import { api } from "./axios";
 import type {
+  AddNoteResponse,
   CreateVendorRequest,
   CreateVendorResponse,
   VendorCategoriesResponse,
@@ -20,4 +21,7 @@ export const vendorsApi = {
 
   getCategories: () =>
     api.get<VendorCategoriesResponse>("avendor/inventory/categories"),
+
+  addNote: (vendorId: string, content: string) =>
+    api.post<AddNoteResponse>(`avendor/vendors/${vendorId}/notes`, { content }),
 };

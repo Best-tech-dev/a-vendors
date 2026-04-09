@@ -10,6 +10,16 @@ export interface VendorDocument {
   thumbnail?: string;
 }
 
+export interface VendorNote {
+  id: string;
+  vendorId: string;
+  content: string;
+  authorId: string;
+  authorName: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface VendorBankDetail {
   bank: string;
   accountNumber: string;
@@ -42,7 +52,7 @@ export interface Vendor {
   updatedAt: string;
   bankDetail: VendorBankDetail | null;
   documents: VendorDocument[];
-  notes: string[];
+  notes: VendorNote[];
   _count?: {
     notes: number;
   };
@@ -81,6 +91,13 @@ export interface VendorCategoriesResponse {
   success: boolean;
   message: string;
   data: VendorCategory[];
+  statusCode: number;
+}
+
+export interface AddNoteResponse {
+  success: boolean;
+  message: string;
+  data: VendorNote;
   statusCode: number;
 }
 

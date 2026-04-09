@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Sheet,
   SheetContent,
@@ -8,6 +8,15 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Star } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -87,13 +96,37 @@ export function VendorDetailsSheet({
   const [vendor, setVendor] = useState<Vendor | null>(null);
   const [loading, setLoading] = useState(false);
   const [prevVendorId, setPrevVendorId] = useState<string | null>(null);
+  const [showNoteForm, setShowNoteForm] = useState(false);
+  const [noteContent, setNoteContent] = useState("");
+  const [submittingNote, setSubmittingNote] = useState(false);
 
   // Reset state when vendorId changes (React-recommended pattern)
   if (vendorId !== prevVendorId) {
     setPrevVendorId(vendorId);
     setActiveTab("contact");
+    setShowNoteForm(false);
+    setNoteContent("");
     setLoading(!!vendorId && open);
   }
+
+  const fetchVendor = useCallback(() => {
+    if (!vendorId) return;
+    vendorsApi
+      .getById(vendorId)
+      .then((res) => {
+        setVendor(res.data.data);
+      })
+      .catch((error: AxiosError<{ message: string }>) => {
+        toast.error(
+          error.response?.data?.message ??
+            "Could not load vendor details. Please try again.",
+        );
+        onOpenChange(false);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [vendorId, onOpenChange]);
 
   useEffect(() => {
     if (!open || !vendorId) return;
@@ -119,6 +152,26 @@ export function VendorDetailsSheet({
       cancelled = true;
     };
   }, [open, vendorId, onOpenChange]);
+
+  const handleSubmitNote = async () => {
+    if (!vendor || !noteContent.trim()) return;
+    setSubmittingNote(true);
+    try {
+      await vendorsApi.addNote(vendor.id, noteContent.trim());
+      toast.success("Note added successfully");
+      setNoteContent("");
+      setShowNoteForm(false);
+      fetchVendor();
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      toast.error(
+        axiosError.response?.data?.message ??
+          "Could not add note. Please try again.",
+      );
+    } finally {
+      setSubmittingNote(false);
+    }
+  };
 
   const tabs: { key: SheetTab; label: string }[] = [
     { key: "contact", label: "Contact info" },
@@ -303,36 +356,78 @@ export function VendorDetailsSheet({
                 {/* Notes */}
                 <div className="mt-6">
                   <span className="text-sm text-brand-description">Notes:</span>
-                  {!vendor.notes || vendor.notes.length === 0 ? (
-                    <div className="mt-4 flex flex-col items-center justify-center">
-                      <Image
-                        src="/svgs/search_empty.svg"
-                        alt="No notes"
-                        width={100}
-                        height={50}
+
+                  {vendor.notes && vendor.notes.length > 0 && (
+                    <div className="mt-2 rounded-lg border border-gray-200">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="text-xs text-brand-description">
+                              Content
+                            </TableHead>
+                            <TableHead className="text-xs text-brand-description">
+                              Author
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {vendor.notes.map((note) => (
+                            <TableRow key={note.id}>
+                              <TableCell className="text-sm text-brand-title whitespace-normal">
+                                {note.content}
+                              </TableCell>
+                              <TableCell className="text-sm text-brand-title">
+                                {note.authorName ?? "Unknown"}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+
+                  {showNoteForm ? (
+                    <div className="mt-4 space-y-3">
+                      <Textarea
+                        placeholder="Write your note here..."
+                        value={noteContent}
+                        onChange={(e) => setNoteContent(e.target.value)}
+                        className="min-h-24 resize-none"
+                        disabled={submittingNote}
                       />
-                      <p className="mt-3 text-sm text-brand-description">
-                        No notes attached to this vendor yet
-                      </p>
+                      <Button
+                        onClick={handleSubmitNote}
+                        disabled={submittingNote || !noteContent.trim()}
+                        className="w-full bg-brand-primary hover:bg-brand-primary/90"
+                      >
+                        {submittingNote ? "Submitting..." : "Submit note"}
+                      </Button>
                     </div>
                   ) : (
-                    <ul className="mt-2 space-y-2">
-                      {vendor.notes.map((note, i) => (
-                        <li
-                          key={i}
-                          className="rounded-md bg-gray-50 p-3 text-sm text-brand-description"
+                    <>
+                      {(!vendor.notes || vendor.notes.length === 0) && (
+                        <div className="mt-4 flex flex-col items-center justify-center">
+                          <Image
+                            src="/svgs/search_empty.svg"
+                            alt="No notes"
+                            width={100}
+                            height={50}
+                          />
+                          <p className="mt-3 text-sm text-brand-description">
+                            No notes attached to this vendor yet
+                          </p>
+                        </div>
+                      )}
+                      <div className="mt-8">
+                        <Button
+                          onClick={() => setShowNoteForm(true)}
+                          className="w-full bg-brand-primary hover:bg-brand-primary/90"
                         >
-                          {note}
-                        </li>
-                      ))}
-                    </ul>
+                          Add notes
+                        </Button>
+                      </div>
+                    </>
                   )}
-                </div>
-
-                <div className="mt-8">
-                  <Button className="w-full bg-brand-primary hover:bg-brand-primary/90">
-                    Add notes
-                  </Button>
                 </div>
               </div>
             )}
