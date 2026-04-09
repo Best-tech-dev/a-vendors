@@ -24,7 +24,7 @@ export default function VendorsPage() {
   const search = searchParams.get("search") ?? "";
 
   const [page, setPage] = useState(1);
-  const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
+  const [selectedVendorId, setSelectedVendorId] = useState<string | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [filter, setFilter] = useState<VendorFilter>("all");
@@ -96,7 +96,7 @@ export default function VendorsPage() {
   };
 
   const handleSelectVendor = (vendor: Vendor) => {
-    setSelectedVendor(vendor);
+    setSelectedVendorId(vendor.id);
     setSheetOpen(true);
   };
 
@@ -205,7 +205,7 @@ export default function VendorsPage() {
       )}
 
       <VendorDetailsSheet
-        vendor={selectedVendor}
+        vendorId={selectedVendorId}
         open={sheetOpen}
         onOpenChange={setSheetOpen}
       />

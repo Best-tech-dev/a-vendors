@@ -65,6 +65,13 @@ export interface CreateVendorResponse {
   statusCode: number;
 }
 
+export interface VendorDetailResponse {
+  success: boolean;
+  message: string;
+  data: Vendor;
+  statusCode: number;
+}
+
 export interface VendorCategory {
   id: string;
   name: string;

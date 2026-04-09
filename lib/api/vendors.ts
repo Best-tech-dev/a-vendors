@@ -3,6 +3,7 @@ import type {
   CreateVendorRequest,
   CreateVendorResponse,
   VendorCategoriesResponse,
+  VendorDetailResponse,
   VendorsListResponse,
   VendorsListParams,
 } from "@/types/vendor";
@@ -10,6 +11,9 @@ import type {
 export const vendorsApi = {
   getAll: (params?: VendorsListParams) =>
     api.get<VendorsListResponse>("avendor/vendors", { params }),
+
+  getById: (id: string) =>
+    api.get<VendorDetailResponse>(`avendor/vendors/${id}`),
 
   create: (payload: CreateVendorRequest) =>
     api.post<CreateVendorResponse>("avendor/vendors", payload),
