@@ -22,6 +22,85 @@ export interface RFQ {
   vendorIds: string[];
 }
 
+// ── Create RFQ Request/Response ──
+
+export interface CreateRFQItemPayload {
+  materialId: string;
+  quantity: number;
+  budget: number;
+  description?: string;
+}
+
+export interface CreateRFQRequest {
+  title: string;
+  dueDate: string;
+  description?: string;
+  unit: string;
+  items: CreateRFQItemPayload[];
+  vendorIds: string[];
+  sendToAllVendors: boolean;
+}
+
+export interface CreateRFQResponseItem {
+  id: string;
+  rfqId: string;
+  materialId: string;
+  materialName: string;
+  quantity: number;
+  unit: string;
+  budget: number;
+  description: string | null;
+  createdAt: string;
+  updatedAt: string;
+  attachments: unknown[];
+  material: {
+    id: string;
+    name: string;
+    unit: string;
+    pricePerUnit: number;
+  };
+}
+
+export interface CreateRFQResponseVendor {
+  id: string;
+  rfqId: string;
+  vendorId: string;
+  sentAt: string | null;
+  createdAt: string;
+  vendor: {
+    id: string;
+    name: string;
+    email: string;
+    rating: number;
+    status: string;
+  };
+}
+
+export interface CreateRFQData {
+  id: string;
+  rfqNumber: string;
+  title: string;
+  description: string | null;
+  dueDate: string;
+  status: string;
+  totalBudget: number;
+  sentAt: string | null;
+  createdById: string;
+  createdByName: string | null;
+  createdAt: string;
+  updatedAt: string;
+  items: CreateRFQResponseItem[];
+  vendors: CreateRFQResponseVendor[];
+  attachments: unknown[];
+}
+
+export interface CreateRFQResponse {
+  success: boolean;
+  message: string;
+  data: CreateRFQData;
+  statusCode: number;
+}
+
 export type VendorTag =
   | "Best price"
   | "Competitive"

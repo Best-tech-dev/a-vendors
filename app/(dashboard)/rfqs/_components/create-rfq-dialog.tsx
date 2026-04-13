@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import Image from "next/image";
 import {
   Dialog,
@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
@@ -26,13 +27,20 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon, Search, Star, Trash2 } from "lucide-react";
-import { selectableVendors } from "@/lib/mock/rfqs";
-import { mockCategories, mockUnits } from "@/lib/mock/inventory";
+import { CalendarIcon, Search, Star, Trash2, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
+import { inventoryApi } from "@/lib/api/inventory";
+import { vendorsApi } from "@/lib/api/vendors";
+import { rfqsApi } from "@/lib/api/rfqs";
+import type { Material } from "@/types/inventory";
+import type { Vendor } from "@/types/vendor";
+import { mockUnits } from "@/lib/mock/inventory";
 
 interface RFQItemDraft {
   id: string;
-  material: string;
+  materialId: string;
+  materialName: string;
   quantity: string;
   unit: string;
   budget: string;
@@ -45,12 +53,19 @@ interface CreateRFQDialogProps {
 
 export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
   const [step, setStep] = useState<1 | 2>(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Data from backend
+  const [materials, setMaterials] = useState<Material[]>([]);
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [loadingMaterials, setLoadingMaterials] = useState(false);
 
   // Step 1 state
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
   const [dueDateOpen, setDueDateOpen] = useState(false);
-  const [currentMaterial, setCurrentMaterial] = useState("");
+  const [currentMaterialId, setCurrentMaterialId] = useState("");
   const [currentQuantity, setCurrentQuantity] = useState("");
   const [currentUnit, setCurrentUnit] = useState("");
   const [currentBudget, setCurrentBudget] = useState("");
@@ -63,35 +78,66 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
   );
   const [sendToAll, setSendToAll] = useState(false);
 
+  // Fetch materials and vendors when dialog opens
+  const fetchMaterials = useCallback(async () => {
+    setLoadingMaterials(true);
+    try {
+      const res = await inventoryApi.getMaterials({ limit: 100 });
+      setMaterials(res.data.data.items);
+    } catch {
+      toast.error("Failed to load materials");
+    } finally {
+      setLoadingMaterials(false);
+    }
+  }, []);
+
+  const fetchVendors = useCallback(async () => {
+    try {
+      const res = await vendorsApi.getAll({ limit: 100 });
+      setVendors(res.data.data.items);
+    } catch {
+      toast.error("Failed to load vendors");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (open) {
+      fetchMaterials();
+      fetchVendors();
+    }
+  }, [open, fetchMaterials, fetchVendors]);
+
+  const filteredVendors = useMemo(() => {
+    if (!vendorSearch.trim()) return vendors;
+    const q = vendorSearch.toLowerCase();
+    return vendors.filter(
+      (v) =>
+        v.name.toLowerCase().includes(q) || v.email.toLowerCase().includes(q),
+    );
+  }, [vendorSearch, vendors]);
+
   const canAddItem =
-    currentMaterial && currentQuantity && currentUnit && currentBudget;
+    currentMaterialId && currentQuantity && currentUnit && currentBudget;
   const canContinue =
     title.trim() && dueDate && (items.length > 0 || canAddItem);
   const canSendRequest = selectedVendorIds.size > 0 || sendToAll;
 
-  const filteredVendors = useMemo(() => {
-    if (!vendorSearch.trim()) return selectableVendors;
-    const q = vendorSearch.toLowerCase();
-    return selectableVendors.filter(
-      (v) =>
-        v.name.toLowerCase().includes(q) ||
-        v.category.toLowerCase().includes(q),
-    );
-  }, [vendorSearch]);
+  const selectedMaterial = materials.find((m) => m.id === currentMaterialId);
 
   const handleAddItem = () => {
-    if (!canAddItem) return;
+    if (!canAddItem || !selectedMaterial) return;
     setItems((prev) => [
       ...prev,
       {
         id: `item-${Date.now()}`,
-        material: currentMaterial,
+        materialId: selectedMaterial.id,
+        materialName: selectedMaterial.name,
         quantity: currentQuantity,
         unit: currentUnit,
         budget: currentBudget,
       },
     ]);
-    setCurrentMaterial("");
+    setCurrentMaterialId("");
     setCurrentQuantity("");
     setCurrentUnit("");
     setCurrentBudget("");
@@ -102,6 +148,7 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
   };
 
   const toggleVendor = (id: string) => {
+    if (sendToAll) return;
     setSelectedVendorIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -116,24 +163,72 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
   const handleSendToAllChange = (checked: boolean) => {
     setSendToAll(checked);
     if (checked) {
-      setSelectedVendorIds(new Set(selectableVendors.map((v) => v.id)));
+      setSelectedVendorIds(new Set(vendors.map((v) => v.id)));
     } else {
       setSelectedVendorIds(new Set());
     }
   };
 
-  const handleSendRequest = () => {
-    if (!canSendRequest) return;
-    resetForm();
-    onOpenChange(false);
+  const handleSendRequest = async () => {
+    if (!canSendRequest || !dueDate) return;
+
+    // Auto-add current item if fields are filled
+    let finalItems = [...items];
+    if (canAddItem && selectedMaterial) {
+      finalItems = [
+        ...finalItems,
+        {
+          id: `item-${Date.now()}`,
+          materialId: selectedMaterial.id,
+          materialName: selectedMaterial.name,
+          quantity: currentQuantity,
+          unit: currentUnit,
+          budget: currentBudget,
+        },
+      ];
+    }
+
+    if (finalItems.length === 0) {
+      toast.error("At least one item is required");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await rfqsApi.create({
+        title: title.trim(),
+        description: description.trim() || undefined,
+        dueDate: dueDate.toISOString(),
+        unit: finalItems[0].unit,
+        items: finalItems.map((item) => ({
+          materialId: item.materialId,
+          quantity: Number(item.quantity),
+          budget: Number(item.budget),
+        })),
+        vendorIds: sendToAll ? [] : Array.from(selectedVendorIds),
+        sendToAllVendors: sendToAll,
+      });
+      toast.success("RFQ created successfully");
+      resetForm();
+      onOpenChange(false);
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      const message =
+        axiosError.response?.data?.message ||
+        "Something went wrong. Please try again.";
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const resetForm = () => {
     setStep(1);
     setTitle("");
+    setDescription("");
     setDueDate(undefined);
     setDueDateOpen(false);
-    setCurrentMaterial("");
+    setCurrentMaterialId("");
     setCurrentQuantity("");
     setCurrentUnit("");
     setCurrentBudget("");
@@ -148,13 +243,6 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
     if (isNaN(num) || num === 0) return "";
     return `₦${num.toLocaleString("en-NG")}`;
   };
-
-  const selectedVendorsList = filteredVendors.filter(
-    (v) => sendToAll || selectedVendorIds.has(v.id),
-  );
-  const unselectedVendorsList = sendToAll
-    ? []
-    : filteredVendors.filter((v) => !selectedVendorIds.has(v.id));
 
   return (
     <Dialog
@@ -172,11 +260,9 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
           <DialogDescription className="text-center text-sm text-brand-description">
             {step === 1
               ? "Fill in the details and add items for your RFQ."
-              : "Search and select vendors to send this RFQ to."}
+              : "Update your workspace info"}
           </DialogDescription>
         </DialogHeader>
-
-        {/* Step indicator removed */}
 
         {/* ── STEP 1 ── */}
         {step === 1 && (
@@ -190,6 +276,20 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
                 placeholder="e.g., Textbook production"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
+
+            {/* Description */}
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold text-brand-description">
+                Description
+              </Label>
+              <Textarea
+                placeholder="e.g., Need materials for Q2 textbook run"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="resize-none"
+                rows={3}
               />
             </div>
 
@@ -254,16 +354,27 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
                     Material
                   </Label>
                   <Select
-                    value={currentMaterial}
-                    onValueChange={setCurrentMaterial}
+                    value={currentMaterialId}
+                    onValueChange={(value) => {
+                      setCurrentMaterialId(value);
+                      const mat = materials.find((m) => m.id === value);
+                      if (mat?.unit) setCurrentUnit(mat.unit);
+                    }}
+                    disabled={loadingMaterials}
                   >
                     <SelectTrigger className="bg-white">
-                      <SelectValue placeholder="Select material" />
+                      <SelectValue
+                        placeholder={
+                          loadingMaterials
+                            ? "Loading materials..."
+                            : "Select material"
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      {mockCategories.map((cat) => (
-                        <SelectItem key={cat} value={cat}>
-                          {cat}
+                      {materials.map((mat) => (
+                        <SelectItem key={mat.id} value={mat.id}>
+                          {mat.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -336,7 +447,7 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
                     >
                       <div>
                         <p className="text-sm font-semibold text-brand-description">
-                          {item.material}
+                          {item.materialName}
                         </p>
                         <p className="text-xs text-brand-description mt-0.5">
                           Qty: {item.quantity} &nbsp;·&nbsp; Unit: {item.unit}{" "}
@@ -380,7 +491,7 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
               <Input
-                placeholder="Search vendors..."
+                placeholder="Search vendors and click to add"
                 className="pl-9"
                 value={vendorSearch}
                 onChange={(e) => setVendorSearch(e.target.value)}
@@ -405,105 +516,112 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
             </div>
 
             {/* Selected vendors */}
-            {selectedVendorsList.length > 0 && (
+            {filteredVendors.filter(
+              (v) => sendToAll || selectedVendorIds.has(v.id),
+            ).length > 0 && (
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
                   Selected vendors
                 </p>
                 <div className="space-y-1">
-                  {selectedVendorsList.map((vendor) => (
-                    <div
-                      key={vendor.id}
-                      className="flex items-center gap-3 rounded-lg p-3 bg-gray-50 border border-gray-100 cursor-pointer"
-                      onClick={() => {
-                        if (!sendToAll) toggleVendor(vendor.id);
-                      }}
-                    >
-                      <Checkbox
-                        checked
-                        onClick={(e) => e.stopPropagation()}
-                        onCheckedChange={() => {
+                  {filteredVendors
+                    .filter((v) => sendToAll || selectedVendorIds.has(v.id))
+                    .map((vendor) => (
+                      <div
+                        key={vendor.id}
+                        className="flex items-center gap-3 rounded-lg p-3 bg-gray-50 border border-gray-100 cursor-pointer"
+                        onClick={() => {
                           if (!sendToAll) toggleVendor(vendor.id);
                         }}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-900 truncate">
-                          {vendor.name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {vendor.category}
-                        </p>
+                      >
+                        <Checkbox
+                          checked
+                          onClick={(e) => e.stopPropagation()}
+                          onCheckedChange={() => {
+                            if (!sendToAll) toggleVendor(vendor.id);
+                          }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-gray-900 truncate">
+                            {vendor.name}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {vendor.email}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Star className="size-3.5 fill-amber-400 text-amber-400" />
+                          <span className="text-sm font-medium text-gray-700">
+                            {vendor.rating}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <Star className="size-3.5 fill-amber-400 text-amber-400" />
-                        <span className="text-sm font-medium text-gray-700">
-                          {vendor.rating}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </div>
             )}
 
             {/* Unselected vendors */}
-            {unselectedVendorsList.length > 0 && (
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
-                  All vendors
-                </p>
-                <div className="space-y-1">
-                  {unselectedVendorsList.map((vendor) => (
-                    <div
-                      key={vendor.id}
-                      className="flex items-center gap-3 rounded-lg p-3 hover:bg-gray-50 cursor-pointer"
-                      onClick={() => toggleVendor(vendor.id)}
-                    >
-                      <Checkbox
-                        checked={false}
-                        onClick={(e) => e.stopPropagation()}
-                        onCheckedChange={() => toggleVendor(vendor.id)}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-900 truncate">
-                          {vendor.name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {vendor.category}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <Star className="size-3.5 fill-amber-400 text-amber-400" />
-                        <span className="text-sm font-medium text-gray-700">
-                          {vendor.rating}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Empty state for step 2 */}
-            {selectedVendorsList.length === 0 &&
-              unselectedVendorsList.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <Image
-                    src="/svgs/search_empty.svg"
-                    alt="No results"
-                    width={60}
-                    height={60}
-                    className="mb-3"
-                  />
-                  <p className="text-sm text-gray-500">
-                    No vendors match your search
+            {!sendToAll &&
+              filteredVendors.filter((v) => !selectedVendorIds.has(v.id))
+                .length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
+                    All vendors
                   </p>
+                  <div className="space-y-1">
+                    {filteredVendors
+                      .filter((v) => !selectedVendorIds.has(v.id))
+                      .map((vendor) => (
+                        <div
+                          key={vendor.id}
+                          className="flex items-center gap-3 rounded-lg p-3 hover:bg-gray-50 cursor-pointer"
+                          onClick={() => toggleVendor(vendor.id)}
+                        >
+                          <Checkbox
+                            checked={false}
+                            onClick={(e) => e.stopPropagation()}
+                            onCheckedChange={() => toggleVendor(vendor.id)}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-gray-900 truncate">
+                              {vendor.name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {vendor.email}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <Star className="size-3.5 fill-amber-400 text-amber-400" />
+                            <span className="text-sm font-medium text-gray-700">
+                              {vendor.rating}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
                 </div>
               )}
 
-            {selectedVendorsList.length === 0 &&
+            {/* Empty state for step 2 */}
+            {filteredVendors.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-12">
+                <Image
+                  src="/svgs/search_empty.svg"
+                  alt="No results"
+                  width={60}
+                  height={60}
+                  className="mb-3"
+                />
+                <p className="text-sm text-gray-500">
+                  No vendors match your search
+                </p>
+              </div>
+            )}
+
+            {selectedVendorIds.size === 0 &&
               !sendToAll &&
-              unselectedVendorsList.length > 0 && (
+              filteredVendors.length > 0 && (
                 <div className="flex flex-col items-center py-6 -mt-2">
                   <p className="text-xs text-gray-400">
                     Click on vendors above to select them
@@ -513,11 +631,21 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
 
             {/* Footer */}
             <div className="flex items-center justify-end gap-3 pt-2 pb-1 mt-auto">
-              <Button variant="outline" onClick={() => setStep(1)}>
+              <Button
+                variant="outline"
+                onClick={() => setStep(1)}
+                disabled={isSubmitting}
+              >
                 Back
               </Button>
-              <Button onClick={handleSendRequest} disabled={!canSendRequest}>
-                Send Request
+              <Button
+                onClick={handleSendRequest}
+                disabled={!canSendRequest || isSubmitting}
+              >
+                {isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Sending Request
               </Button>
             </div>
           </div>
