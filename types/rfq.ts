@@ -148,6 +148,61 @@ export interface RFQDetail {
   analysis: AnalysisRecommendation[];
 }
 
+// ── RFQ List API Types ──
+
+export interface RFQListItem {
+  id: string;
+  rfqNumber: string;
+  title: string;
+  description: string | null;
+  dueDate: string;
+  status: string;
+  totalBudget: number;
+  sentAt: string | null;
+  createdById: string;
+  createdByName: string | null;
+  createdAt: string;
+  updatedAt: string;
+  _count: {
+    items: number;
+    vendors: number;
+  };
+}
+
+export interface RFQsAnalysis {
+  totalRfqs: number;
+  draftCount: number;
+  sentCount: number;
+  awardedCount: number;
+}
+
+export interface RFQsListResponse {
+  success: boolean;
+  message: string;
+  data: {
+    analysis: RFQsAnalysis;
+    items: RFQListItem[];
+    meta: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+      hasNextPage: boolean;
+      hasPrevPage: boolean;
+    };
+  };
+  statusCode: number;
+}
+
+export interface RFQsListParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: string;
+  sortBy?: string;
+  sortOrder?: string;
+}
+
 export interface SelectableVendor {
   id: string;
   name: string;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Plus, Users, ClipboardList, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatsCard } from "@/app/_components/stats-card";
@@ -8,32 +8,88 @@ import { EmptyState } from "@/app/_components/empty-state";
 import Image from "next/image";
 import { RFQListTable } from "./_components/rfq-list-table";
 import { CreateRFQDialog } from "./_components/create-rfq-dialog";
-import { mockRFQs, rfqStats } from "@/lib/mock/rfqs";
+import { rfqsApi } from "@/lib/api/rfqs";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
+import { useSearchParams } from "next/navigation";
+import type { RFQListItem, RFQsAnalysis } from "@/types/rfq";
 
 type RFQFilter = "all" | "awarded" | "awaiting_quotes" | "awaiting_selection";
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 20;
 
 export default function RFQsPage() {
-  const [isEmpty] = useState(false);
+  const searchParams = useSearchParams();
+  const search = searchParams.get("search") ?? "";
+
   const [page, setPage] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [filter, setFilter] = useState<RFQFilter>("all");
+  const [loading, setLoading] = useState(true);
 
-  const rfqs = isEmpty ? [] : mockRFQs;
+  const [rfqs, setRfqs] = useState<RFQListItem[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [analysis, setAnalysis] = useState<RFQsAnalysis>({
+    totalRfqs: 0,
+    draftCount: 0,
+    sentCount: 0,
+    awardedCount: 0,
+  });
 
-  const filterTabs: { key: RFQFilter; label: string; count: number }[] = [
-    { key: "all", label: "All", count: rfqs.length },
-    { key: "awarded", label: "Awarded", count: 12 },
-    { key: "awaiting_quotes", label: "Awaiting quotes", count: 3 },
-    { key: "awaiting_selection", label: "Awaiting selection", count: 3 },
-  ];
-
-  const totalPages = Math.max(1, Math.ceil(rfqs.length / ITEMS_PER_PAGE));
-  const paginatedRFQs = rfqs.slice(
-    (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE,
+  const fetchRFQs = useCallback(
+    async (pageNum: number, searchQuery: string, statusFilter: RFQFilter) => {
+      setLoading(true);
+      try {
+        const res = await rfqsApi.getAll({
+          page: pageNum,
+          limit: ITEMS_PER_PAGE,
+          search: searchQuery || undefined,
+          status: statusFilter !== "all" ? statusFilter : undefined,
+          sortBy: "createdAt",
+          sortOrder: "desc",
+        });
+        const { analysis, items, meta } = res.data.data;
+        setAnalysis(analysis);
+        setRfqs(items);
+        setTotalPages(meta.totalPages || 1);
+      } catch (error) {
+        const axiosError = error as AxiosError<{ message: string }>;
+        if (!axiosError.response) {
+          toast.error(
+            "Network error — please check your connection and retry.",
+          );
+        } else {
+          toast.error(
+            axiosError.response.data?.message ??
+              "Could not load RFQs. Please try again.",
+          );
+        }
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
   );
+
+  // Reset to page 1 when search or filter changes
+  useEffect(() => {
+    setPage(1);
+  }, [search, filter]);
+
+  useEffect(() => {
+    fetchRFQs(page, search, filter);
+  }, [page, search, filter, fetchRFQs]);
+
+  const handleMutationSuccess = () => {
+    fetchRFQs(page, search, filter);
+  };
+
+  const filterTabs: { key: RFQFilter; label: string }[] = [
+    { key: "all", label: "All" },
+    { key: "awarded", label: "Awarded" },
+    { key: "awaiting_quotes", label: "Awaiting quotes" },
+    { key: "awaiting_selection", label: "Awaiting selection" },
+  ];
 
   return (
     <div className="space-y-6">
@@ -56,7 +112,7 @@ export default function RFQsPage() {
         </Button>
       </div>
 
-      {rfqs.length === 0 ? (
+      {!loading && rfqs.length === 0 && !search ? (
         <div className="rounded-lg border border-gray-200 bg-white">
           <EmptyState
             title="No request available yet"
@@ -77,19 +133,27 @@ export default function RFQsPage() {
         <>
           {/* Stats row */}
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <StatsCard value={rfqStats.total} label="Total RFQs" icon={Users} />
             <StatsCard
-              value={rfqStats.draft}
+              loading={loading}
+              value={analysis.totalRfqs}
+              label="Total RFQs"
+              icon={Users}
+            />
+            <StatsCard
+              loading={loading}
+              value={analysis.draftCount}
               label="Draft"
               icon={ClipboardList}
             />
             <StatsCard
-              value={rfqStats.sent}
+              loading={loading}
+              value={analysis.sentCount}
               label="Sent"
               icon={ClipboardList}
             />
             <StatsCard
-              value={rfqStats.awarded}
+              loading={loading}
+              value={analysis.awardedCount}
               label="Awarded"
               icon={AlertTriangle}
               iconColor="text-red-500"
@@ -101,24 +165,14 @@ export default function RFQsPage() {
             {filterTabs.map((tab) => (
               <button
                 key={tab.key}
-                onClick={() => {
-                  setFilter(tab.key);
-                  setPage(1);
-                }}
+                onClick={() => setFilter(tab.key)}
                 className={`rounded-md px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
                   filter === tab.key
                     ? "border border-gray-300 bg-white text-gray-900 shadow-sm"
                     : "text-brand-border hover:text-brand-border/90"
                 }`}
               >
-                {tab.label}{" "}
-                <span
-                  className={`text-xs ${
-                    filter === tab.key ? "text-gray-500" : "text-gray-400"
-                  }`}
-                >
-                  ({tab.count})
-                </span>
+                {tab.label}
               </button>
             ))}
           </div>
@@ -126,16 +180,21 @@ export default function RFQsPage() {
           {/* Table */}
           <div className="rounded-lg border border-gray-200 bg-white">
             <RFQListTable
-              rfqs={paginatedRFQs}
+              rfqs={rfqs}
               page={page}
               totalPages={totalPages}
               onPageChange={setPage}
+              loading={loading}
             />
           </div>
         </>
       )}
 
-      <CreateRFQDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+      <CreateRFQDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSuccess={handleMutationSuccess}
+      />
     </div>
   );
 }

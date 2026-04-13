@@ -49,9 +49,14 @@ interface RFQItemDraft {
 interface CreateRFQDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
-export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
+export function CreateRFQDialog({
+  open,
+  onOpenChange,
+  onSuccess,
+}: CreateRFQDialogProps) {
   const [step, setStep] = useState<1 | 2>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -211,6 +216,7 @@ export function CreateRFQDialog({ open, onOpenChange }: CreateRFQDialogProps) {
       toast.success("RFQ created successfully");
       resetForm();
       onOpenChange(false);
+      onSuccess?.();
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
       const message =

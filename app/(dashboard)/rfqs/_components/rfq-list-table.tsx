@@ -11,46 +11,55 @@ import {
 import { Button } from "@/components/ui/button";
 import { MoreVertical } from "lucide-react";
 import { useRouter } from "next/navigation";
-import type { RFQ, RFQStatus } from "@/types/rfq";
+import type { RFQListItem } from "@/types/rfq";
 
 interface RFQListTableProps {
-  rfqs: RFQ[];
+  rfqs: RFQListItem[];
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  loading?: boolean;
 }
 
-function StatusBadge({ status }: { status: RFQStatus }) {
-  const config: Record<RFQStatus, { bg: string; text: string }> = {
-    Awarded: {
-      bg: "bg-badge-green-accent",
-      text: "text-badge-green",
-    },
-    Draft: {
-      bg: "bg-gray-100",
-      text: "text-brand-description",
-    },
-    Sent: {
-      bg: "bg-blue-50",
-      text: "text-blue-700",
-    },
-    "Awaiting Quotes": {
-      bg: "bg-badge-yellow-accent",
-      text: "text-badge-yellow",
-    },
-    "Awaiting Selection": {
-      bg: "bg-purple-50",
-      text: "text-purple-700",
-    },
-  };
+type StatusKey =
+  | "draft"
+  | "sent"
+  | "awarded"
+  | "awaiting_quotes"
+  | "awaiting_selection";
 
-  const c = config[status];
+const STATUS_CONFIG: Record<
+  StatusKey,
+  { bg: string; text: string; label: string }
+> = {
+  draft: { bg: "bg-gray-100", text: "text-brand-description", label: "Draft" },
+  sent: { bg: "bg-blue-50", text: "text-blue-700", label: "Sent" },
+  awarded: {
+    bg: "bg-badge-green-accent",
+    text: "text-badge-green",
+    label: "Awarded",
+  },
+  awaiting_quotes: {
+    bg: "bg-badge-yellow-accent",
+    text: "text-badge-yellow",
+    label: "Awaiting Quotes",
+  },
+  awaiting_selection: {
+    bg: "bg-purple-50",
+    text: "text-purple-700",
+    label: "Awaiting Selection",
+  },
+};
+
+function StatusBadge({ status }: { status: string }) {
+  const key = status.toLowerCase().replace(/\s+/g, "_") as StatusKey;
+  const c = STATUS_CONFIG[key] ?? STATUS_CONFIG.draft;
 
   return (
     <span
       className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${c.bg} ${c.text}`}
     >
-      {status}
+      {c.label}
     </span>
   );
 }
@@ -60,6 +69,7 @@ export function RFQListTable({
   page,
   totalPages,
   onPageChange,
+  loading,
 }: RFQListTableProps) {
   const router = useRouter();
 
@@ -86,36 +96,59 @@ export function RFQListTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {rfqs.map((rfq, index) => (
-            <TableRow
-              key={rfq.id}
-              className="cursor-pointer border-gray-100 hover:bg-gray-50"
-              onClick={() => router.push(`/rfqs/${rfq.id}`)}
-            >
-              <TableCell className="font-medium text-brand-description">
-                RFQ-2024-00{(page - 1) * 5 + index + 1}Q1
-              </TableCell>
-              <TableCell className="text-brand-description">
-                {rfq.title}
-              </TableCell>
-              <TableCell className="text-brand-description">
-                {rfq.deadline}
-              </TableCell>
-              <TableCell>
-                <StatusBadge status={rfq.status} />
-              </TableCell>
-              <TableCell className="text-right">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <MoreVertical className="h-4 w-4 text-brand-muted" />
-                </Button>
+          {loading ? (
+            Array.from({ length: 5 }).map((_, i) => (
+              <TableRow key={i} className="border-gray-100">
+                <TableCell colSpan={5}>
+                  <div className="h-4 w-full animate-pulse rounded bg-gray-100" />
+                </TableCell>
+              </TableRow>
+            ))
+          ) : rfqs.length === 0 ? (
+            <TableRow>
+              <TableCell
+                colSpan={5}
+                className="py-10 text-center text-sm text-brand-description"
+              >
+                No RFQs match your search.
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            rfqs.map((rfq) => (
+              <TableRow
+                key={rfq.id}
+                className="cursor-pointer border-gray-100 hover:bg-gray-50"
+                onClick={() => router.push(`/rfqs/${rfq.id}`)}
+              >
+                <TableCell className="font-medium text-brand-description">
+                  {rfq.rfqNumber}
+                </TableCell>
+                <TableCell className="text-brand-description">
+                  {rfq.title}
+                </TableCell>
+                <TableCell className="text-brand-description">
+                  {new Date(rfq.dueDate).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </TableCell>
+                <TableCell>
+                  <StatusBadge status={rfq.status} />
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <MoreVertical className="h-4 w-4 text-brand-muted" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
 
