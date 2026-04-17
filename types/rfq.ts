@@ -138,6 +138,22 @@ export interface AddRFQItemResponse {
   data: CreateRFQResponseItem;
 }
 
+// ── Update RFQ Item ──
+
+export interface UpdateRFQItemRequest {
+  materialId?: string;
+  quantity?: number;
+  budget?: number;
+  description?: string;
+}
+
+export interface UpdateRFQItemResponse {
+  success: boolean;
+  message: string;
+  data: CreateRFQResponseItem;
+  statusCode: number;
+}
+
 export type VendorTag =
   | "Best price"
   | "Competitive"

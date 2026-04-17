@@ -11,6 +11,7 @@ import { AxiosError } from "axios";
 import type { CreateRFQData } from "@/types/rfq";
 import { EditRFQDialog } from "../_components/edit-rfq-dialog";
 import { AddItemDialog } from "../_components/add-item-dialog";
+import { EditItemDialog } from "../_components/edit-item-dialog";
 
 function formatCurrency(value: number) {
   return `₦${value.toLocaleString("en-NG")}`;
@@ -26,6 +27,7 @@ export default function RFQDetailsPage() {
   const [activeItemIndex, setActiveItemIndex] = useState(0);
   const [editOpen, setEditOpen] = useState(false);
   const [addItemOpen, setAddItemOpen] = useState(false);
+  const [editItemOpen, setEditItemOpen] = useState(false);
 
   useEffect(() => {
     async function fetchRFQ() {
@@ -227,13 +229,25 @@ export default function RFQDetailsPage() {
               {detail.vendors.length}
             </p>
           </div>
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-brand-muted">
-              Status
-            </p>
-            <p className="mt-1.5 text-xl font-bold text-brand-title capitalize">
-              {detail.status}
-            </p>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-brand-muted">
+                Status
+              </p>
+              <p className="mt-1.5 text-xl font-bold text-brand-title capitalize">
+                {detail.status}
+              </p>
+            </div>
+            {(detail.status === "draft" || detail.status === "sent") && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditItemOpen(true)}
+              >
+                <Pencil className="mr-1.5 size-3.5" />
+                Edit Item
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -309,6 +323,27 @@ export default function RFQDetailsPage() {
             };
           });
           setActiveItemIndex(detail.items.length);
+        }}
+      />
+
+      {/* Edit Item Dialog */}
+      <EditItemDialog
+        open={editItemOpen}
+        onOpenChange={setEditItemOpen}
+        rfqId={rfqId}
+        item={currentItem}
+        onSuccess={(updatedItem) => {
+          setDetail((prev) => {
+            if (!prev) return prev;
+            const updatedItems = prev.items.map((i) =>
+              i.id === updatedItem.id ? updatedItem : i,
+            );
+            return {
+              ...prev,
+              items: updatedItems,
+              totalBudget: updatedItems.reduce((sum, i) => sum + i.budget, 0),
+            };
+          });
         }}
       />
     </div>

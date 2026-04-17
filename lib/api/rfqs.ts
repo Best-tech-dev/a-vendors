@@ -7,6 +7,8 @@ import type {
   UpdateRFQResponse,
   AddRFQItemRequest,
   AddRFQItemResponse,
+  UpdateRFQItemRequest,
+  UpdateRFQItemResponse,
   RFQsListResponse,
   RFQsListParams,
 } from "@/types/rfq";
@@ -30,6 +32,12 @@ export const rfqsApi = {
   addItem: (rfqId: string, payload: AddRFQItemRequest) =>
     api.post<AddRFQItemResponse>(
       `avendor/rfqs/${encodeURIComponent(rfqId)}/items`,
+      payload,
+    ),
+
+  updateItem: (rfqId: string, itemId: string, payload: UpdateRFQItemRequest) =>
+    api.patch<UpdateRFQItemResponse>(
+      `avendor/rfqs/${encodeURIComponent(rfqId)}/items/${encodeURIComponent(itemId)}`,
       payload,
     ),
 };

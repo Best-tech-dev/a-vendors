@@ -46,3 +46,12 @@ export const addRFQItemSchema = z.object({
 });
 
 export type AddRFQItemFormValues = z.infer<typeof addRFQItemSchema>;
+
+export const updateRFQItemSchema = z.object({
+  materialId: z.string().min(1, "Please select a material"),
+  quantity: z.number().min(1, "Quantity must be at least 1"),
+  budget: z.number().min(1, "Budget must be greater than 0"),
+  description: z.string().optional(),
+});
+
+export type UpdateRFQItemFormValues = z.infer<typeof updateRFQItemSchema>;
