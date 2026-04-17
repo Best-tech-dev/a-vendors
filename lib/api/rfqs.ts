@@ -12,6 +12,9 @@ import type {
   RFQsListResponse,
   RFQsListParams,
   UploadItemAttachmentsResponse,
+  AssignVendorsRequest,
+  AssignVendorsResponse,
+  SendRFQResponse,
 } from "@/types/rfq";
 
 export const rfqsApi = {
@@ -51,4 +54,15 @@ export const rfqsApi = {
       { headers: { "Content-Type": "multipart/form-data" } },
     );
   },
+
+  assignVendors: (rfqId: string, payload: AssignVendorsRequest) =>
+    api.put<AssignVendorsResponse>(
+      `avendor/rfqs/${encodeURIComponent(rfqId)}/vendors`,
+      payload,
+    ),
+
+  send: (rfqId: string) =>
+    api.patch<SendRFQResponse>(
+      `avendor/rfqs/${encodeURIComponent(rfqId)}/send`,
+    ),
 };

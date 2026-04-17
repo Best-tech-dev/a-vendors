@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { ChevronLeft, Pencil, Plus } from "lucide-react";
+import { ChevronLeft, Pencil, Plus, Send, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { rfqsApi } from "@/lib/api/rfqs";
@@ -13,6 +13,8 @@ import { EditRFQDialog } from "../_components/edit-rfq-dialog";
 import { AddItemDialog } from "../_components/add-item-dialog";
 import { EditItemDialog } from "../_components/edit-item-dialog";
 import { ItemAttachments } from "../_components/item-attachments";
+import { ManageVendorsDialog } from "../_components/manage-vendors-dialog";
+import { SendRFQDialog } from "../_components/send-rfq-dialog";
 
 function formatCurrency(value: number) {
   return `₦${value.toLocaleString("en-NG")}`;
@@ -29,6 +31,8 @@ export default function RFQDetailsPage() {
   const [editOpen, setEditOpen] = useState(false);
   const [addItemOpen, setAddItemOpen] = useState(false);
   const [editItemOpen, setEditItemOpen] = useState(false);
+  const [manageVendorsOpen, setManageVendorsOpen] = useState(false);
+  const [sendRfqOpen, setSendRfqOpen] = useState(false);
 
   useEffect(() => {
     async function fetchRFQ() {
@@ -158,6 +162,12 @@ export default function RFQDetailsPage() {
           </Badge>
         </div>
         <div className="flex items-center gap-3 shrink-0">
+          {detail.status === "draft" && (
+            <Button size="sm" onClick={() => setSendRfqOpen(true)}>
+              <Send className="mr-1.5 size-3.5" />
+              Send RFQ
+            </Button>
+          )}
           {(detail.status === "draft" || detail.status === "sent") && (
             <Button
               variant="outline"
@@ -277,9 +287,21 @@ export default function RFQDetailsPage() {
 
       {/* Vendors Invited (shown when no quotes are available yet) */}
       <div>
-        <h2 className="text-lg font-bold text-brand-title mb-4">
-          Vendors Invited
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-brand-title">
+            Vendors Invited
+          </h2>
+          {(detail.status === "draft" || detail.status === "sent") && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setManageVendorsOpen(true)}
+            >
+              <Users className="mr-1.5 size-3.5" />
+              Manage Vendors
+            </Button>
+          )}
+        </div>
         <div className="rounded-lg border border-gray-200 bg-white divide-y divide-gray-100">
           {detail.vendors.map((v) => (
             <div
@@ -368,6 +390,28 @@ export default function RFQDetailsPage() {
             };
           });
         }}
+      />
+
+      {/* Manage Vendors Dialog */}
+      <ManageVendorsDialog
+        open={manageVendorsOpen}
+        onOpenChange={setManageVendorsOpen}
+        rfqId={rfqId}
+        currentVendors={detail.vendors}
+        onSuccess={(updatedVendors) => {
+          setDetail((prev) => {
+            if (!prev) return prev;
+            return { ...prev, vendors: updatedVendors };
+          });
+        }}
+      />
+
+      {/* Send RFQ Dialog */}
+      <SendRFQDialog
+        open={sendRfqOpen}
+        onOpenChange={setSendRfqOpen}
+        rfq={detail}
+        onSuccess={(updated) => setDetail(updated)}
       />
     </div>
   );

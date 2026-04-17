@@ -277,3 +277,26 @@ export interface SelectableVendor {
   category: string;
   rating: number;
 }
+
+// ── Assign Vendors to RFQ ──
+
+export interface AssignVendorsRequest {
+  vendorIds: string[];
+  sendToAllVendors: boolean;
+}
+
+export interface AssignVendorsResponse {
+  success: boolean;
+  message: string;
+  data: CreateRFQResponseVendor[];
+  statusCode: number;
+}
+
+// ── Send RFQ to Vendors ──
+
+export interface SendRFQResponse {
+  success: boolean;
+  message: string;
+  data: CreateRFQData;
+  statusCode: number;
+}
