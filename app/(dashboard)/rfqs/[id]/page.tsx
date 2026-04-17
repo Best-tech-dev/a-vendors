@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { QuoteComparisonTable } from "../_components/quote-comparison-table";
-import { AnalysisCard } from "../_components/analysis-card";
-import { mockRFQDetail } from "@/lib/mock/rfqs";
+import { rfqsApi } from "@/lib/api/rfqs";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
+import type { CreateRFQData } from "@/types/rfq";
 
 function formatCurrency(value: number) {
   return `₦${value.toLocaleString("en-NG")}`;
@@ -14,8 +15,61 @@ function formatCurrency(value: number) {
 
 export default function RFQDetailsPage() {
   const router = useRouter();
-  const detail = mockRFQDetail;
+  const params = useParams();
+  const rfqId = params.id as string;
+
+  const [detail, setDetail] = useState<CreateRFQData | null>(null);
+  const [loading, setLoading] = useState(true);
   const [activeItemIndex, setActiveItemIndex] = useState(0);
+
+  const fetchRFQ = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await rfqsApi.getById(rfqId);
+      setDetail(res.data.data);
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      if (!axiosError.response) {
+        toast.error("Network error — please check your connection and retry.");
+      } else {
+        toast.error(
+          axiosError.response.data?.message ??
+            "Could not load RFQ details. Please try again.",
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [rfqId]);
+
+  useEffect(() => {
+    fetchRFQ();
+  }, [fetchRFQ]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="size-6 animate-spin text-brand-muted" />
+      </div>
+    );
+  }
+
+  if (!detail) {
+    return (
+      <div className="space-y-6">
+        <button
+          onClick={() => router.push("/rfqs")}
+          className="inline-flex items-center gap-1 text-sm text-brand-muted hover:text-brand-primary font-medium"
+        >
+          <ChevronLeft className="size-4" />
+          Back to RFQs
+        </button>
+        <p className="text-sm text-brand-description">
+          RFQ not found or could not be loaded.
+        </p>
+      </div>
+    );
+  }
 
   const currentItem = detail.items[activeItemIndex];
 
@@ -24,7 +78,7 @@ export default function RFQDetailsPage() {
       {/* Back link */}
       <button
         onClick={() => router.push("/rfqs")}
-        className="inline-flex items-center gap-1 text-sm text-badge-green hover:text-badge-green/80 font-medium"
+        className="inline-flex items-center gap-1 text-sm text-brand-muted hover:text-brand-primary font-medium"
       >
         <ChevronLeft className="size-4" />
         Back to RFQs
@@ -40,11 +94,11 @@ export default function RFQDetailsPage() {
             variant="outline"
             className="text-xs text-brand-description border-0"
           >
-            {detail.rfqId}
+            {detail.rfqNumber}
           </Badge>
         </div>
         <span className="text-sm text-brand-description shrink-0">
-          Items: {detail.totalItems}
+          Items: {detail.items.length}
         </span>
       </div>
 
@@ -52,7 +106,7 @@ export default function RFQDetailsPage() {
       <div className="flex gap-1 rounded-lg border border-gray-200 bg-brand-primary p-1 w-fit overflow-x-auto max-w-full">
         {detail.items.map((item, index) => (
           <button
-            key={item.itemName}
+            key={item.id}
             onClick={() => setActiveItemIndex(index)}
             className={`rounded-md px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
               activeItemIndex === index
@@ -60,7 +114,7 @@ export default function RFQDetailsPage() {
                 : "text-brand-border hover:text-brand-border/90"
             }`}
           >
-            {item.itemName}
+            {item.materialName}
           </button>
         ))}
       </div>
@@ -86,45 +140,67 @@ export default function RFQDetailsPage() {
           </div>
           <div>
             <p className="text-xs font-medium uppercase tracking-wider text-brand-muted">
-              Best price
+              Vendors invited
             </p>
             <p className="mt-1.5 text-xl font-bold text-brand-title">
-              {formatCurrency(currentItem.bestPrice)}
+              {detail.vendors.length}
             </p>
           </div>
           <div>
             <p className="text-xs font-medium uppercase tracking-wider text-brand-muted">
-              Average price
+              Status
             </p>
-            <p className="mt-1.5 text-xl font-bold text-brand-title">
-              {formatCurrency(currentItem.averagePrice)}
+            <p className="mt-1.5 text-xl font-bold text-brand-title capitalize">
+              {detail.status}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Comparison Table */}
-      <div className="rounded-lg border border-gray-200 bg-white overflow-x-auto">
-        <QuoteComparisonTable quotes={currentItem.quotes} />
-      </div>
-
-      {/* Analysis & Recommendations */}
+      {/* Vendors Invited (shown when no quotes are available yet) */}
       <div>
         <h2 className="text-lg font-bold text-brand-title mb-4">
-          Analysis & Recommendations
+          Vendors Invited
         </h2>
-        <div className="space-y-3">
-          {detail.analysis.map((rec, index) => (
-            <AnalysisCard
-              key={index}
-              variant={rec.variant}
-              label={rec.label}
-              vendorName={rec.vendorName}
-              description={rec.description}
-            />
+        <div className="rounded-lg border border-gray-200 bg-white divide-y divide-gray-100">
+          {detail.vendors.map((v) => (
+            <div
+              key={v.id}
+              className="flex items-center justify-between px-5 py-4"
+            >
+              <div>
+                <p className="text-sm font-medium text-brand-title">
+                  {v.vendor.name}
+                </p>
+                <p className="text-xs text-brand-description">
+                  {v.vendor.email}
+                </p>
+              </div>
+              <Badge
+                variant="outline"
+                className={`text-xs border-0 ${
+                  v.vendor.status === "active"
+                    ? "bg-badge-green-accent text-badge-green"
+                    : "bg-gray-100 text-brand-description"
+                }`}
+              >
+                {v.vendor.status}
+              </Badge>
+            </div>
           ))}
         </div>
       </div>
+
+      {/* Placeholder for quotes & analysis — shown when the RFQ has no quotes yet */}
+      {detail.status === "draft" && (
+        <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
+          <p className="text-sm text-brand-description">
+            This RFQ is still in <strong>draft</strong> status. Vendor quotes
+            and analysis will appear here once the RFQ is sent and vendors
+            respond.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

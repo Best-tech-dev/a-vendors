@@ -98,6 +98,13 @@ export interface CreateRFQResponse {
   success: boolean;
   message: string;
   data: CreateRFQData;
+}
+
+/** GET /avendor/rfqs/:id returns the same data shape as create */
+export interface GetRFQByIdResponse {
+  success: boolean;
+  message: string;
+  data: CreateRFQData;
   statusCode: number;
 }
 
