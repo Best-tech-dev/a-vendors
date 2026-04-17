@@ -41,6 +41,21 @@ export interface CreateRFQRequest {
   sendToAllVendors: boolean;
 }
 
+export interface ItemAttachment {
+  id: string;
+  imageUrl: string;
+  imagePublicId: string;
+  originalFilename: string;
+  createdAt: string;
+}
+
+export interface UploadItemAttachmentsResponse {
+  success: boolean;
+  message: string;
+  data: ItemAttachment[];
+  statusCode: number;
+}
+
 export interface CreateRFQResponseItem {
   id: string;
   rfqId: string;
@@ -52,7 +67,7 @@ export interface CreateRFQResponseItem {
   description: string | null;
   createdAt: string;
   updatedAt: string;
-  attachments: unknown[];
+  attachments: ItemAttachment[];
   material: {
     id: string;
     name: string;

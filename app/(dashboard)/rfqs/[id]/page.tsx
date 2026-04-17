@@ -12,6 +12,7 @@ import type { CreateRFQData } from "@/types/rfq";
 import { EditRFQDialog } from "../_components/edit-rfq-dialog";
 import { AddItemDialog } from "../_components/add-item-dialog";
 import { EditItemDialog } from "../_components/edit-item-dialog";
+import { ItemAttachments } from "../_components/item-attachments";
 
 function formatCurrency(value: number) {
   return `₦${value.toLocaleString("en-NG")}`;
@@ -251,6 +252,28 @@ export default function RFQDetailsPage() {
           </div>
         </div>
       </div>
+
+      {/* Item Attachments */}
+      <ItemAttachments
+        rfqId={rfqId}
+        itemId={currentItem.id}
+        attachments={currentItem.attachments}
+        editable={detail.status === "draft" || detail.status === "sent"}
+        onUploaded={(newAttachments) => {
+          setDetail((prev) => {
+            if (!prev) return prev;
+            const updatedItems = prev.items.map((item) =>
+              item.id === currentItem.id
+                ? {
+                    ...item,
+                    attachments: [...item.attachments, ...newAttachments],
+                  }
+                : item,
+            );
+            return { ...prev, items: updatedItems };
+          });
+        }}
+      />
 
       {/* Vendors Invited (shown when no quotes are available yet) */}
       <div>

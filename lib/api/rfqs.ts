@@ -11,6 +11,7 @@ import type {
   UpdateRFQItemResponse,
   RFQsListResponse,
   RFQsListParams,
+  UploadItemAttachmentsResponse,
 } from "@/types/rfq";
 
 export const rfqsApi = {
@@ -40,4 +41,14 @@ export const rfqsApi = {
       `avendor/rfqs/${encodeURIComponent(rfqId)}/items/${encodeURIComponent(itemId)}`,
       payload,
     ),
+
+  uploadItemAttachments: (rfqId: string, itemId: string, files: File[]) => {
+    const formData = new FormData();
+    files.forEach((file) => formData.append("images", file));
+    return api.post<UploadItemAttachmentsResponse>(
+      `avendor/rfqs/${encodeURIComponent(rfqId)}/items/${encodeURIComponent(itemId)}/attachments`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } },
+    );
+  },
 };
