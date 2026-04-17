@@ -3,6 +3,8 @@ import type {
   CreateRFQRequest,
   CreateRFQResponse,
   GetRFQByIdResponse,
+  UpdateRFQRequest,
+  UpdateRFQResponse,
   RFQsListResponse,
   RFQsListParams,
 } from "@/types/rfq";
@@ -16,4 +18,10 @@ export const rfqsApi = {
 
   create: (payload: CreateRFQRequest) =>
     api.post<CreateRFQResponse>("avendor/rfqs", payload),
+
+  update: (id: string, payload: UpdateRFQRequest) =>
+    api.patch<UpdateRFQResponse>(
+      `avendor/rfqs/${encodeURIComponent(id)}`,
+      payload,
+    ),
 };

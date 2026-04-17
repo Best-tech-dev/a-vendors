@@ -108,6 +108,21 @@ export interface GetRFQByIdResponse {
   statusCode: number;
 }
 
+// ── Update RFQ ──
+
+export interface UpdateRFQRequest {
+  title?: string;
+  dueDate?: string;
+  description?: string;
+}
+
+export interface UpdateRFQResponse {
+  success: boolean;
+  message: string;
+  data: CreateRFQData;
+  statusCode: number;
+}
+
 export type VendorTag =
   | "Best price"
   | "Competitive"

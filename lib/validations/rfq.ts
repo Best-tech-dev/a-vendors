@@ -26,3 +26,14 @@ export const createRFQSchema = z
   });
 
 export type CreateRFQFormValues = z.infer<typeof createRFQSchema>;
+
+export const updateRFQSchema = z.object({
+  title: z
+    .string()
+    .min(1, "RFQ title is required")
+    .max(200, "Title must be at most 200 characters"),
+  description: z.string().optional(),
+  dueDate: z.string().min(1, "Due date is required"),
+});
+
+export type UpdateRFQFormValues = z.infer<typeof updateRFQSchema>;

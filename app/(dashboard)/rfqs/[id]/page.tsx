@@ -2,12 +2,14 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { rfqsApi } from "@/lib/api/rfqs";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import type { CreateRFQData } from "@/types/rfq";
+import { EditRFQDialog } from "../_components/edit-rfq-dialog";
 
 function formatCurrency(value: number) {
   return `₦${value.toLocaleString("en-NG")}`;
@@ -21,6 +23,7 @@ export default function RFQDetailsPage() {
   const [detail, setDetail] = useState<CreateRFQData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeItemIndex, setActiveItemIndex] = useState(0);
+  const [editOpen, setEditOpen] = useState(false);
 
   const fetchRFQ = useCallback(async () => {
     setLoading(true);
@@ -148,9 +151,21 @@ export default function RFQDetailsPage() {
             {detail.rfqNumber}
           </Badge>
         </div>
-        <span className="text-sm text-brand-description shrink-0">
-          Items: {detail.items.length}
-        </span>
+        <div className="flex items-center gap-3 shrink-0">
+          {(detail.status === "draft" || detail.status === "sent") && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setEditOpen(true)}
+            >
+              <Pencil className="mr-1.5 size-3.5" />
+              Edit
+            </Button>
+          )}
+          <span className="text-sm text-brand-description">
+            Items: {detail.items.length}
+          </span>
+        </div>
       </div>
 
       {/* Item Tabs */}
@@ -251,6 +266,16 @@ export default function RFQDetailsPage() {
             respond.
           </p>
         </div>
+      )}
+
+      {/* Edit RFQ Dialog */}
+      {detail && (
+        <EditRFQDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          rfq={detail}
+          onSuccess={(updated) => setDetail(updated)}
+        />
       )}
     </div>
   );
