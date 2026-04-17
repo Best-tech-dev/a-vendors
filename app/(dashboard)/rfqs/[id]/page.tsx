@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { ChevronLeft, Pencil } from "lucide-react";
+import { ChevronLeft, Pencil, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { rfqsApi } from "@/lib/api/rfqs";
@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { AxiosError } from "axios";
 import type { CreateRFQData } from "@/types/rfq";
 import { EditRFQDialog } from "../_components/edit-rfq-dialog";
+import { AddItemDialog } from "../_components/add-item-dialog";
 
 function formatCurrency(value: number) {
   return `₦${value.toLocaleString("en-NG")}`;
@@ -24,6 +25,7 @@ export default function RFQDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [activeItemIndex, setActiveItemIndex] = useState(0);
   const [editOpen, setEditOpen] = useState(false);
+  const [addItemOpen, setAddItemOpen] = useState(false);
 
   useEffect(() => {
     async function fetchRFQ() {
@@ -170,20 +172,32 @@ export default function RFQDetailsPage() {
       </div>
 
       {/* Item Tabs */}
-      <div className="flex gap-1 rounded-lg border border-gray-200 bg-brand-primary p-1 w-fit overflow-x-auto max-w-full">
-        {detail.items.map((item, index) => (
-          <button
-            key={item.id}
-            onClick={() => setActiveItemIndex(index)}
-            className={`rounded-md px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
-              activeItemIndex === index
-                ? "border border-gray-300 bg-white text-gray-900 shadow-sm"
-                : "text-brand-border hover:text-brand-border/90"
-            }`}
+      <div className="flex items-center gap-3">
+        <div className="flex gap-1 rounded-lg border border-gray-200 bg-brand-primary p-1 w-fit overflow-x-auto max-w-full">
+          {detail.items.map((item, index) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveItemIndex(index)}
+              className={`rounded-md px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
+                activeItemIndex === index
+                  ? "border border-gray-300 bg-white text-gray-900 shadow-sm"
+                  : "text-brand-border hover:text-brand-border/90"
+              }`}
+            >
+              {item.materialName}
+            </button>
+          ))}
+        </div>
+        {(detail.status === "draft" || detail.status === "sent") && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setAddItemOpen(true)}
           >
-            {item.materialName}
-          </button>
-        ))}
+            <Plus className="mr-1.5 size-3.5" />
+            Add Item
+          </Button>
+        )}
       </div>
 
       {/* Summary Row */}
@@ -278,6 +292,25 @@ export default function RFQDetailsPage() {
           onSuccess={(updated) => setDetail(updated)}
         />
       )}
+
+      {/* Add Item Dialog */}
+      <AddItemDialog
+        open={addItemOpen}
+        onOpenChange={setAddItemOpen}
+        rfqId={rfqId}
+        onSuccess={(newItem) => {
+          setDetail((prev) => {
+            if (!prev) return prev;
+            const updatedItems = [...prev.items, newItem];
+            return {
+              ...prev,
+              items: updatedItems,
+              totalBudget: updatedItems.reduce((sum, i) => sum + i.budget, 0),
+            };
+          });
+          setActiveItemIndex(detail.items.length);
+        }}
+      />
     </div>
   );
 }

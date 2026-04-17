@@ -5,6 +5,8 @@ import type {
   GetRFQByIdResponse,
   UpdateRFQRequest,
   UpdateRFQResponse,
+  AddRFQItemRequest,
+  AddRFQItemResponse,
   RFQsListResponse,
   RFQsListParams,
 } from "@/types/rfq";
@@ -22,6 +24,12 @@ export const rfqsApi = {
   update: (id: string, payload: UpdateRFQRequest) =>
     api.patch<UpdateRFQResponse>(
       `avendor/rfqs/${encodeURIComponent(id)}`,
+      payload,
+    ),
+
+  addItem: (rfqId: string, payload: AddRFQItemRequest) =>
+    api.post<AddRFQItemResponse>(
+      `avendor/rfqs/${encodeURIComponent(rfqId)}/items`,
       payload,
     ),
 };
