@@ -193,7 +193,7 @@ export function EditRFQDialog({
           </Button>
           <Button onClick={handleSubmit} disabled={isSubmitting}>
             {isSubmitting && <Loader2 className="mr-2 size-4 animate-spin" />}
-            Save Changes
+            {isSubmitting ? "Saving Changes" : "Save Changes"}
           </Button>
         </DialogFooter>
       </DialogContent>

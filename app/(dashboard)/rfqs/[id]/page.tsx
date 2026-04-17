@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { ChevronLeft, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -25,29 +25,30 @@ export default function RFQDetailsPage() {
   const [activeItemIndex, setActiveItemIndex] = useState(0);
   const [editOpen, setEditOpen] = useState(false);
 
-  const fetchRFQ = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await rfqsApi.getById(rfqId);
-      setDetail(res.data.data);
-    } catch (error) {
-      const axiosError = error as AxiosError<{ message: string }>;
-      if (!axiosError.response) {
-        toast.error("Network error — please check your connection and retry.");
-      } else {
-        toast.error(
-          axiosError.response.data?.message ??
-            "Could not load RFQ details. Please try again.",
-        );
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [rfqId]);
-
   useEffect(() => {
+    async function fetchRFQ() {
+      setLoading(true);
+      try {
+        const res = await rfqsApi.getById(rfqId);
+        setDetail(res.data.data);
+      } catch (error) {
+        const axiosError = error as AxiosError<{ message: string }>;
+        if (!axiosError.response) {
+          toast.error(
+            "Network error — please check your connection and retry.",
+          );
+        } else {
+          toast.error(
+            axiosError.response.data?.message ??
+              "Could not load RFQ details. Please try again.",
+          );
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
     fetchRFQ();
-  }, [fetchRFQ]);
+  }, [rfqId]);
 
   if (loading) {
     return (
