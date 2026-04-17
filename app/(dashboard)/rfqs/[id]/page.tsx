@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { ChevronLeft, Loader2 } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { rfqsApi } from "@/lib/api/rfqs";
 import { toast } from "sonner";
@@ -48,8 +48,59 @@ export default function RFQDetailsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="size-6 animate-spin text-brand-muted" />
+      <div className="space-y-6">
+        {/* Back link */}
+        <div className="h-4 w-24 animate-pulse rounded bg-gray-100" />
+
+        {/* Header */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-7 w-56 animate-pulse rounded bg-gray-100" />
+            <div className="h-5 w-28 animate-pulse rounded bg-gray-100" />
+          </div>
+          <div className="h-4 w-16 animate-pulse rounded bg-gray-100" />
+        </div>
+
+        {/* Item tabs */}
+        <div className="flex gap-1 rounded-lg border border-gray-200 bg-brand-primary p-1 w-fit">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-9 w-28 animate-pulse rounded-md bg-gray-200"
+            />
+          ))}
+        </div>
+
+        {/* Summary row */}
+        <div className="rounded-lg border border-gray-200 bg-white">
+          <div className="grid grid-cols-2 gap-4 p-4 sm:gap-6 sm:p-6 sm:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="space-y-2">
+                <div className="h-3 w-20 animate-pulse rounded bg-gray-100" />
+                <div className="h-7 w-32 animate-pulse rounded bg-gray-100" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Vendors section */}
+        <div className="space-y-4">
+          <div className="h-5 w-36 animate-pulse rounded bg-gray-100" />
+          <div className="rounded-lg border border-gray-200 bg-white divide-y divide-gray-100">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex items-center justify-between px-5 py-4"
+              >
+                <div className="space-y-2">
+                  <div className="h-4 w-40 animate-pulse rounded bg-gray-100" />
+                  <div className="h-3 w-52 animate-pulse rounded bg-gray-100" />
+                </div>
+                <div className="h-5 w-14 animate-pulse rounded-full bg-gray-100" />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
