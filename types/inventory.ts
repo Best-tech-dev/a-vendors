@@ -110,3 +110,22 @@ export interface SingleCategoryResponse {
   data: MaterialCategory;
   statusCode: number;
 }
+
+// Vendor-facing material — has SKU, no imageUrl
+export interface VendorMaterial {
+  id: string;
+  sku: string;
+  name: string;
+  category: { id: string; name: string };
+  unit: string;
+  stock: number;
+  reorderLevel: number;
+  pricePerUnit: number;
+}
+
+export interface VendorInventoryAnalysis {
+  totalMaterials: number;
+  totalCategories: number;
+  totalStock: number;
+  totalUnitPrice: number;
+}
