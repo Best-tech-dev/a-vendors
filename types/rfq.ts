@@ -310,3 +310,25 @@ export interface VendorQuoteRequest {
   expectedDelivery: string;
   submissionDeadline: string;
 }
+
+export interface VendorRFQItem {
+  id: string;
+  materialName: string;
+  imageUrl?: string;
+  quantity: number;
+  unit: string;
+  expectedAmount: number;
+}
+
+// ── Vendor RFQ Detail ──
+export interface VendorRFQDetail {
+  id: string;
+  reference: string;
+  title: string;
+  sentDate: string;
+  totalItems: number;
+  totalAmount: number;
+  submissionDeadline: string;
+  expectedDelivery: string;
+  items: VendorRFQItem[];
+}

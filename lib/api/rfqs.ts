@@ -66,9 +66,13 @@ export const rfqsApi = {
       `avendor/rfqs/${encodeURIComponent(rfqId)}/send`,
     ),
 
+  // Vendor-specific endpoint to fetch quote requests assigned to the logged-in vendor
   getVendorQuoteRequests: (params: {
     page?: number;
     limit?: number;
     search?: string;
   }) => api.get("avendor/rfqs", { params }),
+
+  // Vendor-specific endpoint to fetch details of a specific RFQ assigned to the logged-in vendor
+  getVendorRFQById: (id: string) => api.get(`avendor/rfqs/${id}`),
 };

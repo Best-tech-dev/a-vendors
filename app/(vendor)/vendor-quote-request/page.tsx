@@ -71,7 +71,7 @@ export default function VendorQuoteRequestPage() {
   }, [page, search, fetchQuotes]);
 
   const handleViewRFQ = (id: string) => {
-    router.push(`/vendor/quotes-request/${id}`);
+    router.push(`/vendor-quote-request/${id}`);
   };
 
   const isEmpty = !loading && quotes.length === 0;
