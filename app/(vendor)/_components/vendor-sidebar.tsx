@@ -15,15 +15,15 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 const mainNavItems = [
-  { label: "Dashboard", href: "/vendor/dashboard", icon: LayoutDashboard },
-  { label: "Inventory", href: "/vendor/inventory", icon: PackagePlus },
-  { label: "Quotes Request", href: "/vendor/quotes-request", icon: FileText },
+  { label: "Dashboard", href: "/vendor-dashboard", icon: LayoutDashboard },
+  { label: "Inventory", href: "/vendor-inventory", icon: PackagePlus },
+  { label: "Quotes Request", href: "/vendor-quote-request", icon: FileText },
   {
     label: "Quotes History",
-    href: "/vendor/quotes-history",
+    href: "/vendor-quotes-history",
     icon: ClipboardList,
   },
-  { label: "Profile", href: "/vendor/profile", icon: UserCircle },
+  { label: "Profile", href: "/vendor-profile", icon: UserCircle },
 ];
 
 export function VendorSidebar() {

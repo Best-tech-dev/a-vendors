@@ -139,7 +139,7 @@ export default function VendorDashboardPage() {
 
           {/* CTA */}
           <Link
-            href="/vendor/profile"
+            href="/vendor-profile"
             className="relative z-10 flex shrink-0 items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-brand-primary transition-opacity hover:opacity-90"
           >
             Complete profile setup

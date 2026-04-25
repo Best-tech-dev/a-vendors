@@ -65,4 +65,10 @@ export const rfqsApi = {
     api.patch<SendRFQResponse>(
       `avendor/rfqs/${encodeURIComponent(rfqId)}/send`,
     ),
+
+  getVendorQuoteRequests: (params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+  }) => api.get("avendor/rfqs", { params }),
 };

@@ -300,3 +300,13 @@ export interface SendRFQResponse {
   data: CreateRFQData;
   statusCode: number;
 }
+
+// ── Vendor Quote Requests List ──
+export interface VendorQuoteRequest {
+  id: string;
+  reference: string;
+  title: string;
+  itemCount: number;
+  expectedDelivery: string;
+  submissionDeadline: string;
+}
