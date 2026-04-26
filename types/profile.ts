@@ -57,3 +57,13 @@ export interface TeamUsersResponse {
   meta: PaginationMeta;
   statusCode: number;
 }
+
+export interface VendorProfile {
+  company_name?: string;
+  industry?: string;
+  address?: string;
+  email?: string;
+  phone?: string;
+  bank_account_number?: string;
+  compliance_document_url?: string;
+}
