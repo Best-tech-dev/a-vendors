@@ -65,5 +65,10 @@ export interface VendorProfile {
   email?: string;
   phone?: string;
   bank_account_number?: string;
+  bank_name?: string;
+  account_number?: string;
+  account_name?: string;
   compliance_document_url?: string;
+  compliance_document_name?: string;
+  compliance_document_expiry?: string;
 }

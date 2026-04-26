@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Upload } from "lucide-react";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
+import Image from "next/image";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { profileApi } from "@/lib/api/profile";
 import type { VendorProfile } from "@/types/profile";
@@ -31,7 +32,6 @@ interface InfoRowProps {
 function SectionCard({ title, subtitle, action, children }: SectionCardProps) {
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-      {/* Card header */}
       <div className="flex items-start justify-between px-6 py-5">
         <div>
           <p className="font-semibold text-brand-title">{title}</p>
@@ -39,11 +39,7 @@ function SectionCard({ title, subtitle, action, children }: SectionCardProps) {
         </div>
         {action}
       </div>
-
-      {/* Divider */}
       <div className="border-t border-gray-100" />
-
-      {/* Card body */}
       <div className="px-6 py-5">{children}</div>
     </div>
   );
@@ -95,22 +91,44 @@ function DarkButton({
   );
 }
 
+function SkeletonRows({ count = 5 }: { count?: number }) {
+  return (
+    <div className="space-y-0">
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          className="flex items-center justify-between border-b border-gray-100 py-3.5 last:border-0"
+        >
+          <span className="block h-4 w-24 animate-pulse rounded bg-gray-200" />
+          <span className="block h-4 w-36 animate-pulse rounded bg-gray-200" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------------------
-// Four section cards
+// Section cards
 // ---------------------------------------------------------------------------
 
 function CompanyDetailsCard({ profile }: { profile: VendorProfile | null }) {
-  const handleEdit = () => {
-    // TODO: open edit sheet/dialog
-  };
-
   return (
     <SectionCard
       title="Company details"
       subtitle="Update your workspace info"
-      action={<GhostButton onClick={handleEdit}>Edit</GhostButton>}
+      action={
+        <GhostButton
+          onClick={() => {
+            /* TODO: open edit dialog */
+          }}
+        >
+          Edit
+        </GhostButton>
+      }
     >
-      {profile ? (
+      {profile === null ? (
+        <SkeletonRows count={5} />
+      ) : (
         <>
           <InfoRow label="Company Name" value={profile.company_name} />
           <InfoRow label="Industry" value={profile.industry} />
@@ -118,46 +136,43 @@ function CompanyDetailsCard({ profile }: { profile: VendorProfile | null }) {
           <InfoRow label="Email" value={profile.email} />
           <InfoRow label="Phone" value={profile.phone} />
         </>
-      ) : (
-        // Loading skeleton
-        <div className="space-y-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div
-              key={i}
-              className="flex items-center justify-between border-b border-gray-100 py-3.5 last:border-0"
-            >
-              <span className="block h-4 w-24 animate-pulse rounded bg-gray-200" />
-              <span className="block h-4 w-36 animate-pulse rounded bg-gray-200" />
-            </div>
-          ))}
-        </div>
       )}
     </SectionCard>
   );
 }
 
-function BankDetailsCard({ hasBankDetails }: { hasBankDetails: boolean }) {
-  const handleEdit = () => {
-    // TODO: open edit sheet/dialog
-  };
-
-  const handleAdd = () => {
-    // TODO: open add bank details dialog
-  };
+function BankDetailsCard({ profile }: { profile: VendorProfile | null }) {
+  const hasBankDetails =
+    !!profile?.bank_name ||
+    !!profile?.account_number ||
+    !!profile?.account_name;
 
   return (
     <SectionCard
       title="Bank details"
       subtitle="Update your workspace info"
       action={
-        hasBankDetails ? (
-          <GhostButton onClick={handleEdit}>Edit</GhostButton>
+        // Edit button appears as soon as profile has loaded regardless of
+        // whether bank details exist, so the user can always open the form.
+        profile !== null ? (
+          <GhostButton
+            onClick={() => {
+              /* TODO: open edit/add dialog */
+            }}
+          >
+            Edit
+          </GhostButton>
         ) : undefined
       }
     >
-      {hasBankDetails ? (
-        // TODO: render actual bank details rows once API shape is known
-        <p className="text-sm text-brand-description">Bank details loaded.</p>
+      {profile === null ? (
+        <SkeletonRows count={3} />
+      ) : hasBankDetails ? (
+        <>
+          <InfoRow label="Bank Name" value={profile.bank_name} />
+          <InfoRow label="Account Number" value={profile.account_number} />
+          <InfoRow label="Account Name" value={profile.account_name} />
+        </>
       ) : (
         <div className="flex flex-col items-center gap-4 py-6 text-center">
           <p className="font-semibold text-brand-title">
@@ -167,26 +182,95 @@ function BankDetailsCard({ hasBankDetails }: { hasBankDetails: boolean }) {
             To ensure your invoices are processed and paid without delay, please
             provide your bank account details or preferred payment method.
           </p>
-          <DarkButton onClick={handleAdd}>Add Bank Details</DarkButton>
+          <DarkButton
+            onClick={() => {
+              /* TODO: open add bank dialog */
+            }}
+          >
+            Add Bank Details
+          </DarkButton>
         </div>
       )}
     </SectionCard>
   );
 }
 
-function ComplianceDocumentCard({ hasDocument }: { hasDocument: boolean }) {
-  const handleUpload = () => {
-    // TODO: open file picker / upload dialog
+function ComplianceDocumentCard({
+  profile,
+}: {
+  profile: VendorProfile | null;
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleReupload = () => fileInputRef.current?.click();
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    // TODO: call upload API with the selected file
+    console.log("Re-uploading:", file.name);
   };
+
+  const hasDocument = !!profile?.compliance_document_url;
 
   return (
     <SectionCard
       title="Compliance document"
       subtitle="Update your workspace info"
     >
-      {hasDocument ? (
-        // TODO: render document list once API shape is known
-        <p className="text-sm text-brand-description">Documents uploaded.</p>
+      {profile === null ? (
+        // Skeleton shaped like the document row
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-12 shrink-0 animate-pulse rounded-md bg-gray-200" />
+            <div className="space-y-1.5">
+              <span className="block h-4 w-32 animate-pulse rounded bg-gray-200" />
+              <span className="block h-3 w-24 animate-pulse rounded bg-gray-200" />
+            </div>
+          </div>
+          <span className="block h-8 w-24 animate-pulse rounded bg-gray-200" />
+        </div>
+      ) : hasDocument ? (
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            {/* Document thumbnail */}
+            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-gray-100">
+              <Image
+                src={profile.compliance_document_url!}
+                alt="Compliance document"
+                width={48}
+                height={48}
+                className="h-full w-full object-cover"
+              />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-brand-title">
+                {profile.compliance_document_name ?? "CAC Certificate"}
+              </p>
+              {profile.compliance_document_expiry && (
+                <p className="text-xs text-brand-description">
+                  Expires: {profile.compliance_document_expiry}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <button
+            onClick={handleReupload}
+            className="flex shrink-0 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-brand-title transition-colors hover:bg-gray-50"
+          >
+            <Upload className="size-3.5" />
+            Re-upload
+          </button>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.png,.jpg,.jpeg"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+        </div>
       ) : (
         <div className="flex flex-col items-center gap-4 py-6 text-center">
           <p className="font-semibold text-brand-title">
@@ -196,7 +280,13 @@ function ComplianceDocumentCard({ hasDocument }: { hasDocument: boolean }) {
             To become a verified supplier and start bidding on RFQs, please
             upload your required document.
           </p>
-          <DarkButton onClick={handleUpload}>Upload document</DarkButton>
+          <DarkButton
+            onClick={() => {
+              /* TODO: open upload dialog */
+            }}
+          >
+            Upload document
+          </DarkButton>
         </div>
       )}
     </SectionCard>
@@ -204,16 +294,16 @@ function ComplianceDocumentCard({ hasDocument }: { hasDocument: boolean }) {
 }
 
 function PasswordCard() {
-  const handleChangePassword = () => {
-    // TODO: open change password dialog/sheet
-  };
-
   return (
     <SectionCard
       title="Password"
       subtitle="Manage your login credentials"
       action={
-        <GhostButton onClick={handleChangePassword}>
+        <GhostButton
+          onClick={() => {
+            /* TODO: open change password dialog */
+          }}
+        >
           Change password
         </GhostButton>
       }
@@ -230,7 +320,6 @@ function PasswordCard() {
 export default function VendorProfilePage() {
   const token = useAuthStore((state) => state.token);
   const [profile, setProfile] = useState<VendorProfile | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!token) return;
@@ -242,18 +331,11 @@ export default function VendorProfilePage() {
           error.response?.data?.message ??
             "Could not load profile. Please try again.",
         );
-      })
-      .finally(() => setLoading(false));
+      });
   }, [token]);
-
-  // Derive flags from the profile once it loads.
-  // Adjust the field checks to match whatever your API actually returns.
-  const hasBankDetails = !!profile?.bank_account_number;
-  const hasComplianceDocument = !!profile?.compliance_document_url;
 
   return (
     <div className="space-y-6">
-      {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold text-brand-title">
           Profile &amp; Settings
@@ -263,17 +345,16 @@ export default function VendorProfilePage() {
         </p>
       </div>
 
-      {/* 2-column grid — stacks to 1 column on mobile */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         {/* Left column */}
         <div className="flex flex-col gap-5">
-          <CompanyDetailsCard profile={loading ? null : profile} />
-          <ComplianceDocumentCard hasDocument={hasComplianceDocument} />
+          <CompanyDetailsCard profile={profile} />
+          <ComplianceDocumentCard profile={profile} />
         </div>
 
         {/* Right column */}
         <div className="flex flex-col gap-5">
-          <BankDetailsCard hasBankDetails={hasBankDetails} />
+          <BankDetailsCard profile={profile} />
           <PasswordCard />
         </div>
       </div>
