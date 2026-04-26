@@ -75,4 +75,12 @@ export const rfqsApi = {
 
   // Vendor-specific endpoint to fetch details of a specific RFQ assigned to the logged-in vendor
   getVendorRFQById: (id: string) => api.get(`avendor/rfqs/${id}`),
+
+  // Vendor-specific endpoint to fetch quote history for the logged-in vendor
+  getVendorQuoteHistory: (params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    filter?: "awarded" | "pending";
+  }) => api.get("avendor/rfqs/history", { params }),
 };

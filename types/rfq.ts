@@ -332,3 +332,15 @@ export interface VendorRFQDetail {
   expectedDelivery: string;
   items: VendorRFQItem[];
 }
+
+// ── Vendor Quote History ──
+export type QuoteHistoryFilter = "all" | "awarded" | "pending";
+export interface VendorQuoteHistory {
+  id: string;
+  reference: string;
+  totalItems: number;
+  acceptedItems: number;
+  amountQuoted: number;
+  dateSubmitted: string;
+  status: "awarded" | "pending" | "rejected";
+}

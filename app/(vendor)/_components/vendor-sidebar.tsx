@@ -20,7 +20,7 @@ const mainNavItems = [
   { label: "Quotes Request", href: "/vendor-quote-request", icon: FileText },
   {
     label: "Quotes History",
-    href: "/vendor-quotes-history",
+    href: "/vendor-quote-history",
     icon: ClipboardList,
   },
   { label: "Profile", href: "/vendor-profile", icon: UserCircle },
