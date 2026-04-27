@@ -27,7 +27,25 @@ export default function DashboardGroupLayout({
     if (!token) return;
     profileApi
       .get()
-      .then(({ data: res }) => setProfile(res.data))
+      .then(({ data: res }) => {
+        // Transform VendorUser (camelCase) to UserProfile (snake_case)
+        const vendorUser = res.data.user;
+        const userProfile = {
+          id: vendorUser.id,
+          first_name: vendorUser.firstName,
+          last_name: vendorUser.lastName,
+          username: null,
+          email: vendorUser.email,
+          phone_number: vendorUser.phone,
+          company_position: vendorUser.companyPosition,
+          display_picture: vendorUser.displayPicture,
+          role: "user",
+          status: "active",
+          is_active: true,
+          is_email_verified: true,
+        };
+        setProfile(userProfile);
+      })
       .catch(() => {
         // Profile fetch failure is non-blocking; header will show empty state
       });

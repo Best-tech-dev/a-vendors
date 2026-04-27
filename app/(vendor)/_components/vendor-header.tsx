@@ -80,12 +80,13 @@ export function VendorHeader() {
 
   const { displayName, initials } = useMemo(() => {
     if (!profile) return { displayName: "", initials: "" };
-    const fullName = `${profile.first_name} ${profile.last_name}`;
+    const firstName = profile.first_name || "";
+    const lastName = profile.last_name || "";
+    const fullName = `${firstName} ${lastName}`.trim();
     const clipped =
       fullName.length > 12 ? `${fullName.slice(0, 12)}...` : fullName;
-    const ini =
-      `${profile.first_name.charAt(0)}${profile.last_name.charAt(0)}`.toUpperCase();
-    return { displayName: clipped, initials: ini };
+    const ini = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+    return { displayName: clipped || profile.email || "", initials: ini };
   }, [profile]);
 
   const handleLogout = () => {

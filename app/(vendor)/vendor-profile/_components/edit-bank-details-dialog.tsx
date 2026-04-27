@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { profileApi } from "@/lib/api/profile";
-import type { VendorProfile } from "@/types/profile";
+import type { VendorProfileData } from "@/types/profile";
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -74,8 +74,8 @@ const NIGERIAN_BANKS = [
 interface EditBankDetailsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  profile: VendorProfile | null;
-  onSuccess?: (updated: VendorProfile) => void;
+  profile: VendorProfileData | null;
+  onSuccess?: (updated: Partial<VendorProfileData>) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -105,11 +105,11 @@ export function EditBankDetailsDialog({
   });
 
   useEffect(() => {
-    if (open && profile) {
+    if (open && profile && profile.bank) {
       reset({
-        bank_name: profile.bank_name ?? "",
-        account_number: profile.account_number ?? "",
-        account_name: profile.account_name ?? "",
+        bank_name: profile.bank.bank_name ?? "",
+        account_number: profile.bank.account_number ?? "",
+        account_name: profile.bank.account_name ?? "",
       });
     }
   }, [open, profile, reset]);

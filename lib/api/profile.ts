@@ -1,8 +1,27 @@
 import { api } from "./axios";
-import type { UserProfileResponse, TeamUsersResponse } from "@/types/profile";
+import type {
+  UserProfileResponse,
+  TeamUsersResponse,
+  VendorProfileResponse,
+} from "@/types/profile";
 
 export const profileApi = {
-  get: () => api.get<UserProfileResponse>("/avendor/user/profile"),
+  get: () => api.get<VendorProfileResponse>("/vendor/profile"),
+
+  updateCompanyDetails: (data: {
+    company_name: string;
+    industry: string;
+    city: string;
+    country: string;
+    email: string;
+    phone: string;
+  }) => api.put<VendorProfileResponse>("/vendor/profile/company", data),
+
+  updateBankDetails: (data: {
+    bank_name: string;
+    account_number: string;
+    account_name: string;
+  }) => api.put<VendorProfileResponse>("/vendor/profile/bank", data),
 };
 
 export const usersApi = {

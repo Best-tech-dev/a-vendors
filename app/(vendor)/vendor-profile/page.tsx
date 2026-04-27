@@ -11,7 +11,7 @@ import { EditCompanyDetailsDialog } from "./_components/edit-company-details-dia
 import { EditBankDetailsDialog } from "./_components/edit-bank-details-dialog";
 import { UploadComplianceDocumentDialog } from "./_components/upload-compliance-document-dialog";
 import { ChangePasswordDialog } from "./_components/change-password-dialog";
-import type { VendorProfile } from "@/types/profile";
+import type { VendorProfileData } from "@/types/profile";
 
 // ---------------------------------------------------------------------------
 // Shared primitives
@@ -115,7 +115,7 @@ function CompanyDetailsCard({
   profile,
   onEditClick,
 }: {
-  profile: VendorProfile | null;
+  profile: VendorProfileData | null;
   onEditClick: () => void;
 }) {
   return (
@@ -128,11 +128,11 @@ function CompanyDetailsCard({
         <SkeletonRows count={5} />
       ) : (
         <>
-          <InfoRow label="Company Name" value={profile.company_name} />
-          <InfoRow label="Industry" value={profile.industry} />
-          <InfoRow label="Address" value={profile.address} />
-          <InfoRow label="Email" value={profile.email} />
-          <InfoRow label="Phone" value={profile.phone} />
+          <InfoRow label="Company Name" value={profile.company.name} />
+          <InfoRow label="Industry" value={profile.company.industry} />
+          <InfoRow label="Address" value={profile.company.address} />
+          <InfoRow label="Email" value={profile.company.email} />
+          <InfoRow label="Phone" value={profile.company.phone} />
         </>
       )}
     </SectionCard>
@@ -143,10 +143,10 @@ function BankDetailsCard({
   profile,
   onEditClick,
 }: {
-  profile: VendorProfile | null;
+  profile: VendorProfileData | null;
   onEditClick: () => void;
 }) {
-  const hasBankDetails = !!profile?.bank_name || !!profile?.account_number;
+  const hasBankDetails = profile?.bank !== null && profile?.bank !== undefined;
 
   return (
     <SectionCard
@@ -162,9 +162,12 @@ function BankDetailsCard({
         <SkeletonRows count={3} />
       ) : hasBankDetails ? (
         <>
-          <InfoRow label="Bank Name" value={profile.bank_name} />
-          <InfoRow label="Account Number" value={profile.account_number} />
-          <InfoRow label="Account Name" value={profile.account_name} />
+          <InfoRow label="Bank Name" value={profile.bank!.bank_name} />
+          <InfoRow
+            label="Account Number"
+            value={profile.bank!.account_number}
+          />
+          <InfoRow label="Account Name" value={profile.bank!.account_name} />
         </>
       ) : (
         <div className="flex flex-col items-center gap-4 py-6 text-center">
@@ -186,11 +189,13 @@ function ComplianceDocumentCard({
   profile,
   onUploadClick,
 }: {
-  profile: VendorProfile | null;
+  profile: VendorProfileData | null;
   onUploadClick: () => void;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const hasDocument = !!profile?.compliance_document_url;
+  const hasDocument =
+    profile?.compliance && profile.compliance.documents.length > 0;
+  const document = hasDocument ? profile.compliance.documents[0] : null;
 
   const handleReupload = () => fileInputRef.current?.click();
 
@@ -222,7 +227,7 @@ function ComplianceDocumentCard({
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-gray-100">
               <Image
-                src={profile.compliance_document_url!}
+                src={document!.url}
                 alt="Compliance document"
                 width={48}
                 height={48}
@@ -231,11 +236,11 @@ function ComplianceDocumentCard({
             </div>
             <div>
               <p className="text-sm font-medium text-brand-title">
-                {profile.compliance_document_name ?? "CAC Certificate"}
+                {document!.name ?? "CAC Certificate"}
               </p>
-              {profile.compliance_document_expiry && (
+              {document!.expiry && (
                 <p className="text-xs text-brand-description">
-                  Expires: {profile.compliance_document_expiry}
+                  Expires: {document!.expiry}
                 </p>
               )}
             </div>
@@ -293,7 +298,7 @@ function PasswordCard({ onChangeClick }: { onChangeClick: () => void }) {
 
 export default function VendorProfilePage() {
   const token = useAuthStore((state) => state.token);
-  const [profile, setProfile] = useState<VendorProfile | null>(null);
+  const [profile, setProfile] = useState<VendorProfileData | null>(null);
 
   // Dialog open states
   const [companyDialogOpen, setCompanyDialogOpen] = useState(false);
@@ -316,8 +321,11 @@ export default function VendorProfilePage() {
 
   // After a successful edit, merge the updated fields into local state
   // so the page reflects changes immediately without a full refetch.
-  const handleProfileUpdate = (updated: VendorProfile) => {
-    setProfile((prev) => ({ ...prev, ...updated }));
+  const handleProfileUpdate = (updated: Partial<VendorProfileData>) => {
+    setProfile((prev) => {
+      if (!prev) return prev;
+      return { ...prev, ...updated };
+    });
   };
 
   const handleDocumentSuccess = () => {

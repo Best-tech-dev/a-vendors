@@ -58,17 +58,78 @@ export interface TeamUsersResponse {
   statusCode: number;
 }
 
-export interface VendorProfile {
-  company_name?: string;
-  industry?: string;
-  address?: string;
-  email?: string;
-  phone?: string;
-  bank_account_number?: string;
-  bank_name?: string;
-  account_number?: string;
-  account_name?: string;
-  compliance_document_url?: string;
-  compliance_document_name?: string;
-  compliance_document_expiry?: string;
+// Vendor Profile API Types
+export interface VendorUser {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  displayPicture: string | null;
+  companyPosition: string | null;
+}
+
+export interface VendorCompany {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  industry: string;
+  address: string;
+  city: string;
+  country: string;
+  status: string;
+  complianceStatus: string;
+  rating: number;
+  totalOrders: number;
+  totalSpend: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface VendorBank {
+  id?: string;
+  bank_name: string;
+  account_number: string;
+  account_name: string;
+  [key: string]: string | undefined;
+}
+
+export interface ComplianceDocument {
+  id: string;
+  url: string;
+  name: string;
+  expiry: string | null;
+  [key: string]: string | null | undefined;
+}
+
+export interface VendorCompliance {
+  status: string;
+  documents: ComplianceDocument[];
+}
+
+export interface VendorSecurity {
+  hasPassword: boolean;
+}
+
+export interface ProfileCompletion {
+  completionPercent: number;
+  completedItems: string[];
+  missingItems: string[];
+}
+
+export interface VendorProfileData {
+  user: VendorUser;
+  company: VendorCompany;
+  bank: VendorBank | null;
+  compliance: VendorCompliance;
+  security: VendorSecurity;
+  profileCompletion: ProfileCompletion;
+}
+
+export interface VendorProfileResponse {
+  success: boolean;
+  message: string;
+  data: VendorProfileData;
+  statusCode: number;
 }

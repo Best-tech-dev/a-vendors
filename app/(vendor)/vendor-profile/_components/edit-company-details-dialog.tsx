@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { profileApi } from "@/lib/api/profile";
-import type { VendorProfile } from "@/types/profile";
+import type { VendorProfileData } from "@/types/profile";
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -74,8 +74,8 @@ const COUNTRIES = [
 interface EditCompanyDetailsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  profile: VendorProfile | null;
-  onSuccess?: (updated: VendorProfile) => void;
+  profile: VendorProfileData | null;
+  onSuccess?: (updated: Partial<VendorProfileData>) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -111,12 +111,12 @@ export function EditCompanyDetailsDialog({
   useEffect(() => {
     if (open && profile) {
       reset({
-        company_name: profile.company_name ?? "",
-        industry: profile.industry ?? "",
-        city: profile.city ?? "",
-        country: profile.country ?? "",
-        email: profile.email ?? "",
-        phone: profile.phone ?? "",
+        company_name: profile.company.name ?? "",
+        industry: profile.company.industry ?? "",
+        city: profile.company.city ?? "",
+        country: profile.company.country ?? "",
+        email: profile.company.email ?? "",
+        phone: profile.company.phone ?? "",
       });
     }
   }, [open, profile, reset]);
