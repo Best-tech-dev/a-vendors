@@ -12,13 +12,17 @@ export default function AuthGroupLayout({
 }) {
   const router = useRouter();
   const token = useAuthStore((state) => state.token);
+  const user = useAuthStore((state) => state.user);
   const hasHydrated = useAuthStore((state) => state._hasHydrated);
 
   useEffect(() => {
-    if (hasHydrated && token) {
+    if (!hasHydrated || !token) return;
+    if (user?.role === "admin") {
       router.replace("/dashboard");
+    } else if (user?.role === "user") {
+      router.replace("/vendor-dashboard");
     }
-  }, [hasHydrated, token, router]);
+  }, [hasHydrated, token, user, router]);
 
   if (!hasHydrated) return null;
   if (token) return null;

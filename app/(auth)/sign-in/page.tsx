@@ -24,6 +24,7 @@ import {
 
 export default function SignInPage() {
   const router = useRouter();
+  const setAuth = useAuthStore((state) => state.setAuth);
   const setPendingEmail = useAuthStore((state) => state.setPendingEmail);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -41,10 +42,23 @@ export default function SignInPage() {
   async function onSubmit(data: SignInFormValues) {
     setIsLoading(true);
     try {
-      await authApi.signIn(data);
-      setPendingEmail(data.email);
-      toast.success("OTP sent to your email");
-      router.push("/verify");
+      const response = await authApi.signIn(data);
+      const { role, access_token } = response.data.data;
+
+      if (role === "admin") {
+        setPendingEmail(data.email);
+        toast.success("OTP sent to your email");
+        router.push("/verify");
+      } else {
+        setAuth(access_token, {
+          id: "",
+          email: data.email,
+          name: "",
+          role,
+        });
+        toast.success("Signed in successfully");
+        router.push("/vendor-dashboard");
+      }
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
       const message =
