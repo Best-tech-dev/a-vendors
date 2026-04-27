@@ -48,23 +48,27 @@ export function AddVendorDialog({
   onSuccess,
 }: AddVendorDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [categories, setCategories] = useState<VendorCategory[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
 
   const form = useForm<CreateVendorFormValues>({
     resolver: zodResolver(createVendorSchema),
     defaultValues: {
       name: "",
-      category: "",
       email: "",
+      user: {
+        first_name: "",
+        last_name: "",
+        username: "",
+      },
       phone: "",
+      industry: "",
+      address: "",
       city: "",
       country: "",
       status: "",
     },
   });
-
-  // Categories from backend
-  const [categories, setCategories] = useState<VendorCategory[]>([]);
-  const [categoriesLoading, setCategoriesLoading] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -90,7 +94,17 @@ export function AddVendorDialog({
   const handleSubmit = async (values: CreateVendorFormValues) => {
     setIsSubmitting(true);
     try {
-      await vendorsApi.create(values);
+      // Strip username if empty (existing-user-link flow doesn't need it)
+      const payload: CreateVendorFormValues = {
+        ...values,
+        user: {
+          ...values.user,
+          ...(values.user.username?.trim()
+            ? { username: values.user.username.trim() }
+            : {}),
+        },
+      };
+      await vendorsApi.create(payload);
       toast.success("Vendor created successfully");
       form.reset();
       onOpenChange(false);
@@ -133,7 +147,7 @@ export function AddVendorDialog({
             onSubmit={form.handleSubmit(handleSubmit)}
             className="space-y-5 pt-2"
           >
-            {/* Name */}
+            {/* Vendor Name */}
             <FormField
               control={form.control}
               name="name"
@@ -151,37 +165,7 @@ export function AddVendorDialog({
               )}
             />
 
-            {/* Category */}
-            <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Category</FormLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={
-                            categoriesLoading ? "Loading…" : "Select a category"
-                          }
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {categories.map((cat) => (
-                        <SelectItem key={cat.id} value={cat.name}>
-                          {cat.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Email */}
+            {/* Contact Email */}
             <FormField
               control={form.control}
               name="email"
@@ -200,6 +184,88 @@ export function AddVendorDialog({
               )}
             />
 
+            {/* Portal User — First & Last Name */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="user.first_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>First Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Chioma" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="user.last_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Last Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Adeyemi" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Username (optional — only needed for new users) */}
+            <FormField
+              control={form.control}
+              name="user.username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Username{" "}
+                    <span className="text-muted-foreground font-normal">
+                      (optional — leave blank if email already has an account)
+                    </span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., chioma_ade" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Industry (was Category) */}
+            <FormField
+              control={form.control}
+              name="industry"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Industry</FormLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={
+                            categoriesLoading
+                              ? "Loading…"
+                              : "Select an industry"
+                          }
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.name}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             {/* Phone */}
             <FormField
               control={form.control}
@@ -210,7 +276,25 @@ export function AddVendorDialog({
                   <FormControl>
                     <Input
                       type="tel"
-                      placeholder="e.g., 08161252897"
+                      placeholder="e.g., 08000000000"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Address */}
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Address</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="e.g., 12 Adeola Odeku Street"
                       {...field}
                     />
                   </FormControl>

@@ -58,11 +58,19 @@ export interface Vendor {
   };
 }
 
+export interface VendorUser {
+  first_name: string;
+  last_name: string;
+  username?: string; // optional: not sent when linking existing user
+}
+
 export interface CreateVendorRequest {
   name: string;
-  category: string;
   email: string;
+  user: VendorUser;
   phone: string;
+  industry: string;
+  address: string;
   city: string;
   country: string;
   status: string;

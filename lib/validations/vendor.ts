@@ -5,12 +5,21 @@ export const createVendorSchema = z.object({
     .string()
     .min(1, "Vendor name is required")
     .max(150, "Name must be at most 150 characters"),
-  category: z.string().min(1, "Please select a category"),
-  email: z.string().min(1, "Email is required").email("Enter a valid email"),
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .email("Enter a valid email address"),
+  user: z.object({
+    first_name: z.string().min(1, "First name is required"),
+    last_name: z.string().min(1, "Last name is required"),
+    username: z.string().optional(),
+  }),
   phone: z
     .string()
     .min(1, "Phone number is required")
     .max(11, "Phone number must be at most 11 digits"),
+  industry: z.string().min(1, "Please select an industry"),
+  address: z.string().min(1, "Address is required"),
   city: z.string().min(1, "City is required"),
   country: z.string().min(1, "Country is required"),
   status: z.string().min(1, "Please select a status"),
