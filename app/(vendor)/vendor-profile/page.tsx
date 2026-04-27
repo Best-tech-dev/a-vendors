@@ -7,10 +7,14 @@ import { AxiosError } from "axios";
 import Image from "next/image";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { profileApi } from "@/lib/api/profile";
+import { EditCompanyDetailsDialog } from "./_components/edit-company-details-dialog";
+import { EditBankDetailsDialog } from "./_components/edit-bank-details-dialog";
+import { UploadComplianceDocumentDialog } from "./_components/upload-compliance-document-dialog";
+import { ChangePasswordDialog } from "./_components/change-password-dialog";
 import type { VendorProfile } from "@/types/profile";
 
 // ---------------------------------------------------------------------------
-// Types
+// Shared primitives
 // ---------------------------------------------------------------------------
 
 interface SectionCardProps {
@@ -24,10 +28,6 @@ interface InfoRowProps {
   label: string;
   value?: string | null;
 }
-
-// ---------------------------------------------------------------------------
-// Shared primitives
-// ---------------------------------------------------------------------------
 
 function SectionCard({ title, subtitle, action, children }: SectionCardProps) {
   return (
@@ -93,7 +93,7 @@ function DarkButton({
 
 function SkeletonRows({ count = 5 }: { count?: number }) {
   return (
-    <div className="space-y-0">
+    <div>
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
@@ -111,20 +111,18 @@ function SkeletonRows({ count = 5 }: { count?: number }) {
 // Section cards
 // ---------------------------------------------------------------------------
 
-function CompanyDetailsCard({ profile }: { profile: VendorProfile | null }) {
+function CompanyDetailsCard({
+  profile,
+  onEditClick,
+}: {
+  profile: VendorProfile | null;
+  onEditClick: () => void;
+}) {
   return (
     <SectionCard
       title="Company details"
       subtitle="Update your workspace info"
-      action={
-        <GhostButton
-          onClick={() => {
-            /* TODO: open edit dialog */
-          }}
-        >
-          Edit
-        </GhostButton>
-      }
+      action={<GhostButton onClick={onEditClick}>Edit</GhostButton>}
     >
       {profile === null ? (
         <SkeletonRows count={5} />
@@ -141,27 +139,22 @@ function CompanyDetailsCard({ profile }: { profile: VendorProfile | null }) {
   );
 }
 
-function BankDetailsCard({ profile }: { profile: VendorProfile | null }) {
-  const hasBankDetails =
-    !!profile?.bank_name ||
-    !!profile?.account_number ||
-    !!profile?.account_name;
+function BankDetailsCard({
+  profile,
+  onEditClick,
+}: {
+  profile: VendorProfile | null;
+  onEditClick: () => void;
+}) {
+  const hasBankDetails = !!profile?.bank_name || !!profile?.account_number;
 
   return (
     <SectionCard
       title="Bank details"
       subtitle="Update your workspace info"
       action={
-        // Edit button appears as soon as profile has loaded regardless of
-        // whether bank details exist, so the user can always open the form.
         profile !== null ? (
-          <GhostButton
-            onClick={() => {
-              /* TODO: open edit/add dialog */
-            }}
-          >
-            Edit
-          </GhostButton>
+          <GhostButton onClick={onEditClick}>Edit</GhostButton>
         ) : undefined
       }
     >
@@ -182,13 +175,7 @@ function BankDetailsCard({ profile }: { profile: VendorProfile | null }) {
             To ensure your invoices are processed and paid without delay, please
             provide your bank account details or preferred payment method.
           </p>
-          <DarkButton
-            onClick={() => {
-              /* TODO: open add bank dialog */
-            }}
-          >
-            Add Bank Details
-          </DarkButton>
+          <DarkButton onClick={onEditClick}>Add Bank Details</DarkButton>
         </div>
       )}
     </SectionCard>
@@ -197,21 +184,22 @@ function BankDetailsCard({ profile }: { profile: VendorProfile | null }) {
 
 function ComplianceDocumentCard({
   profile,
+  onUploadClick,
 }: {
   profile: VendorProfile | null;
+  onUploadClick: () => void;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const hasDocument = !!profile?.compliance_document_url;
 
   const handleReupload = () => fileInputRef.current?.click();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    // TODO: call upload API with the selected file
-    console.log("Re-uploading:", file.name);
+    // Re-upload opens the same dialog so user can also update the expiry date
+    onUploadClick();
   };
-
-  const hasDocument = !!profile?.compliance_document_url;
 
   return (
     <SectionCard
@@ -219,7 +207,6 @@ function ComplianceDocumentCard({
       subtitle="Update your workspace info"
     >
       {profile === null ? (
-        // Skeleton shaped like the document row
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 shrink-0 animate-pulse rounded-md bg-gray-200" />
@@ -233,7 +220,6 @@ function ComplianceDocumentCard({
       ) : hasDocument ? (
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            {/* Document thumbnail */}
             <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-gray-100">
               <Image
                 src={profile.compliance_document_url!}
@@ -280,32 +266,20 @@ function ComplianceDocumentCard({
             To become a verified supplier and start bidding on RFQs, please
             upload your required document.
           </p>
-          <DarkButton
-            onClick={() => {
-              /* TODO: open upload dialog */
-            }}
-          >
-            Upload document
-          </DarkButton>
+          <DarkButton onClick={onUploadClick}>Upload document</DarkButton>
         </div>
       )}
     </SectionCard>
   );
 }
 
-function PasswordCard() {
+function PasswordCard({ onChangeClick }: { onChangeClick: () => void }) {
   return (
     <SectionCard
       title="Password"
       subtitle="Manage your login credentials"
       action={
-        <GhostButton
-          onClick={() => {
-            /* TODO: open change password dialog */
-          }}
-        >
-          Change password
-        </GhostButton>
+        <GhostButton onClick={onChangeClick}>Change password</GhostButton>
       }
     >
       <InfoRow label="Password" value="••••••••" />
@@ -321,6 +295,12 @@ export default function VendorProfilePage() {
   const token = useAuthStore((state) => state.token);
   const [profile, setProfile] = useState<VendorProfile | null>(null);
 
+  // Dialog open states
+  const [companyDialogOpen, setCompanyDialogOpen] = useState(false);
+  const [bankDialogOpen, setBankDialogOpen] = useState(false);
+  const [documentDialogOpen, setDocumentDialogOpen] = useState(false);
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+
   useEffect(() => {
     if (!token) return;
     profileApi
@@ -333,6 +313,21 @@ export default function VendorProfilePage() {
         );
       });
   }, [token]);
+
+  // After a successful edit, merge the updated fields into local state
+  // so the page reflects changes immediately without a full refetch.
+  const handleProfileUpdate = (updated: VendorProfile) => {
+    setProfile((prev) => ({ ...prev, ...updated }));
+  };
+
+  const handleDocumentSuccess = () => {
+    // Refetch to get the new document URL + expiry from the server
+    if (!token) return;
+    profileApi
+      .get()
+      .then(({ data: res }) => setProfile(res.data))
+      .catch(() => {});
+  };
 
   return (
     <div className="space-y-6">
@@ -348,16 +343,48 @@ export default function VendorProfilePage() {
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         {/* Left column */}
         <div className="flex flex-col gap-5">
-          <CompanyDetailsCard profile={profile} />
-          <ComplianceDocumentCard profile={profile} />
+          <CompanyDetailsCard
+            profile={profile}
+            onEditClick={() => setCompanyDialogOpen(true)}
+          />
+          <ComplianceDocumentCard
+            profile={profile}
+            onUploadClick={() => setDocumentDialogOpen(true)}
+          />
         </div>
 
         {/* Right column */}
         <div className="flex flex-col gap-5">
-          <BankDetailsCard profile={profile} />
-          <PasswordCard />
+          <BankDetailsCard
+            profile={profile}
+            onEditClick={() => setBankDialogOpen(true)}
+          />
+          <PasswordCard onChangeClick={() => setPasswordDialogOpen(true)} />
         </div>
       </div>
+
+      {/* Dialogs */}
+      <EditCompanyDetailsDialog
+        open={companyDialogOpen}
+        onOpenChange={setCompanyDialogOpen}
+        profile={profile}
+        onSuccess={handleProfileUpdate}
+      />
+      <EditBankDetailsDialog
+        open={bankDialogOpen}
+        onOpenChange={setBankDialogOpen}
+        profile={profile}
+        onSuccess={handleProfileUpdate}
+      />
+      <UploadComplianceDocumentDialog
+        open={documentDialogOpen}
+        onOpenChange={setDocumentDialogOpen}
+        onSuccess={handleDocumentSuccess}
+      />
+      <ChangePasswordDialog
+        open={passwordDialogOpen}
+        onOpenChange={setPasswordDialogOpen}
+      />
     </div>
   );
 }
