@@ -130,7 +130,7 @@ export default function VendorDashboardPage() {
 
           {/* Profile completion banner */}
           {profileBanner && profileBanner.completionPercent < 100 && (
-            <div className="relative flex items-center gap-5 overflow-hidden rounded-[10px] bg-brand-primary px-6 py-5">
+            <div className="relative flex flex-col items-center gap-4 overflow-hidden rounded-[10px] bg-brand-primary px-6 py-5 md:flex-row md:items-center md:gap-5">
               {/* SVG background image — positioned right, vertically centered */}
               <Image
                 aria-hidden
@@ -138,7 +138,7 @@ export default function VendorDashboardPage() {
                 alt=""
                 width={200}
                 height={200}
-                className="pointer-events-none absolute -right-10 top-1/2 h-[160%] w-auto -translate-y-1/2 object-cover select-none"
+                className="pointer-events-none absolute -right-10 top-1/2 hidden h-[160%] w-auto -translate-y-1/2 select-none object-cover md:block"
               />
 
               {/* Avatar placeholder */}
@@ -160,7 +160,7 @@ export default function VendorDashboardPage() {
               {/* CTA */}
               <Link
                 href="/vendor-profile"
-                className="relative z-10 flex shrink-0 items-center gap-2 rounded-sm bg-white px-5 py-2.5 text-sm font-semibold text-brand-primary transition-opacity hover:opacity-90"
+                className="relative z-10 flex w-full shrink-0 items-center justify-center gap-2 rounded-sm bg-white px-5 py-2.5 text-sm font-semibold text-brand-primary transition-opacity hover:opacity-90 md:w-auto"
               >
                 {profileBanner.ctaLabel}
                 <ChevronsRight className="size-4" />
@@ -175,7 +175,7 @@ export default function VendorDashboardPage() {
                 Quotes Request
               </h2>
               <Link
-                href="/vendor/quotes-request"
+                href="/vendor-quote-request"
                 className="text-sm font-medium text-brand-primary underline underline-offset-2 hover:opacity-80"
               >
                 See more
@@ -217,7 +217,7 @@ export default function VendorDashboardPage() {
                           {row.title}
                         </td>
                         <td className="px-4 py-3.5 text-brand-description">
-                          {row.items}
+                          {row.itemsCount}
                         </td>
                         <td className="px-4 py-3.5 text-brand-description">
                           {row.expectedDelivery}

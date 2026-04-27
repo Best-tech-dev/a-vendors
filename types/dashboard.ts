@@ -25,7 +25,7 @@ export interface DashboardGreeting {
 export interface RecentQuoteRequest {
   reference: string;
   title: string;
-  items: number;
+  itemsCount: number;
   expectedDelivery: string;
   submissionDeadline: string;
 }
