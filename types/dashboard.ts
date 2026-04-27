@@ -23,7 +23,6 @@ export interface DashboardGreeting {
 }
 
 export interface RecentQuoteRequest {
-  id: string;
   reference: string;
   title: string;
   items: number;

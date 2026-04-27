@@ -89,41 +89,43 @@ export default function VendorDashboardPage() {
         <>
           {/* Stat cards */}
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <div className="rounded-lg border border-brand-border bg-white p-5">
-              <p className="text-2xl font-semibold text-brand-title">
-                {kpis?.activeQuoteRequests ?? 0}
-              </p>
-              <p className="mt-1 text-sm text-brand-description">
-                Active Quote Request
-              </p>
-            </div>
-            <div className="rounded-lg border border-brand-border bg-white p-5">
-              <p className="text-2xl font-semibold text-brand-title">
-                {kpis?.acceptedQuotes ?? 0}
-              </p>
-              <p className="mt-1 text-sm text-brand-description">
-                Accepted Quotes
-              </p>
-            </div>
-            <div className="rounded-lg border border-brand-border bg-white p-5">
-              <p className="text-2xl font-semibold text-brand-title">
-                {kpis?.totalInventory ?? 0}
-              </p>
-              <p className="mt-1 text-sm text-brand-description">
-                Total Inventory
-              </p>
-            </div>
-            <div className="rounded-lg border border-brand-border bg-white p-5">
-              <p className="text-2xl font-semibold text-brand-title">
-                {formatCurrency(
+            {[
+              {
+                id: "active-quotes",
+                value: kpis?.activeQuoteRequests ?? 0,
+                label: "Active Quote Request",
+              },
+              {
+                id: "accepted-quotes",
+                value: kpis?.acceptedQuotes ?? 0,
+                label: "Accepted Quotes",
+              },
+              {
+                id: "total-inventory",
+                value: kpis?.totalInventory ?? 0,
+                label: "Total Inventory",
+              },
+              {
+                id: "total-payment",
+                value: formatCurrency(
                   kpis?.totalApprovedPayment.amount ?? 0,
                   kpis?.totalApprovedPayment.currency,
-                )}
-              </p>
-              <p className="mt-1 text-sm text-brand-description">
-                Total Approved Payment
-              </p>
-            </div>
+                ),
+                label: "Total Approved Payment",
+              },
+            ].map((stat) => (
+              <div
+                key={stat.id}
+                className="rounded-lg border border-brand-border bg-white p-5"
+              >
+                <p className="text-2xl font-semibold text-brand-title">
+                  {stat.value}
+                </p>
+                <p className="mt-1 text-sm text-brand-description">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
           </div>
 
           {/* Profile completion banner */}
@@ -203,9 +205,9 @@ export default function VendorDashboardPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-brand-border">
-                    {quoteRows.map((row) => (
+                    {quoteRows.map((row, idx) => (
                       <tr
-                        key={row.id}
+                        key={`${row.reference}-${idx}`}
                         className="transition-colors hover:bg-gray-50/50"
                       >
                         <td className="px-4 py-3.5 text-brand-title">
