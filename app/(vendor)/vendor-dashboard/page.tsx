@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { dashboardApi } from "@/lib/api/dashboard";
 import type { DashboardSummaryData } from "@/types/dashboard";
+import { formatDate } from "@/lib/utils";
 
 // ---------------------------------------------------------------------------
 // Page
@@ -220,10 +221,10 @@ export default function VendorDashboardPage() {
                           {row.itemsCount}
                         </td>
                         <td className="px-4 py-3.5 text-brand-description">
-                          {row.expectedDelivery}
+                          {formatDate(row.expectedDelivery)}
                         </td>
                         <td className="px-4 py-3.5 text-brand-description">
-                          {row.submissionDeadline}
+                          {formatDate(row.submissionDeadline)}
                         </td>
                       </tr>
                     ))}
