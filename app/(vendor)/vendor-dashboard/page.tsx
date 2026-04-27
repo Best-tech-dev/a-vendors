@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useAuthStore } from "@/lib/stores/auth-store";
-import { UserCircle } from "lucide-react";
+import { ChevronsRight, UserRound } from "lucide-react";
+import Image from "next/image";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -110,40 +111,40 @@ export default function VendorDashboardPage() {
 
       {/* Profile completion banner */}
       {isProfileIncomplete && (
-        <div className="relative flex items-center gap-5 overflow-hidden rounded-xl bg-brand-primary px-6 py-5">
-          {/* Decorative blobs — pure CSS, no images needed */}
-          <span
+        <div className="relative flex items-center gap-5 overflow-hidden rounded-[10px] bg-brand-primary px-6 py-5">
+          {/* SVG background image — positioned right, vertically centered */}
+          <Image
             aria-hidden
-            className="pointer-events-none absolute right-0 top-0 h-full w-64 opacity-20"
-            style={{
-              background:
-                "radial-gradient(ellipse at 80% 20%, #6366f1 0%, transparent 60%), radial-gradient(ellipse at 100% 80%, #8b5cf6 0%, transparent 50%)",
-            }}
+            src="/svgs/background-gradient.svg"
+            alt=""
+            width={200}
+            height={200}
+            className="pointer-events-none absolute -right-10 top-1/2 h-[160%] w-auto -translate-y-1/2 object-cover select-none"
           />
 
           {/* Avatar placeholder */}
-          <div className="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white/10">
-            <UserCircle className="size-8 text-white/70" />
+          <div className="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#F5F7F9] border-4 border-brand-border">
+            <UserRound className="size-8 text-brand-primary" />
           </div>
 
           {/* Text */}
           <div className="relative z-10 flex-1">
-            <p className="font-semibold text-white">
+            <p className="font-medium text-white">
               Your profile is 50% complete, take action now
             </p>
             <p className="mt-0.5 text-sm text-white/70">
               Your profile is missing required documentation. Upload your files
-              now to avoid delays in order processing.
+              now to <br /> avoid delays in order processing.
             </p>
           </div>
 
           {/* CTA */}
           <Link
             href="/vendor-profile"
-            className="relative z-10 flex shrink-0 items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-brand-primary transition-opacity hover:opacity-90"
+            className="relative z-10 flex shrink-0 items-center gap-2 rounded-sm bg-white px-5 py-2.5 text-sm font-semibold text-brand-primary transition-opacity hover:opacity-90"
           >
             Complete profile setup
-            <span aria-hidden>»</span>
+            <ChevronsRight className="size-4" />
           </Link>
         </div>
       )}
