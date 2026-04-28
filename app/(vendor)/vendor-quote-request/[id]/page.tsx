@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import { rfqsApi } from "@/lib/api/rfqs";
 import type { VendorRFQDetail } from "@/types/rfq";
+import { formatDate } from "@/lib/utils";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -24,6 +25,11 @@ import type { VendorRFQDetail } from "@/types/rfq";
 
 function formatCurrency(value: number) {
   return `₦${value.toLocaleString("en-NG")}`;
+}
+
+function formatDisplayDate(value: string) {
+  if (!value) return "-";
+  return formatDate(value);
 }
 
 // ---------------------------------------------------------------------------
@@ -39,11 +45,33 @@ export default function VendorRFQDetailPage() {
 
   useEffect(() => {
     if (!params.id) return;
-
-    setLoading(true);
     rfqsApi
       .getVendorRFQById(params.id)
-      .then(({ data: res }) => setRfq(res.data))
+      .then(({ data: res }) => {
+        const detail: VendorRFQDetail = {
+          id: res.data.rfq.id,
+          reference: res.data.rfq.rfqNumber,
+          title: res.data.rfq.title,
+          sentDate: formatDisplayDate(res.data.rfq.sentAt),
+          totalItems: res.data.summary.totalItems,
+          totalAmount: res.data.summary.totalAmount,
+          submissionDeadline: formatDisplayDate(res.data.rfq.submissionDeadline),
+          expectedDelivery: formatDisplayDate(res.data.rfq.expectedDelivery),
+          attachments: res.data.rfq.attachments,
+          items: res.data.items.map((item) => ({
+            id: item.id,
+            materialId: item.materialId,
+            materialName: item.materialName,
+            description: item.description,
+            imageUrl: item.imageUrl,
+            quantity: item.quantity,
+            unit: item.unit,
+            expectedAmount: item.budget,
+            attachments: item.attachments,
+          })),
+        };
+        setRfq(detail);
+      })
       .catch((error: AxiosError<{ message: string }>) => {
         toast.error(
           error.response?.data?.message ??

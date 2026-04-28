@@ -303,21 +303,47 @@ export interface SendRFQResponse {
 
 // ── Vendor Quote Requests List ──
 export interface VendorQuoteRequest {
-  id: string;
+  assignmentId: string;
+  rfqId: string;
   reference: string;
   title: string;
-  itemCount: number;
+  description: string;
+  itemsCount: number;
+  rfqStatus: string;
+  totalBudget: number;
+  sentAt: string;
   expectedDelivery: string;
   submissionDeadline: string;
+  myQuote: {
+    id: string;
+    quoteNumber: string;
+    status: string;
+    totalAmount: number;
+    currency: string;
+    submittedAt: string;
+    updatedAt: string;
+    paymentPlan: {
+      id: string;
+      name: string;
+      code: string;
+    } | null;
+  } | null;
 }
 
 export interface VendorRFQItem {
   id: string;
   materialName: string;
+  materialId: string;
+  description: string;
   imageUrl?: string;
   quantity: number;
   unit: string;
   expectedAmount: number;
+  attachments: {
+    id: string;
+    imageUrl: string;
+    originalFilename: string;
+  }[];
 }
 
 // ── Vendor RFQ Detail ──
@@ -331,6 +357,111 @@ export interface VendorRFQDetail {
   submissionDeadline: string;
   expectedDelivery: string;
   items: VendorRFQItem[];
+  attachments: {
+    id: string;
+    imageUrl: string;
+    originalFilename: string;
+  }[];
+}
+
+export interface VendorQuoteRequestsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  view?: "open" | "submitted" | "active";
+}
+
+export interface VendorQuoteRequestsResponse {
+  success: boolean;
+  message: string;
+  data: VendorQuoteRequest[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+  statusCode: number;
+}
+
+export interface VendorQuoteRequestDetailResponse {
+  success: boolean;
+  message: string;
+  data: {
+    rfq: {
+      id: string;
+      rfqNumber: string;
+      title: string;
+      description: string;
+      status: string;
+      totalBudget: number;
+      expectedDelivery: string;
+      submissionDeadline: string;
+      sentAt: string;
+      createdAt: string;
+      attachments: {
+        id: string;
+        imageUrl: string;
+        originalFilename: string;
+      }[];
+    };
+    items: {
+      id: string;
+      materialId: string;
+      materialName: string;
+      quantity: number;
+      unit: string;
+      budget: number;
+      description: string;
+      imageUrl: string;
+      attachments: {
+        id: string;
+        imageUrl: string;
+        originalFilename: string;
+      }[];
+    }[];
+    summary: {
+      totalItems: number;
+      totalAmount: number;
+      currency: string;
+    };
+    quote: {
+      id: string;
+      quoteNumber: string;
+      status: string;
+      currency: string;
+      totalAmount: number;
+      note: string;
+      submittedAt: string;
+      withdrawnAt: string;
+      createdAt: string;
+      updatedAt: string;
+      paymentPlan: {
+        id: string;
+        name: string;
+        code: string;
+        description: string;
+        netDays: number;
+      } | null;
+      paymentPlanSetBy: string;
+      paymentPlanSetAt: string;
+      itemQuotes: {
+        rfqItemId: string;
+        prices: {
+          id: string;
+          position: number;
+          quality: string;
+          possibleDeliveryAt: string;
+          pricePerUnit: number;
+          totalPrice: number;
+          note: string;
+        }[];
+      }[];
+    } | null;
+  };
+  statusCode: number;
 }
 
 // ── Vendor Quote History ──

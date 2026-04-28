@@ -15,6 +15,9 @@ import type {
   AssignVendorsRequest,
   AssignVendorsResponse,
   SendRFQResponse,
+  VendorQuoteRequestsParams,
+  VendorQuoteRequestsResponse,
+  VendorQuoteRequestDetailResponse,
   VendorQuoteHistoryParams,
   VendorQuoteHistoryResponse,
 } from "@/types/rfq";
@@ -69,14 +72,14 @@ export const rfqsApi = {
     ),
 
   // Vendor-specific endpoint to fetch quote requests assigned to the logged-in vendor
-  getVendorQuoteRequests: (params: {
-    page?: number;
-    limit?: number;
-    search?: string;
-  }) => api.get("avendor/rfqs", { params }),
+  getVendorQuoteRequests: (params: VendorQuoteRequestsParams) =>
+    api.get<VendorQuoteRequestsResponse>("/vendor/quote-requests", { params }),
 
   // Vendor-specific endpoint to fetch details of a specific RFQ assigned to the logged-in vendor
-  getVendorRFQById: (id: string) => api.get(`avendor/rfqs/${id}`),
+  getVendorRFQById: (id: string) =>
+    api.get<VendorQuoteRequestDetailResponse>(
+      `/vendor/quote-requests/${encodeURIComponent(id)}`,
+    ),
 
   // Vendor-specific endpoint to fetch quote history for the logged-in vendor
   getVendorQuoteHistory: (params: VendorQuoteHistoryParams) =>

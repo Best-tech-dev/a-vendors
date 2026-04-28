@@ -39,8 +39,8 @@ export default function VendorQuoteRequestPage() {
           limit: ITEMS_PER_PAGE,
           search: searchQuery || undefined,
         });
-        const { items, meta } = res.data.data;
-        setQuotes(items);
+        const { data, meta } = res.data;
+        setQuotes(data);
         setTotalPages(meta.totalPages || 1);
       } catch (error) {
         const axiosError = error as AxiosError<{ message: string }>;
@@ -92,6 +92,8 @@ export default function VendorQuoteRequestPage() {
           <EmptyState
             title="No quote requests"
             description="You have no active quote requests at the moment"
+            actionLabel="Refresh"
+            onAction={() => fetchQuotes(1, search)}
             image={
               <Image
                 src="/svgs/empty-inbox-with-shadow.svg"

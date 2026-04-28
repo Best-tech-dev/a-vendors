@@ -18,6 +18,7 @@ import {
   PaginationLink,
 } from "@/components/ui/pagination";
 import type { VendorQuoteRequest } from "@/types/rfq";
+import { formatDate } from "@/lib/utils";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -94,7 +95,7 @@ export function VendorQuoteRequestTable({
 
         <TableBody>
           {loading
-            ? Array.from({ length: 9 }).map((_, i) => (
+              ? Array.from({ length: 9 }).map((_, i) => (
                 <TableRow key={i} className="border-gray-100">
                   <TableCell>
                     <span className="block h-4 w-32 animate-pulse rounded bg-gray-200" />
@@ -117,7 +118,10 @@ export function VendorQuoteRequestTable({
                 </TableRow>
               ))
             : quotes.map((quote) => (
-                <TableRow key={quote.id} className="border-gray-100">
+                <TableRow
+                  key={`${quote.assignmentId}-${quote.rfqId}`}
+                  className="border-gray-100"
+                >
                   <TableCell className="font-medium text-brand-title">
                     {quote.reference}
                   </TableCell>
@@ -125,17 +129,17 @@ export function VendorQuoteRequestTable({
                     {quote.title}
                   </TableCell>
                   <TableCell className="text-brand-description">
-                    {quote.itemCount}
+                    {quote.itemsCount}
                   </TableCell>
                   <TableCell className="text-brand-description">
-                    {quote.expectedDelivery}
+                    {formatDate(quote.expectedDelivery)}
                   </TableCell>
                   <TableCell className="text-brand-description">
-                    {quote.submissionDeadline}
+                    {formatDate(quote.submissionDeadline)}
                   </TableCell>
                   <TableCell className="text-right">
                     <button
-                      onClick={() => onViewRFQ(quote.id)}
+                      onClick={() => onViewRFQ(quote.rfqId)}
                       className="rounded-md border border-gray-200 bg-white px-4 py-1.5 text-sm font-medium text-brand-title transition-colors hover:bg-gray-50"
                     >
                       View RFQ
