@@ -224,7 +224,7 @@ function ComplianceDocumentCard({
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 shrink-0 overflow-hidden rounded-md bg-gray-100">
               <Image
-                src={document!.url}
+                src={document!.imageUrl}
                 alt="Compliance document"
                 width={48}
                 height={48}
@@ -233,11 +233,11 @@ function ComplianceDocumentCard({
             </div>
             <div>
               <p className="text-sm font-medium text-brand-title">
-                {document!.name ?? "CAC Certificate"}
+                {document!.label ?? document!.documentType}
               </p>
-              {document!.expiry && (
+              {document!.expiresAt && (
                 <p className="text-xs text-brand-description">
-                  Expires: {document!.expiry}
+                  Expires: {new Date(document!.expiresAt).toLocaleDateString()}
                 </p>
               )}
             </div>

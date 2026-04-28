@@ -97,10 +97,13 @@ export interface VendorBank {
 
 export interface ComplianceDocument {
   id: string;
-  url: string;
-  name: string;
-  expiry: string | null;
-  [key: string]: string | null | undefined;
+  documentType: string;
+  label: string;
+  imageUrl: string;
+  status: "valid" | "expired";
+  expiresAt: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface VendorCompliance {

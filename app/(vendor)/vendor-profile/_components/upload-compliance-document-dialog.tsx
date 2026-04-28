@@ -3,11 +3,11 @@
 import { useCallback, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { Upload, X, CalendarIcon } from "lucide-react";
 import Image from "next/image";
+import { format } from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -18,18 +18,24 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { profileApi } from "@/lib/api/profile";
+import {
+  uploadComplianceDocumentSchema,
+  type UploadComplianceDocumentFormValues,
+} from "@/lib/validations/vendor";
 
 // ---------------------------------------------------------------------------
-// Schema
+// Types
 // ---------------------------------------------------------------------------
 
-const schema = z.object({
-  expiry_date: z.string().min(1, "Expiry date is required"),
-});
-
-type FormValues = z.infer<typeof schema>;
+type FormValues = UploadComplianceDocumentFormValues;
 
 // ---------------------------------------------------------------------------
 // Props
@@ -54,15 +60,21 @@ export function UploadComplianceDocumentDialog({
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: { expiry_date: "" },
+    resolver: zodResolver(uploadComplianceDocumentSchema),
+    defaultValues: {
+      documentType: "",
+      label: "",
+      expiry_date: "",
+    },
   });
 
   const handleFile = (f: File) => {
@@ -115,6 +127,7 @@ export function UploadComplianceDocumentDialog({
   const handleClose = () => {
     setFile(null);
     setPreview(null);
+    setSelectedDate(undefined);
     reset();
     onOpenChange(false);
   };
@@ -128,6 +141,8 @@ export function UploadComplianceDocumentDialog({
     try {
       await profileApi.uploadComplianceDocument({
         file,
+        documentType: values.documentType,
+        label: values.label,
         expiry_date: values.expiry_date,
       });
       toast.success("Compliance document uploaded successfully");
@@ -168,10 +183,10 @@ export function UploadComplianceDocumentDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 pt-2">
-          {/* CAC Certificate upload zone */}
+          {/* Certificate upload zone */}
           <div className="space-y-2">
             <Label className="text-sm font-medium text-brand-description">
-              CAC Certificate
+              Certificate
             </Label>
 
             {file ? (
@@ -238,24 +253,85 @@ export function UploadComplianceDocumentDialog({
             />
           </div>
 
-          {/* Expiry date */}
+          {/* Document Type */}
           <div className="space-y-2">
             <Label
-              htmlFor="expiry_date"
+              htmlFor="documentType"
               className="text-sm font-medium text-brand-description"
             >
+              Document Type
+            </Label>
+            <Input
+              id="documentType"
+              type="text"
+              placeholder="e.g., CAC, TIN, NIN, etc."
+              {...register("documentType")}
+            />
+            {errors.documentType && (
+              <p className="text-xs text-red-500">
+                {errors.documentType.message}
+              </p>
+            )}
+          </div>
+
+          {/* Label */}
+          <div className="space-y-2">
+            <Label
+              htmlFor="label"
+              className="text-sm font-medium text-brand-description"
+            >
+              Label
+            </Label>
+            <Input
+              id="label"
+              type="text"
+              placeholder="e.g., Tax ID Certificate, Business Registration"
+              {...register("label")}
+            />
+            {errors.label && (
+              <p className="text-xs text-red-500">{errors.label.message}</p>
+            )}
+          </div>
+
+          {/* Expiry date with calendar */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-brand-description">
               Expiry Date
             </Label>
-            <div className="relative">
-              <Input
-                id="expiry_date"
-                type="date"
-                placeholder="DD-MM-YYYY"
-                className="placeholder:text-[#94A3B8] pr-10"
-                {...register("expiry_date")}
-              />
-              <CalendarIcon className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-muted" />
-            </div>
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className={cn(
+                    "relative flex h-10 w-full rounded-[6px] border border-brand-border bg-transparent px-3 py-2 text-base shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:border-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+                    !selectedDate && "text-muted-foreground",
+                  )}
+                >
+                  <span className="flex-1 text-left">
+                    {selectedDate
+                      ? format(selectedDate, "MMM dd, yyyy")
+                      : "Select a date"}
+                  </span>
+                  <CalendarIcon className="h-4 w-4" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(date) => {
+                    setSelectedDate(date);
+                    if (date) {
+                      const dateStr = format(date, "yyyy-MM-dd");
+                      setValue("expiry_date", dateStr);
+                    }
+                  }}
+                  disabled={(date) =>
+                    date < new Date(new Date().setHours(0, 0, 0, 0))
+                  }
+                />
+              </PopoverContent>
+            </Popover>
             {errors.expiry_date && (
               <p className="text-xs text-red-500">
                 {errors.expiry_date.message}

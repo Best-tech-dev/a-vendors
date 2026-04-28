@@ -23,6 +23,26 @@ export const profileApi = {
     accountNumber: string;
     accountName: string;
   }) => api.put<VendorProfileResponse>("/vendor/profile/bank", data),
+
+  uploadComplianceDocument: (data: {
+    file: File;
+    documentType: string;
+    label: string;
+    expiry_date: string;
+  }) => {
+    const formData = new FormData();
+    formData.append("image", data.file);
+    formData.append("documentType", data.documentType);
+    formData.append("label", data.label);
+    formData.append("expiresAt", data.expiry_date);
+    return api.post<VendorProfileResponse>(
+      "/vendor/profile/compliance/documents",
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      },
+    );
+  },
 };
 
 export const usersApi = {

@@ -26,3 +26,23 @@ export const createVendorSchema = z.object({
 });
 
 export type CreateVendorFormValues = z.infer<typeof createVendorSchema>;
+
+// Compliance Document Schema
+export const uploadComplianceDocumentSchema = z.object({
+  documentType: z
+    .string()
+    .min(1, "Document type is required")
+    .min(
+      2,
+      "Required document type is any valid government issued ID for businesses, e.g., CAC",
+    ),
+  label: z
+    .string()
+    .min(1, "Label is required")
+    .max(100, "Label must be at most 100 characters"),
+  expiry_date: z.string().min(1, "Expiry date is required"),
+});
+
+export type UploadComplianceDocumentFormValues = z.infer<
+  typeof uploadComplianceDocumentSchema
+>;
