@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { EmptyState } from "@/app/_components/empty-state";
@@ -21,6 +21,7 @@ const ITEMS_PER_PAGE = 20;
 // ---------------------------------------------------------------------------
 
 export default function VendorQuoteHistoryPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const search = searchParams.get("search") ?? "";
 
@@ -33,6 +34,8 @@ export default function VendorQuoteHistoryPage() {
     all: 0,
     awarded: 0,
     pending: 0,
+    rejected: 0,
+    withdrawn: 0,
   });
 
   const fetchHistory = useCallback(
@@ -47,12 +50,25 @@ export default function VendorQuoteHistoryPage() {
           page: pageNum,
           limit: ITEMS_PER_PAGE,
           search: searchQuery || undefined,
-          filter: filter === "all" ? undefined : filter,
+          view: filter,
         });
-        const { items, meta, filterCounts } = res.data.data;
-        setQuotes(items);
+        const { data, meta } = res.data;
+
+        setQuotes(
+          data.map((quote) => ({
+            ...quote,
+            // Keep table status behavior unchanged while using backend value.
+            status: quote.displayStatus.toLowerCase(),
+          })),
+        );
         setTotalPages(meta.totalPages || 1);
-        setFilterCounts(filterCounts);
+        setFilterCounts({
+          all: meta.tabs.all,
+          awarded: meta.tabs.awarded,
+          pending: meta.tabs.pending,
+          rejected: meta.tabs.rejected,
+          withdrawn: meta.tabs.withdrawn,
+        });
       } catch (error) {
         const axiosError = error as AxiosError<{ message: string }>;
         if (!axiosError.response) {
@@ -101,7 +117,7 @@ export default function VendorQuoteHistoryPage() {
       {isEmpty ? (
         <>
           {/* Keep tabs visible even when empty so the user can switch filters */}
-          <div className="inline-flex rounded-lg bg-[#F1F3F5] p-1">
+          <div className="inline-flex rounded-lg bg-[#F1F3F5] p-1 overflow-x-auto">
             {(["all", "awarded", "pending"] as QuoteHistoryFilter[]).map(
               (f) => (
                 <button
@@ -117,12 +133,27 @@ export default function VendorQuoteHistoryPage() {
                 </button>
               ),
             )}
+            {(["rejected", "withdrawn"] as QuoteHistoryFilter[]).map((f) => (
+              <button
+                key={f}
+                onClick={() => handleFilterChange(f)}
+                className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors whitespace-nowrap ${
+                  activeFilter === f
+                    ? "bg-brand-primary text-white shadow-sm"
+                    : "text-brand-description hover:text-brand-title"
+                }`}
+              >
+                {f.charAt(0).toUpperCase() + f.slice(1)} ({filterCounts[f]})
+              </button>
+            ))}
           </div>
 
           <div className="rounded-lg border border-gray-200 bg-white">
             <EmptyState
               title="No quotes found"
               description="You haven't submitted any quotes yet"
+              actionLabel="View quote requests"
+              onAction={() => router.push("/vendor-quote-request")}
               image={
                 <Image
                   src="/svgs/empty-inbox-with-shadow.svg"

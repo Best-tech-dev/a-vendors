@@ -37,7 +37,13 @@ interface VendorQuoteHistoryTableProps {
   onPageChange: (page: number) => void;
   activeFilter: QuoteHistoryFilter;
   onFilterChange: (filter: QuoteHistoryFilter) => void;
-  filterCounts: { all: number; awarded: number; pending: number };
+  filterCounts: {
+    all: number;
+    awarded: number;
+    pending: number;
+    rejected: number;
+    withdrawn: number;
+  };
   loading?: boolean;
 }
 
@@ -101,9 +107,11 @@ export function VendorQuoteHistoryTable({
   loading,
 }: VendorQuoteHistoryTableProps) {
   const tabs: FilterTab[] = [
-    { key: "all", label: "All", count: filterCounts.all },
-    { key: "awarded", label: "Awarded", count: filterCounts.awarded },
+    { key: "all", label: "All", count: filterCounts.all }, // Ensure 'all' is always present
     { key: "pending", label: "Pending", count: filterCounts.pending },
+    { key: "awarded", label: "Awarded", count: filterCounts.awarded },
+    { key: "rejected", label: "Rejected", count: filterCounts.rejected },
+    { key: "withdrawn", label: "Withdrawn", count: filterCounts.withdrawn },
   ];
 
   const pageNumbers = buildPageNumbers(page, totalPages);
@@ -111,7 +119,7 @@ export function VendorQuoteHistoryTable({
   return (
     <div className="space-y-4">
       {/* Filter tabs */}
-      <div className="inline-flex rounded-lg bg-[#F1F3F5] p-1">
+      <div className="inline-flex rounded-lg bg-[#F1F3F5] p-1 overflow-x-auto">
         {tabs.map((tab) => (
           <button
             key={tab.key}

@@ -334,13 +334,63 @@ export interface VendorRFQDetail {
 }
 
 // ── Vendor Quote History ──
-export type QuoteHistoryFilter = "all" | "awarded" | "pending";
+export type QuoteHistoryFilter =
+  | "all"
+  | "awarded"
+  | "pending"
+  | "rejected"
+  | "withdrawn";
 export interface VendorQuoteHistory {
   id: string;
+  quoteNumber: string;
   reference: string;
+  title: string;
   totalItems: number;
   acceptedItems: number;
+  totalPriceOptions: number;
   amountQuoted: number;
+  currency: string;
   dateSubmitted: string;
-  status: "awarded" | "pending" | "rejected";
+  expectedDelivery: string;
+  rfqId: string;
+  rfqStatus: string;
+  status: string;
+  displayStatus: string;
+  fulfillment: {
+    stage: string;
+    stageLabel: string;
+    shippedAt: string | null;
+    deliveredAt: string | null;
+  };
+}
+
+export interface VendorQuoteHistoryMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+  tabs: {
+    all: number;
+    awarded: number;
+    pending: number;
+    rejected: number;
+    withdrawn: number;
+  };
+}
+
+export interface VendorQuoteHistoryResponse {
+  success: boolean;
+  message: string;
+  data: VendorQuoteHistory[];
+  meta: VendorQuoteHistoryMeta;
+  statusCode: number;
+}
+
+export interface VendorQuoteHistoryParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  view?: QuoteHistoryFilter;
 }
