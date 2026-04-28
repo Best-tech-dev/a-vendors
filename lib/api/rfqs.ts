@@ -84,4 +84,21 @@ export const rfqsApi = {
   // Vendor-specific endpoint to fetch quote history for the logged-in vendor
   getVendorQuoteHistory: (params: VendorQuoteHistoryParams) =>
     api.get<VendorQuoteHistoryResponse>("/vendor/quotes-history", { params }),
+
+  // Vendor-specific endpoint to submit a quote for a specific RFQ
+  submitVendorQuote: (payload: {
+    rfqId: string;
+    paymentPlan: string;
+    items: { itemId: string; entries: PriceEntry[] }[];
+    proofFile?: File;
+  }) => {
+    const form = new FormData();
+    form.append("rfqId", payload.rfqId);
+    form.append("paymentPlan", payload.paymentPlan);
+    form.append("items", JSON.stringify(payload.items));
+    if (payload.proofFile) form.append("proof", payload.proofFile);
+    return api.post("avendor/rfqs/submit", form, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
 };
