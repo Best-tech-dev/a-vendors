@@ -31,12 +31,13 @@ import type { VendorProfileData } from "@/types/profile";
 // ---------------------------------------------------------------------------
 
 const schema = z.object({
-  company_name: z.string().min(1, "Company name is required"),
-  industry: z.string().min(1, "Please select a role / industry"),
-  city: z.string().min(1, "Please select a city"),
-  country: z.string().min(1, "Please select a country"),
+  name: z.string().min(1, "Company name is required"),
+  industry: z.string().min(1, "Please select an industry"),
+  city: z.string().min(1, "City is required"),
+  country: z.string().min(1, "Country is required"),
   email: z.string().email("Enter a valid email address"),
   phone: z.string().min(7, "Enter a valid phone number"),
+  address: z.string().min(1, "Address is required"),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -54,17 +55,6 @@ const INDUSTRIES = [
   "Food & Beverage",
   "Healthcare",
   "Other",
-];
-
-const CITIES = ["Lagos", "Abuja", "Port Harcourt", "Kano", "Ibadan", "Enugu"];
-
-const COUNTRIES = [
-  "Nigeria",
-  "Ghana",
-  "Kenya",
-  "South Africa",
-  "United Kingdom",
-  "United States",
 ];
 
 // ---------------------------------------------------------------------------
@@ -98,12 +88,13 @@ export function EditCompanyDetailsDialog({
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      company_name: "",
+      name: "",
       industry: "",
       city: "",
       country: "",
       email: "",
       phone: "",
+      address: "",
     },
   });
 
@@ -111,12 +102,13 @@ export function EditCompanyDetailsDialog({
   useEffect(() => {
     if (open && profile) {
       reset({
-        company_name: profile.company.name ?? "",
+        name: profile.company.name ?? "",
         industry: profile.company.industry ?? "",
         city: profile.company.city ?? "",
         country: profile.company.country ?? "",
         email: profile.company.email ?? "",
         phone: profile.company.phone ?? "",
+        address: profile.company.address ?? "",
       });
     }
   }, [open, profile, reset]);
@@ -129,7 +121,7 @@ export function EditCompanyDetailsDialog({
   const onSubmit = async (values: FormValues) => {
     try {
       const res = await profileApi.updateCompanyDetails(values);
-      toast.success("Company details updated successfully");
+      toast.success(res.data.message || "Company details updated successfully");
       onSuccess?.(res.data.data);
       handleClose();
     } catch (error) {
@@ -165,28 +157,26 @@ export function EditCompanyDetailsDialog({
           {/* Company Name */}
           <div className="space-y-2">
             <Label
-              htmlFor="company_name"
+              htmlFor="name"
               className="text-sm font-medium text-brand-description"
             >
               Company Name
             </Label>
             <Input
-              id="company_name"
+              id="name"
               placeholder="e.g., Global Supplies LTD"
               className="placeholder:text-[#94A3B8]"
-              {...register("company_name")}
+              {...register("name")}
             />
-            {errors.company_name && (
-              <p className="text-xs text-red-500">
-                {errors.company_name.message}
-              </p>
+            {errors.name && (
+              <p className="text-xs text-red-500">{errors.name.message}</p>
             )}
           </div>
 
-          {/* Role / Industry */}
+          {/* Industry */}
           <div className="space-y-2">
             <Label className="text-sm font-medium text-brand-description">
-              Role
+              Industry
             </Label>
             <Select
               value={watch("industry")}
@@ -210,55 +200,58 @@ export function EditCompanyDetailsDialog({
             )}
           </div>
 
+          {/* Address */}
+          <div className="space-y-2">
+            <Label
+              htmlFor="address"
+              className="text-sm font-medium text-brand-description"
+            >
+              Address
+            </Label>
+            <Input
+              id="address"
+              placeholder="e.g., 12 Adeola Odeku Street"
+              className="placeholder:text-[#94A3B8]"
+              {...register("address")}
+            />
+            {errors.address && (
+              <p className="text-xs text-red-500">{errors.address.message}</p>
+            )}
+          </div>
+
           {/* City + Country */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-brand-description">
+              <Label
+                htmlFor="city"
+                className="text-sm font-medium text-brand-description"
+              >
                 City
               </Label>
-              <Select
-                value={watch("city")}
-                onValueChange={(val) =>
-                  setValue("city", val, { shouldValidate: true })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select city" />
-                </SelectTrigger>
-                <SelectContent>
-                  {CITIES.map((city) => (
-                    <SelectItem key={city} value={city}>
-                      {city}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Input
+                id="city"
+                placeholder="e.g., Lagos"
+                className="placeholder:text-[#94A3B8]"
+                {...register("city")}
+              />
               {errors.city && (
                 <p className="text-xs text-red-500">{errors.city.message}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-brand-description">
+              <Label
+                htmlFor="country"
+                className="text-sm font-medium text-brand-description"
+              >
                 Country
               </Label>
-              <Select
-                value={watch("country")}
-                onValueChange={(val) =>
-                  setValue("country", val, { shouldValidate: true })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select country" />
-                </SelectTrigger>
-                <SelectContent>
-                  {COUNTRIES.map((country) => (
-                    <SelectItem key={country} value={country}>
-                      {country}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Input
+                id="country"
+                placeholder="e.g., Nigeria"
+                className="placeholder:text-[#94A3B8]"
+                {...register("country")}
+              />
               {errors.country && (
                 <p className="text-xs text-red-500">{errors.country.message}</p>
               )}
@@ -279,10 +272,14 @@ export function EditCompanyDetailsDialog({
               placeholder="globalsupplies@gmail.com"
               className="placeholder:text-[#94A3B8]"
               {...register("email")}
+              disabled
             />
             {errors.email && (
               <p className="text-xs text-red-500">{errors.email.message}</p>
             )}
+            <p className="text-xs text-brand-description">
+              Email is sourced from login credentials and cannot be edited here.
+            </p>
           </div>
 
           {/* Phone */}

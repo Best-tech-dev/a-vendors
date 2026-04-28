@@ -162,12 +162,9 @@ function BankDetailsCard({
         <SkeletonRows count={3} />
       ) : hasBankDetails ? (
         <>
-          <InfoRow label="Bank Name" value={profile.bank!.bank_name} />
-          <InfoRow
-            label="Account Number"
-            value={profile.bank!.account_number}
-          />
-          <InfoRow label="Account Name" value={profile.bank!.account_name} />
+          <InfoRow label="Bank Name" value={profile.bank!.bankName} />
+          <InfoRow label="Account Number" value={profile.bank!.accountNumber} />
+          <InfoRow label="Account Name" value={profile.bank!.accountName} />
         </>
       ) : (
         <div className="flex flex-col items-center gap-4 py-6 text-center">

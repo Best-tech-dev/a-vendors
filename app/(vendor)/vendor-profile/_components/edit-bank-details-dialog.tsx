@@ -16,13 +16,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { profileApi } from "@/lib/api/profile";
 import type { VendorProfileData } from "@/types/profile";
 
@@ -31,41 +24,16 @@ import type { VendorProfileData } from "@/types/profile";
 // ---------------------------------------------------------------------------
 
 const schema = z.object({
-  bank_name: z.string().min(1, "Please select a bank"),
-  account_number: z
+  bankName: z.string().min(1, "Bank name is required"),
+  accountNumber: z
     .string()
     .min(10, "Account number must be 10 digits")
     .max(10, "Account number must be 10 digits")
     .regex(/^\d+$/, "Account number must contain only digits"),
-  account_name: z.string().min(1, "Account name is required"),
+  accountName: z.string().min(1, "Account name is required"),
 });
 
 type FormValues = z.infer<typeof schema>;
-
-// ---------------------------------------------------------------------------
-// Static options — extend as needed
-// ---------------------------------------------------------------------------
-
-const NIGERIAN_BANKS = [
-  "Access Bank",
-  "Citibank Nigeria",
-  "Ecobank Nigeria",
-  "Fidelity Bank",
-  "First Bank Nigeria",
-  "First City Monument Bank (FCMB)",
-  "Guaranty Trust Bank (GTBank)",
-  "Heritage Bank",
-  "Keystone Bank",
-  "Polaris Bank",
-  "Stanbic IBTC Bank",
-  "Standard Chartered Bank",
-  "Sterling Bank",
-  "Union Bank",
-  "United Bank for Africa (UBA)",
-  "Unity Bank",
-  "Wema Bank",
-  "Zenith Bank",
-];
 
 // ---------------------------------------------------------------------------
 // Props
@@ -92,24 +60,22 @@ export function EditBankDetailsDialog({
     register,
     handleSubmit,
     reset,
-    setValue,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      bank_name: "",
-      account_number: "",
-      account_name: "",
+      bankName: "",
+      accountNumber: "",
+      accountName: "",
     },
   });
 
   useEffect(() => {
     if (open && profile && profile.bank) {
       reset({
-        bank_name: profile.bank.bank_name ?? "",
-        account_number: profile.bank.account_number ?? "",
-        account_name: profile.bank.account_name ?? "",
+        bankName: profile.bank.bankName ?? "",
+        accountNumber: profile.bank.accountNumber ?? "",
+        accountName: profile.bank.accountName ?? "",
       });
     }
   }, [open, profile, reset]);
@@ -122,7 +88,7 @@ export function EditBankDetailsDialog({
   const onSubmit = async (values: FormValues) => {
     try {
       const res = await profileApi.updateBankDetails(values);
-      toast.success("Bank details updated successfully");
+      toast.success(res.data.message || "Bank details updated successfully");
       onSuccess?.(res.data.data);
       handleClose();
     } catch (error) {
@@ -157,50 +123,42 @@ export function EditBankDetailsDialog({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 pt-2">
           {/* Bank name */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-brand-description">
+            <Label
+              htmlFor="bankName"
+              className="text-sm font-medium text-brand-description"
+            >
               Bank name
             </Label>
-            <Select
-              value={watch("bank_name")}
-              onValueChange={(val) =>
-                setValue("bank_name", val, { shouldValidate: true })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select bank" />
-              </SelectTrigger>
-              <SelectContent>
-                {NIGERIAN_BANKS.map((bank) => (
-                  <SelectItem key={bank} value={bank}>
-                    {bank}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.bank_name && (
-              <p className="text-xs text-red-500">{errors.bank_name.message}</p>
+            <Input
+              id="bankName"
+              placeholder="e.g., First Bank Nigeria"
+              className="placeholder:text-[#94A3B8]"
+              {...register("bankName")}
+            />
+            {errors.bankName && (
+              <p className="text-xs text-red-500">{errors.bankName.message}</p>
             )}
           </div>
 
           {/* Account number */}
           <div className="space-y-2">
             <Label
-              htmlFor="account_number"
+              htmlFor="accountNumber"
               className="text-sm font-medium text-brand-description"
             >
               Account number
             </Label>
             <Input
-              id="account_number"
+              id="accountNumber"
               placeholder="Enter account number"
               inputMode="numeric"
               maxLength={10}
               className="placeholder:text-[#94A3B8]"
-              {...register("account_number")}
+              {...register("accountNumber")}
             />
-            {errors.account_number && (
+            {errors.accountNumber && (
               <p className="text-xs text-red-500">
-                {errors.account_number.message}
+                {errors.accountNumber.message}
               </p>
             )}
           </div>
@@ -208,20 +166,20 @@ export function EditBankDetailsDialog({
           {/* Account name */}
           <div className="space-y-2">
             <Label
-              htmlFor="account_name"
+              htmlFor="accountName"
               className="text-sm font-medium text-brand-description"
             >
               Account name
             </Label>
             <Input
-              id="account_name"
+              id="accountName"
               placeholder="Enter account name"
               className="placeholder:text-[#94A3B8]"
-              {...register("account_name")}
+              {...register("accountName")}
             />
-            {errors.account_name && (
+            {errors.accountName && (
               <p className="text-xs text-red-500">
-                {errors.account_name.message}
+                {errors.accountName.message}
               </p>
             )}
           </div>
