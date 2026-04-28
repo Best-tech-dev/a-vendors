@@ -205,9 +205,7 @@ export function UploadComplianceDocumentDialog({
                     PDF
                   </div>
                 )}
-                <p className="flex-1 truncate text-sm text-brand-title">
-                  {file.name}
-                </p>
+                <p className="flex-1 text-sm text-brand-title">{file.name}</p>
                 <button
                   type="button"
                   onClick={removeFile}

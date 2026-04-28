@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Upload } from "lucide-react";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
@@ -189,19 +189,9 @@ function ComplianceDocumentCard({
   profile: VendorProfileData | null;
   onUploadClick: () => void;
 }) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const hasDocument =
     profile?.compliance && profile.compliance.documents.length > 0;
   const document = hasDocument ? profile.compliance.documents[0] : null;
-
-  const handleReupload = () => fileInputRef.current?.click();
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    // Re-upload opens the same dialog so user can also update the expiry date
-    onUploadClick();
-  };
 
   return (
     <SectionCard
@@ -244,20 +234,12 @@ function ComplianceDocumentCard({
           </div>
 
           <button
-            onClick={handleReupload}
+            onClick={onUploadClick}
             className="flex shrink-0 items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-brand-title transition-colors hover:bg-gray-50"
           >
             <Upload className="size-3.5" />
             Re-upload
           </button>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".pdf,.png,.jpg,.jpeg"
-            className="hidden"
-            onChange={handleFileChange}
-          />
         </div>
       ) : (
         <div className="flex flex-col items-center gap-4 py-6 text-center">
