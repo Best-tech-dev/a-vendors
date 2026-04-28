@@ -136,3 +136,18 @@ export interface VendorProfileResponse {
   data: VendorProfileData;
   statusCode: number;
 }
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
+
+export interface ChangePasswordResponse {
+  success: boolean;
+  message: string;
+  data: {
+    id: string;
+  };
+  statusCode: number;
+}

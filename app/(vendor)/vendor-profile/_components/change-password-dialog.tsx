@@ -27,18 +27,20 @@ import { profileApi } from "@/lib/api/profile";
 
 const schema = z
   .object({
-    current_password: z.string().min(1, "Current password is required"),
-    new_password: z
+    currentPassword: z.string().min(1, "Current password is required"),
+    newPassword: z
       .string()
       .min(8, "At least 8 characters")
       .regex(/[a-z]/, "At least one lower case letter")
       .regex(/[A-Z]/, "At least one upper case letter")
       .regex(/[@!<>|,.*&%$]/, "At least one special symbol (@!<>|,.*&%$)"),
-    confirm_password: z.string().min(1, "Please confirm your new password"),
+    confirmNewPassword: z
+      .string()
+      .min(1, "Please confirm your new password"),
   })
-  .refine((data) => data.new_password === data.confirm_password, {
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
     message: "Passwords do not match",
-    path: ["confirm_password"],
+    path: ["confirmNewPassword"],
   });
 
 type FormValues = z.infer<typeof schema>;
@@ -133,27 +135,30 @@ export function ChangePasswordDialog({
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      current_password: "",
-      new_password: "",
-      confirm_password: "",
+      currentPassword: "",
+      newPassword: "",
+      confirmNewPassword: "",
     },
   });
 
-  const newPassword = watch("new_password") ?? "";
+  const newPassword = watch("newPassword") ?? "";
 
-  const handleClose = () => {
-    reset();
-    onOpenChange(false);
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      reset();
+    }
+    onOpenChange(nextOpen);
   };
 
   const onSubmit = async (values: FormValues) => {
     try {
       await profileApi.changePassword({
-        current_password: values.current_password,
-        new_password: values.new_password,
+        currentPassword: values.currentPassword,
+        newPassword: values.newPassword,
+        confirmNewPassword: values.confirmNewPassword,
       });
       toast.success("Password changed successfully. Please sign in again.");
-      handleClose();
+      handleOpenChange(false);
       // Sign the user out — they must re-authenticate with the new password
       clearAuth();
       router.replace("/sign-in");
@@ -175,7 +180,7 @@ export function ChangePasswordDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader className="items-center text-center">
           <DialogTitle className="text-lg font-semibold text-brand-title">
@@ -207,8 +212,8 @@ export function ChangePasswordDialog({
             </Label>
             <PasswordInput
               id="current_password"
-              error={errors.current_password?.message}
-              registration={register("current_password")}
+              error={errors.currentPassword?.message}
+              registration={register("currentPassword")}
             />
           </div>
 
@@ -222,8 +227,8 @@ export function ChangePasswordDialog({
             </Label>
             <PasswordInput
               id="new_password"
-              error={errors.new_password?.message}
-              registration={register("new_password")}
+              error={errors.newPassword?.message}
+              registration={register("newPassword")}
             />
 
             {/* Strength checklist */}
@@ -260,8 +265,8 @@ export function ChangePasswordDialog({
             </Label>
             <PasswordInput
               id="confirm_password"
-              error={errors.confirm_password?.message}
-              registration={register("confirm_password")}
+              error={errors.confirmNewPassword?.message}
+              registration={register("confirmNewPassword")}
             />
           </div>
 
@@ -270,7 +275,7 @@ export function ChangePasswordDialog({
             <Button
               type="button"
               variant="ghost"
-              onClick={handleClose}
+              onClick={() => handleOpenChange(false)}
               disabled={isSubmitting}
             >
               Cancel

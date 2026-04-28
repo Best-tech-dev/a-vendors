@@ -1,5 +1,7 @@
 import { api } from "./axios";
 import type {
+  ChangePasswordRequest,
+  ChangePasswordResponse,
   UserProfileResponse,
   TeamUsersResponse,
   VendorProfileResponse,
@@ -43,6 +45,12 @@ export const profileApi = {
       },
     );
   },
+
+  changePassword: (data: ChangePasswordRequest) =>
+    api.post<ChangePasswordResponse>(
+      "/vendor/profile/security/change-password",
+      data,
+    ),
 };
 
 export const usersApi = {
