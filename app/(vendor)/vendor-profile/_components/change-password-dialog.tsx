@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -130,7 +130,7 @@ export function ChangePasswordDialog({
     register,
     handleSubmit,
     reset,
-    watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -141,7 +141,10 @@ export function ChangePasswordDialog({
     },
   });
 
-  const newPassword = watch("newPassword") ?? "";
+  const newPassword = useWatch({
+    control,
+    name: "newPassword",
+  }) ?? "";
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen) {

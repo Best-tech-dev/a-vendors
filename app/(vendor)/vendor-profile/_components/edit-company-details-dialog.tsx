@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -83,7 +83,7 @@ export function EditCompanyDetailsDialog({
     handleSubmit,
     reset,
     setValue,
-    watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -96,6 +96,11 @@ export function EditCompanyDetailsDialog({
       phone: "",
       address: "",
     },
+  });
+
+  const industryValue = useWatch({
+    control,
+    name: "industry",
   });
 
   // Populate form when profile loads or dialog opens
@@ -179,7 +184,7 @@ export function EditCompanyDetailsDialog({
               Industry
             </Label>
             <Select
-              value={watch("industry")}
+              value={industryValue}
               onValueChange={(val) =>
                 setValue("industry", val, { shouldValidate: true })
               }

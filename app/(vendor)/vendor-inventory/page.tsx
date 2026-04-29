@@ -139,6 +139,8 @@ export default function VendorInventoryPage() {
           <EmptyState
             title="No materials found"
             description="No inventory items match your current filter"
+            actionLabel="Refresh"
+            onAction={() => fetchInventory(1, search, activeFilter)}
             image={
               <Image
                 src="/svgs/empty-inbox-with-shadow.svg"
