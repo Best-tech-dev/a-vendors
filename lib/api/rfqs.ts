@@ -79,33 +79,33 @@ export const rfqsApi = {
 
   // Vendor-specific endpoint to fetch quote requests assigned to the logged-in vendor
   getVendorQuoteRequests: (params: VendorQuoteRequestsParams) =>
-    api.get<VendorQuoteRequestsResponse>("/vendor/quote-requests", { params }),
+    api.get<VendorQuoteRequestsResponse>("vendor/quote-requests", { params }),
 
   // Vendor-specific endpoint to fetch details of a specific RFQ assigned to the logged-in vendor
   getVendorRFQById: (id: string) =>
     api.get<VendorQuoteRequestDetailResponse>(
-      `/vendor/quote-requests/${encodeURIComponent(id)}`,
+      `vendor/quote-requests/${encodeURIComponent(id)}`,
     ),
 
   // Vendor-specific endpoint to fetch quote history for the logged-in vendor
   getVendorQuoteHistory: (params: VendorQuoteHistoryParams) =>
-    api.get<VendorQuoteHistoryResponse>("/vendor/quotes-history", { params }),
+    api.get<VendorQuoteHistoryResponse>("vendor/quotes-history", { params }),
 
   // Vendor quote request payment plans (active list)
   getVendorQuotePaymentPlans: () =>
-    api.get<VendorQuotePaymentPlansResponse>("/vendor/quote-requests/payment-plans"),
+    api.get<VendorQuotePaymentPlansResponse>("vendor/quote-requests/payment-plans"),
 
   // Submit or resubmit quote for an RFQ assignment
   submitVendorQuote: (rfqId: string, payload: SubmitVendorQuoteRequest) =>
     api.post<SubmitVendorQuoteResponse>(
-      `/vendor/quote-requests/${encodeURIComponent(rfqId)}/quote`,
+      `vendor/quote-requests/${encodeURIComponent(rfqId)}/quote`,
       payload,
     ),
 
   // Withdraw (soft delete) a submitted quote
   withdrawVendorQuote: (rfqId: string) =>
     api.delete<WithdrawVendorQuoteResponse>(
-      `/vendor/quote-requests/${encodeURIComponent(rfqId)}/quote`,
+      `vendor/quote-requests/${encodeURIComponent(rfqId)}/quote`,
     ),
 
   // Update/clear payment plan on existing quote without resubmitting lines
@@ -114,7 +114,7 @@ export const rfqsApi = {
     payload: UpdateVendorQuotePaymentPlanRequest,
   ) =>
     api.patch<UpdateVendorQuotePaymentPlanResponse>(
-      `/vendor/quote-requests/${encodeURIComponent(rfqId)}/quote/payment-plan`,
+      `vendor/quote-requests/${encodeURIComponent(rfqId)}/quote/payment-plan`,
       payload,
     ),
 };

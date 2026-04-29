@@ -44,7 +44,8 @@ export default function VendorInventoryPage() {
     totalMaterials: 0,
     totalCategories: 0,
     totalStock: 0,
-    totalUnitPrice: 0,
+    totalInventoryValue: 0,
+    totalUnitPriceSum: 0,
   });
   const [filterCounts, setFilterCounts] = useState({
     in_stock: 0,
@@ -60,13 +61,19 @@ export default function VendorInventoryPage() {
           page: pageNum,
           limit: ITEMS_PER_PAGE,
           search: searchQuery || undefined,
-          stockFilter: filter,
+          status: filter,
+          sortBy: "createdAt",
+          sortOrder: "desc",
         });
-        const { analysis, filterCounts, items, meta } = res.data.data;
-        setAnalysis(analysis);
-        setFilterCounts(filterCounts);
+        const { summary, statusCounts, items } = res.data.data;
+        setAnalysis(summary);
+        setFilterCounts({
+          in_stock: statusCounts.inStock,
+          low_stock: statusCounts.lowStock,
+          out_of_stock: statusCounts.outOfStock,
+        });
         setMaterials(items);
-        setTotalPages(meta.totalPages || 1);
+        setTotalPages(res.data.meta.totalPages || 1);
       } catch (error) {
         const axiosError = error as AxiosError<{ message: string }>;
         if (!axiosError.response) {
@@ -128,8 +135,8 @@ export default function VendorInventoryPage() {
         />
         <StatsCard
           loading={loading}
-          value={formatCurrency(analysis.totalUnitPrice)}
-          label="Total Unit Price"
+          value={formatCurrency(analysis.totalInventoryValue)}
+          label="Total Inventory Value"
         />
       </div>
 

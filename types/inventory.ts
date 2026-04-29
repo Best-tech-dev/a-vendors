@@ -116,16 +116,58 @@ export interface VendorMaterial {
   id: string;
   sku: string;
   name: string;
+  description: string;
   category: { id: string; name: string };
   unit: string;
   stock: number;
   reorderLevel: number;
   pricePerUnit: number;
+  inventoryValue: number;
+  status: "in_stock" | "low_stock" | "out_of_stock";
+  imageUrl: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface VendorInventoryAnalysis {
   totalMaterials: number;
   totalCategories: number;
   totalStock: number;
-  totalUnitPrice: number;
+  totalInventoryValue: number;
+  totalUnitPriceSum: number;
+}
+
+export interface VendorInventoryStatusCounts {
+  inStock: number;
+  lowStock: number;
+  outOfStock: number;
+}
+
+export interface VendorMaterialsListResponse {
+  success: boolean;
+  message: string;
+  data: {
+    summary: VendorInventoryAnalysis;
+    statusCounts: VendorInventoryStatusCounts;
+    items: VendorMaterial[];
+  };
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+  statusCode: number;
+}
+
+export interface VendorMaterialsListParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  categoryId?: string;
+  status?: "in_stock" | "low_stock" | "out_of_stock";
+  sortBy?: "createdAt" | "name" | "sku" | "stock" | "pricePerUnit";
+  sortOrder?: "asc" | "desc";
 }

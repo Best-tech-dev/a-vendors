@@ -8,6 +8,8 @@ import type {
   MaterialsListResponse,
   MaterialsListParams,
   SingleCategoryResponse,
+  VendorMaterialsListParams,
+  VendorMaterialsListResponse,
 } from "@/types/inventory";
 
 export const inventoryApi = {
@@ -23,12 +25,10 @@ export const inventoryApi = {
   getMaterials: (params?: MaterialsListParams) =>
     api.get<MaterialsListResponse>("avendor/inventory/materials", { params }),
 
-  getVendorMaterials: (params: {
-    page?: number;
-    limit?: number;
-    search?: string;
-    stockFilter?: "in_stock" | "low_stock" | "out_of_stock";
-  }) => api.get("avendor/inventory/materials", { params }),
+  getVendorMaterials: (params?: VendorMaterialsListParams) =>
+    api.get<VendorMaterialsListResponse>("vendor/inventory/materials", {
+      params,
+    }),
 
   createMaterial: (payload: CreateMaterialRequest) => {
     const formData = new FormData();

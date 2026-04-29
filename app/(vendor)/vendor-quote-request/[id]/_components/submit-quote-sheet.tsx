@@ -404,6 +404,8 @@ interface SubmitQuoteSheetProps {
   rfqId: string;
   rfqReference: string;
   items: VendorRFQItem[];
+  /** True when a quote already exists and this is a resubmission */
+  isResubmit?: boolean;
   onSuccess?: () => void;
 }
 
@@ -413,6 +415,7 @@ export function SubmitQuoteSheet({
   rfqId,
   rfqReference,
   items,
+  isResubmit = false,
   onSuccess,
 }: SubmitQuoteSheetProps) {
   const [forms, setForms] = useState<Record<string, ItemFormState>>({});
@@ -454,7 +457,7 @@ export function SubmitQuoteSheet({
     try {
       const payload = {
         currency: "NGN",
-        paymentPlanId,
+        paymentPlanId: paymentPlanId || null,
         lines: items.flatMap((item) =>
           getForm(item.id).entries.map((entry) => ({
             rfqItemId: item.id,
@@ -467,7 +470,11 @@ export function SubmitQuoteSheet({
         ),
       };
       await rfqsApi.submitVendorQuote(rfqId, payload);
-      toast.success("Quote submitted successfully");
+      toast.success(
+        isResubmit ? "Quote resubmitted successfully" : "Quote submitted successfully",
+      );
+      // Close the payment dialog first, then the sheet
+      setPaymentDialogOpen(false);
       setForms({});
       onOpenChange(false);
       onSuccess?.();
@@ -477,6 +484,7 @@ export function SubmitQuoteSheet({
         axiosError.response?.data?.message ??
           "Could not submit quote. Please try again.",
       );
+      // Keep the payment dialog open so the user can retry
     } finally {
       setIsSubmitting(false);
     }
@@ -493,7 +501,7 @@ export function SubmitQuoteSheet({
           {/* Header */}
           <SheetHeader className="flex flex-row items-center justify-between border-b border-gray-100 px-6 py-5">
             <SheetTitle className="text-base font-semibold text-brand-title">
-              Submit Quote — {rfqReference}
+              {isResubmit ? "Resubmit Quote" : "Submit Quote"} — {rfqReference}
             </SheetTitle>
             <SheetClose asChild>
               <button className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-brand-title">
@@ -521,7 +529,13 @@ export function SubmitQuoteSheet({
               disabled={isSubmitting}
               className="w-full bg-brand-primary py-3 text-sm font-semibold text-white hover:bg-brand-primary/90 disabled:opacity-50"
             >
-              {isSubmitting ? "Submitting..." : "Submit Quote"}
+              {isSubmitting
+                ? isResubmit
+                  ? "Resubmitting…"
+                  : "Submitting…"
+                : isResubmit
+                  ? "Resubmit Quote"
+                  : "Submit Quote"}
             </Button>
           </div>
         </SheetContent>
@@ -531,6 +545,7 @@ export function SubmitQuoteSheet({
         open={paymentDialogOpen}
         onOpenChange={setPaymentDialogOpen}
         onSave={handlePaymentSave}
+        isSubmitting={isSubmitting}
       />
     </>
   );

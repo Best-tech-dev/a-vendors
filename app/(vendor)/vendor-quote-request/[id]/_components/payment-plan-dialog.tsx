@@ -32,7 +32,11 @@ export interface PaymentPlanValue {
 interface PaymentPlanDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (value: PaymentPlanValue) => void;
+  /** Called when the user presses Save. The parent drives the async work and
+   *  should call onOpenChange(false) when done. */
+  onSave: (value: PaymentPlanValue) => void | Promise<void>;
+  /** While the parent is submitting, pass true to disable the Save button */
+  isSubmitting?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -43,27 +47,35 @@ export function PaymentPlanDialog({
   open,
   onOpenChange,
   onSave,
+  isSubmitting = false,
 }: PaymentPlanDialogProps) {
   const [paymentPlanId, setPaymentPlanId] = useState("");
   const [plans, setPlans] = useState<VendorQuotePaymentPlan[]>([]);
+  const [isLoadingPlans, setIsLoadingPlans] = useState(false);
 
   const handleClose = () => {
+    if (isSubmitting) return; // Don't close while submission is in-flight
     setPaymentPlanId("");
     onOpenChange(false);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!paymentPlanId) {
       toast.error("Please select a payment plan.");
       return;
     }
-    onSave({ paymentPlanId });
-    handleClose();
+    // Delegate the async work to the parent; parent calls onOpenChange(false) on success
+    await onSave({ paymentPlanId });
   };
 
   useEffect(() => {
     if (!open) return;
+    // Reset selection whenever dialog reopens
+    setPaymentPlanId("");
+
+    // Only fetch if we haven't loaded plans yet
     if (plans.length > 0) return;
+    setIsLoadingPlans(true);
     rfqsApi
       .getVendorQuotePaymentPlans()
       .then(({ data }) => {
@@ -71,15 +83,19 @@ export function PaymentPlanDialog({
       })
       .catch(() => {
         toast.error("Could not load payment plans. Please try again.");
+      })
+      .finally(() => {
+        setIsLoadingPlans(false);
       });
-  }, [open, plans.length]);
-
-  const isLoadingPlans = open && plans.length === 0;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const selectedPlan = useMemo(
     () => plans.find((plan) => plan.id === paymentPlanId),
     [paymentPlanId, plans],
   );
+
+  const isBusy = isLoadingPlans || isSubmitting;
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -101,12 +117,12 @@ export function PaymentPlanDialog({
             <Select
               value={paymentPlanId}
               onValueChange={setPaymentPlanId}
-              disabled={isLoadingPlans}
+              disabled={isBusy}
             >
               <SelectTrigger className="w-full">
                 <SelectValue
                   placeholder={
-                    isLoadingPlans ? "Loading payment plans..." : "Select plan"
+                    isLoadingPlans ? "Loading payment plans…" : "Select plan"
                   }
                 />
               </SelectTrigger>
@@ -127,15 +143,21 @@ export function PaymentPlanDialog({
           </div>
 
           <div className="flex items-center justify-end gap-3 pt-2">
-            <Button type="button" variant="ghost" onClick={handleClose}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleClose}
+              disabled={isBusy}
+            >
               Cancel
             </Button>
             <Button
               type="button"
-              onClick={handleSave}
-              className="bg-brand-primary hover:bg-brand-primary/90 text-white"
+              onClick={() => void handleSave()}
+              disabled={isBusy || !paymentPlanId}
+              className="bg-brand-primary hover:bg-brand-primary/90 text-white disabled:opacity-50"
             >
-              Save
+              {isSubmitting ? "Submitting…" : "Save"}
             </Button>
           </div>
         </div>

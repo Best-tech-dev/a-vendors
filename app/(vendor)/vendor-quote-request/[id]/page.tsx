@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
-import { Send } from "lucide-react";
+import { Send, CreditCard, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { Button } from "@/components/ui/button";
@@ -15,10 +15,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { rfqsApi } from "@/lib/api/rfqs";
 import type { VendorRFQDetail } from "@/types/rfq";
 import { formatDate } from "@/lib/utils";
 import { SubmitQuoteSheet } from "./_components/submit-quote-sheet";
+import { PaymentPlanDialog } from "./_components/payment-plan-dialog";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -43,7 +54,17 @@ export default function VendorRFQDetailPage() {
 
   const [rfq, setRfq] = useState<VendorRFQDetail | null>(null);
   const [hasLoaded, setHasLoaded] = useState(false);
+  const [rfqStatus, setRfqStatus] = useState<string | null>(null);
+  const [existingQuoteStatus, setExistingQuoteStatus] = useState<string | null>(null);
+
+  // Sheet / dialog open states
   const [submitSheetOpen, setSubmitSheetOpen] = useState(false);
+  const [withdrawConfirmOpen, setWithdrawConfirmOpen] = useState(false);
+  const [updatePaymentPlanOpen, setUpdatePaymentPlanOpen] = useState(false);
+
+  // Loading states for async actions
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const [isUpdatingPaymentPlan, setIsUpdatingPaymentPlan] = useState(false);
 
   const loadRfq = useCallback(async () => {
     if (!params.id) return;
@@ -72,6 +93,9 @@ export default function VendorRFQDetailPage() {
         })),
       };
       setRfq(detail);
+      // Track RFQ and quote status to control button visibility
+      setRfqStatus(res.data.rfq.status);
+      setExistingQuoteStatus(res.data.quote?.status ?? null);
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>;
       toast.error(
@@ -86,6 +110,50 @@ export default function VendorRFQDetailPage() {
   useEffect(() => {
     void loadRfq();
   }, [loadRfq]);
+
+  // ---------------------------------------------------------------------------
+  // Action handlers
+  // ---------------------------------------------------------------------------
+
+  const handleWithdraw = async () => {
+    setIsWithdrawing(true);
+    try {
+      await rfqsApi.withdrawVendorQuote(params.id);
+      toast.success("Quote withdrawn successfully");
+      setWithdrawConfirmOpen(false);
+      void loadRfq();
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      toast.error(
+        axiosError.response?.data?.message ??
+          "Could not withdraw quote. Please try again.",
+      );
+    } finally {
+      setIsWithdrawing(false);
+    }
+  };
+
+  const handleUpdatePaymentPlan = async ({
+    paymentPlanId,
+  }: {
+    paymentPlanId: string;
+  }) => {
+    setIsUpdatingPaymentPlan(true);
+    try {
+      await rfqsApi.updateVendorQuotePaymentPlan(params.id, { paymentPlanId });
+      toast.success("Payment plan updated successfully");
+      setUpdatePaymentPlanOpen(false);
+      void loadRfq();
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      toast.error(
+        axiosError.response?.data?.message ??
+          "Could not update payment plan. Please try again.",
+      );
+    } finally {
+      setIsUpdatingPaymentPlan(false);
+    }
+  };
 
   // ---------------------------------------------------------------------------
   // Loading skeleton
@@ -179,14 +247,42 @@ export default function VendorRFQDetailPage() {
           <p className="text-sm text-brand-description">Sent: {rfq.sentDate}</p>
         </div>
 
-        {/* Submit quote button — sheet wired up later */}
-        <Button
-          onClick={() => setSubmitSheetOpen(true)}
-          className="flex shrink-0 items-center gap-2 bg-brand-primary text-white hover:bg-brand-primary/90"
-        >
-          <Send className="size-4" />
-          Submit quote
-        </Button>
+        {/* Action buttons — visibility driven by rfqStatus + existingQuoteStatus */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Withdraw — only when quote is submitted and RFQ is in a withdrawable state */}
+          {existingQuoteStatus === "submitted" &&
+            (rfqStatus === "sent" || rfqStatus === "awaiting_selection") && (
+              <Button
+                variant="outline"
+                onClick={() => setWithdrawConfirmOpen(true)}
+                className="flex items-center gap-2 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+              >
+                <Undo2 className="size-4" />
+                Withdraw quote
+              </Button>
+            )}
+
+          {/* Update payment plan — only when a submitted quote exists */}
+          {existingQuoteStatus === "submitted" && (
+            <Button
+              variant="outline"
+              onClick={() => setUpdatePaymentPlanOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <CreditCard className="size-4" />
+              Update payment plan
+            </Button>
+          )}
+
+          {/* Submit / Resubmit */}
+          <Button
+            onClick={() => setSubmitSheetOpen(true)}
+            className="flex shrink-0 items-center gap-2 bg-brand-primary text-white hover:bg-brand-primary/90"
+          >
+            <Send className="size-4" />
+            {existingQuoteStatus ? "Resubmit quote" : "Submit quote"}
+          </Button>
+        </div>
       </div>
 
       {/* Stat boxes */}
@@ -269,10 +365,45 @@ export default function VendorRFQDetailPage() {
       <SubmitQuoteSheet
         open={submitSheetOpen}
         onOpenChange={setSubmitSheetOpen}
-        rfqId={rfq.id}
+        rfqId={params.id}
         rfqReference={rfq.reference}
         items={rfq.items}
+        isResubmit={!!existingQuoteStatus}
         onSuccess={() => void loadRfq()}
+      />
+
+      {/* Withdraw confirmation dialog */}
+      <AlertDialog open={withdrawConfirmOpen} onOpenChange={setWithdrawConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Withdraw quote?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will mark your quote as withdrawn. Your line items are
+              preserved — you can resubmit at any time while the RFQ is still
+              open. This cannot be undone once the RFQ is closed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isWithdrawing}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => void handleWithdraw()}
+              disabled={isWithdrawing}
+              className="bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
+            >
+              {isWithdrawing ? "Withdrawing…" : "Yes, withdraw"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Standalone payment plan update (no resubmission of lines) */}
+      <PaymentPlanDialog
+        open={updatePaymentPlanOpen}
+        onOpenChange={setUpdatePaymentPlanOpen}
+        onSave={handleUpdatePaymentPlan}
+        isSubmitting={isUpdatingPaymentPlan}
       />
     </div>
   );
