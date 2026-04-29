@@ -464,6 +464,95 @@ export interface VendorQuoteRequestDetailResponse {
   statusCode: number;
 }
 
+export interface VendorQuotePaymentPlan {
+  id: string;
+  name: string;
+  code: string;
+  description: string;
+  netDays: number;
+  sortOrder?: number;
+}
+
+export interface VendorQuotePaymentPlansResponse {
+  success: boolean;
+  message: string;
+  data: VendorQuotePaymentPlan[];
+  statusCode: number;
+}
+
+export interface VendorQuoteLineInput {
+  rfqItemId: string;
+  quality: string;
+  possibleDeliveryAt?: string;
+  pricePerUnit: number;
+  totalPrice: number;
+  note?: string;
+}
+
+export interface SubmitVendorQuoteRequest {
+  currency: string;
+  note?: string;
+  lines: VendorQuoteLineInput[];
+  paymentPlanId?: string | null;
+}
+
+export interface VendorQuotePrice {
+  id: string;
+  position: number;
+  quality: string;
+  possibleDeliveryAt: string;
+  pricePerUnit: number;
+  totalPrice: number;
+  note: string;
+}
+
+export interface VendorQuoteItemQuote {
+  rfqItemId: string;
+  prices: VendorQuotePrice[];
+}
+
+export interface VendorQuoteRecord {
+  id: string;
+  quoteNumber: string;
+  status: string;
+  currency: string;
+  totalAmount: number;
+  note: string;
+  submittedAt: string;
+  withdrawnAt: string;
+  createdAt: string;
+  updatedAt: string;
+  paymentPlan: VendorQuotePaymentPlan | null;
+  paymentPlanSetBy: string;
+  paymentPlanSetAt: string;
+  itemQuotes: VendorQuoteItemQuote[];
+}
+
+export interface SubmitVendorQuoteResponse {
+  success: boolean;
+  message: string;
+  data: VendorQuoteRecord;
+  statusCode: number;
+}
+
+export interface WithdrawVendorQuoteResponse {
+  success: boolean;
+  message: string;
+  data: VendorQuoteRecord;
+  statusCode: number;
+}
+
+export interface UpdateVendorQuotePaymentPlanRequest {
+  paymentPlanId: string | null;
+}
+
+export interface UpdateVendorQuotePaymentPlanResponse {
+  success: boolean;
+  message: string;
+  data: VendorQuoteRecord;
+  statusCode: number;
+}
+
 // ── Vendor Quote History ──
 export type QuoteHistoryFilter =
   | "all"

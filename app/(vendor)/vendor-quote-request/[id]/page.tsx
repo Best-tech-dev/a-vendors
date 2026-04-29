@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 import { Send } from "lucide-react";
@@ -18,6 +18,7 @@ import {
 import { rfqsApi } from "@/lib/api/rfqs";
 import type { VendorRFQDetail } from "@/types/rfq";
 import { formatDate } from "@/lib/utils";
+import { SubmitQuoteSheet } from "./_components/submit-quote-sheet";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -40,52 +41,57 @@ export default function VendorRFQDetailPage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
 
-  const [loading, setLoading] = useState(true);
   const [rfq, setRfq] = useState<VendorRFQDetail | null>(null);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [submitSheetOpen, setSubmitSheetOpen] = useState(false);
+
+  const loadRfq = useCallback(async () => {
+    if (!params.id) return;
+    try {
+      const { data: res } = await rfqsApi.getVendorRFQById(params.id);
+      const detail: VendorRFQDetail = {
+        id: res.data.rfq.id,
+        reference: res.data.rfq.rfqNumber,
+        title: res.data.rfq.title,
+        sentDate: formatDisplayDate(res.data.rfq.sentAt),
+        totalItems: res.data.summary.totalItems,
+        totalAmount: res.data.summary.totalAmount,
+        submissionDeadline: formatDisplayDate(res.data.rfq.submissionDeadline),
+        expectedDelivery: formatDisplayDate(res.data.rfq.expectedDelivery),
+        attachments: res.data.rfq.attachments,
+        items: res.data.items.map((item) => ({
+          id: item.id,
+          materialId: item.materialId,
+          materialName: item.materialName,
+          description: item.description,
+          imageUrl: item.imageUrl,
+          quantity: item.quantity,
+          unit: item.unit,
+          expectedAmount: item.budget,
+          attachments: item.attachments,
+        })),
+      };
+      setRfq(detail);
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      toast.error(
+        axiosError.response?.data?.message ??
+          "Could not load RFQ details. Please try again.",
+      );
+    } finally {
+      setHasLoaded(true);
+    }
+  }, [params.id]);
 
   useEffect(() => {
-    if (!params.id) return;
-    rfqsApi
-      .getVendorRFQById(params.id)
-      .then(({ data: res }) => {
-        const detail: VendorRFQDetail = {
-          id: res.data.rfq.id,
-          reference: res.data.rfq.rfqNumber,
-          title: res.data.rfq.title,
-          sentDate: formatDisplayDate(res.data.rfq.sentAt),
-          totalItems: res.data.summary.totalItems,
-          totalAmount: res.data.summary.totalAmount,
-          submissionDeadline: formatDisplayDate(res.data.rfq.submissionDeadline),
-          expectedDelivery: formatDisplayDate(res.data.rfq.expectedDelivery),
-          attachments: res.data.rfq.attachments,
-          items: res.data.items.map((item) => ({
-            id: item.id,
-            materialId: item.materialId,
-            materialName: item.materialName,
-            description: item.description,
-            imageUrl: item.imageUrl,
-            quantity: item.quantity,
-            unit: item.unit,
-            expectedAmount: item.budget,
-            attachments: item.attachments,
-          })),
-        };
-        setRfq(detail);
-      })
-      .catch((error: AxiosError<{ message: string }>) => {
-        toast.error(
-          error.response?.data?.message ??
-            "Could not load RFQ details. Please try again.",
-        );
-      })
-      .finally(() => setLoading(false));
-  }, [params.id]);
+    void loadRfq();
+  }, [loadRfq]);
 
   // ---------------------------------------------------------------------------
   // Loading skeleton
   // ---------------------------------------------------------------------------
 
-  if (loading) {
+  if (!hasLoaded && !rfq) {
     return (
       <div className="space-y-6">
         {/* Back link skeleton */}
@@ -174,7 +180,10 @@ export default function VendorRFQDetailPage() {
         </div>
 
         {/* Submit quote button — sheet wired up later */}
-        <Button className="flex shrink-0 items-center gap-2 bg-brand-primary text-white hover:bg-brand-primary/90">
+        <Button
+          onClick={() => setSubmitSheetOpen(true)}
+          className="flex shrink-0 items-center gap-2 bg-brand-primary text-white hover:bg-brand-primary/90"
+        >
           <Send className="size-4" />
           Submit quote
         </Button>
@@ -256,6 +265,15 @@ export default function VendorRFQDetailPage() {
           </Table>
         </div>
       </div>
+
+      <SubmitQuoteSheet
+        open={submitSheetOpen}
+        onOpenChange={setSubmitSheetOpen}
+        rfqId={rfq.id}
+        rfqReference={rfq.reference}
+        items={rfq.items}
+        onSuccess={() => void loadRfq()}
+      />
     </div>
   );
 }

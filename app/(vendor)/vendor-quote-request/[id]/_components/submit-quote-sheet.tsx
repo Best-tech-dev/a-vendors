@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, X, Pencil, Trash2, CalendarIcon } from "lucide-react";
+import { Plus, X, SquarePen, Trash2, CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import {
@@ -133,7 +133,7 @@ function SavedEntryCard({
                 onClick={onEdit}
                 className="text-brand-description hover:text-brand-title"
               >
-                <Pencil className="h-4 w-4" />
+                <SquarePen className="h-4 w-4" />
               </button>
               <button
                 onClick={onDelete}
@@ -155,7 +155,7 @@ function SavedEntryCard({
             onClick={onEdit}
             className="text-brand-description hover:text-brand-title"
           >
-            <Pencil className="h-4 w-4" />
+            <SquarePen className="h-4 w-4" />
           </button>
           <button
             onClick={onDelete}
@@ -212,8 +212,15 @@ function ItemSection({
   onChange: (updated: Partial<ItemFormState>) => void;
 }) {
   const handleSaveEntry = () => {
-    if (!form.quality || !form.pricePerUnit) {
-      toast.error("Quality and price per unit are required.");
+    if (
+      !form.quality ||
+      !form.possibleDelivery ||
+      !form.pricePerUnit ||
+      !form.totalPrice
+    ) {
+      toast.error(
+        "Quality, possible delivery, price per unit and total price are required.",
+      );
       return;
     }
 
@@ -375,7 +382,7 @@ function ItemSection({
             </button>
           </div>
           <Textarea
-            placeholder="Describe product"
+            placeholder="Enter note or description for this price (optional)..."
             rows={3}
             className="placeholder:text-gray-300 resize-none"
             value={form.note}
@@ -439,24 +446,27 @@ export function SubmitQuoteSheet({
   };
 
   const handlePaymentSave = async ({
-    plan,
-    proofFile,
+    paymentPlanId,
   }: {
-    plan: string;
-    proofFile: File | null;
+    paymentPlanId: string;
   }) => {
     setIsSubmitting(true);
     try {
       const payload = {
-        rfqId,
-        paymentPlan: plan,
-        items: items.map((item) => ({
-          itemId: item.id,
-          entries: getForm(item.id).entries,
-        })),
-        proofFile: proofFile ?? undefined,
+        currency: "NGN",
+        paymentPlanId,
+        lines: items.flatMap((item) =>
+          getForm(item.id).entries.map((entry) => ({
+            rfqItemId: item.id,
+            quality: entry.quality,
+            possibleDeliveryAt: new Date(entry.possibleDelivery).toISOString(),
+            pricePerUnit: Number(entry.pricePerUnit),
+            totalPrice: Number(entry.totalPrice),
+            note: entry.note || undefined,
+          })),
+        ),
       };
-      await rfqsApi.submitVendorQuote(payload);
+      await rfqsApi.submitVendorQuote(rfqId, payload);
       toast.success("Quote submitted successfully");
       setForms({});
       onOpenChange(false);
