@@ -8,7 +8,11 @@ import type {
 } from "@/types/profile";
 
 export const profileApi = {
-  get: () => api.get<VendorProfileResponse>("/vendor/profile"),
+  // Logged-in platform user profile (admin/dashboard header/settings)
+  get: () => api.get<UserProfileResponse>("/avendor/user/profile"),
+
+  // Logged-in vendor profile (vendor profile/settings area)
+  getVendorProfile: () => api.get<VendorProfileResponse>("/vendor/profile"),
 
   updateCompanyDetails: (data: {
     name: string;

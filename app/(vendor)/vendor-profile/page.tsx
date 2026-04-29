@@ -288,7 +288,7 @@ export default function VendorProfilePage() {
   useEffect(() => {
     if (!token) return;
     profileApi
-      .get()
+      .getVendorProfile()
       .then(({ data: res }) => setProfile(res.data))
       .catch((error: AxiosError<{ message: string }>) => {
         toast.error(
@@ -311,7 +311,7 @@ export default function VendorProfilePage() {
     // Refetch to get the new document URL + expiry from the server
     if (!token) return;
     profileApi
-      .get()
+      .getVendorProfile()
       .then(({ data: res }) => setProfile(res.data))
       .catch(() => {});
   };
