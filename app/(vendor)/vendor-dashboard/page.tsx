@@ -68,12 +68,54 @@ export default function VendorDashboardPage() {
 
       {/* Loading state */}
       {isLoading && (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-brand-primary"></div>
-            <p className="mt-3 text-sm text-brand-description">
-              Loading dashboard...
-            </p>
+        <div className="space-y-6 animate-pulse">
+          {/* Stat cards skeleton */}
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="rounded-lg border border-brand-border bg-white p-5"
+              >
+                <div className="mb-2 h-8 w-24 rounded bg-gray-200"></div>
+                <div className="h-4 w-32 rounded bg-gray-200"></div>
+              </div>
+            ))}
+          </div>
+
+          {/* Profile completion banner skeleton */}
+          <div className="h-24 w-full rounded-[10px] bg-gray-200"></div>
+
+          {/* Quotes Request table skeleton */}
+          <div>
+            <div className="mb-3 flex items-center justify-between">
+              <div className="h-6 w-32 rounded bg-gray-200"></div>
+              <div className="h-4 w-16 rounded bg-gray-200"></div>
+            </div>
+
+            <div className="overflow-x-auto rounded-lg border border-brand-border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-brand-border bg-gray-50/60">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <th key={i} className="px-4 py-3 text-left">
+                        <div className="h-3 w-full rounded bg-gray-200"></div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-brand-border">
+                  {[1, 2, 3, 4].map((row) => (
+                    <tr key={row}>
+                      {[1, 2, 3, 4, 5].map((col) => (
+                        <td key={col} className="px-4 py-3.5">
+                          <div className="h-4 w-full rounded bg-gray-100"></div>
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}

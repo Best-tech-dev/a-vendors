@@ -32,9 +32,24 @@ export default function VendorGroupLayout({
   useEffect(() => {
     if (!token) return;
     profileApi
-      .get()
+      .getVendorProfile()
       .then(({ data: res }) => {
-        setProfile(res.data);
+        const vendorUser = res.data.user;
+        const mappedProfile = {
+          id: vendorUser.id,
+          first_name: vendorUser.firstName,
+          last_name: vendorUser.lastName,
+          username: null,
+          email: vendorUser.email,
+          phone_number: vendorUser.phone,
+          company_position: vendorUser.companyPosition,
+          display_picture: vendorUser.displayPicture,
+          role: "vendor",
+          status: "active",
+          is_active: true,
+          is_email_verified: true,
+        };
+        setProfile(mappedProfile);
       })
       .catch(() => {
         // Profile fetch failure is non-blocking; header will show empty state
