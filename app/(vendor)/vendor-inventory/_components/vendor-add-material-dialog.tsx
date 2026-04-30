@@ -62,7 +62,16 @@ export function VendorAddMaterialDialog({
     inventoryApi
       .getVendorCategories()
       .then((res) => {
-        if (!cancelled) setCategories(res.data.data);
+        if (!cancelled) {
+          const fetchedCategories = res.data.data;
+          setCategories(fetchedCategories);
+          if (fetchedCategories.length === 0) {
+            toast.warning("No categories found", {
+              description:
+                "Please create a category first before trying to create a material.",
+            });
+          }
+        }
       })
       .catch(() => {
         if (!cancelled)
@@ -223,11 +232,19 @@ export function VendorAddMaterialDialog({
                 />
               </SelectTrigger>
               <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </SelectItem>
-                ))}
+                {categories.length > 0 ? (
+                  categories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </SelectItem>
+                  ))
+                ) : (
+                  <div className="p-3 text-sm text-brand-description text-center">
+                    No categories found.
+                    <br />
+                    Please create a category first.
+                  </div>
+                )}
               </SelectContent>
             </Select>
           </div>
