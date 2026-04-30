@@ -31,7 +31,7 @@ interface InfoRowProps {
 
 function SectionCard({ title, subtitle, action, children }: SectionCardProps) {
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+    <div className="flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white">
       <div className="flex items-start justify-between px-6 py-5">
         <div>
           <p className="font-semibold text-brand-title">{title}</p>
@@ -40,7 +40,7 @@ function SectionCard({ title, subtitle, action, children }: SectionCardProps) {
         {action}
       </div>
       <div className="border-t border-gray-100" />
-      <div className="px-6 py-5">{children}</div>
+      <div className="flex-1 px-6 py-5">{children}</div>
     </div>
   );
 }
@@ -328,26 +328,19 @@ export default function VendorProfilePage() {
       </div>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        {/* Left column */}
-        <div className="flex flex-col gap-5">
-          <CompanyDetailsCard
-            profile={profile}
-            onEditClick={() => setCompanyDialogOpen(true)}
-          />
-          <ComplianceDocumentCard
-            profile={profile}
-            onUploadClick={() => setDocumentDialogOpen(true)}
-          />
-        </div>
-
-        {/* Right column */}
-        <div className="flex flex-col gap-5">
-          <BankDetailsCard
-            profile={profile}
-            onEditClick={() => setBankDialogOpen(true)}
-          />
-          <PasswordCard onChangeClick={() => setPasswordDialogOpen(true)} />
-        </div>
+        <CompanyDetailsCard
+          profile={profile}
+          onEditClick={() => setCompanyDialogOpen(true)}
+        />
+        <BankDetailsCard
+          profile={profile}
+          onEditClick={() => setBankDialogOpen(true)}
+        />
+        <ComplianceDocumentCard
+          profile={profile}
+          onUploadClick={() => setDocumentDialogOpen(true)}
+        />
+        <PasswordCard onChangeClick={() => setPasswordDialogOpen(true)} />
       </div>
 
       {/* Dialogs */}
