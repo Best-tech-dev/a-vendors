@@ -20,6 +20,10 @@ import type {
   VendorQuoteRequestDetailResponse,
   VendorQuoteHistoryParams,
   VendorQuoteHistoryResponse,
+  VendorQuoteHistoryDetailResponse,
+  FulfillmentTimelineResponse,
+  UpdateFulfillmentStageRequest,
+  UpdateFulfillmentStageResponse,
   VendorQuotePaymentPlansResponse,
   SubmitVendorQuoteRequest,
   SubmitVendorQuoteResponse,
@@ -90,6 +94,28 @@ export const rfqsApi = {
   // Vendor-specific endpoint to fetch quote history for the logged-in vendor
   getVendorQuoteHistory: (params: VendorQuoteHistoryParams) =>
     api.get<VendorQuoteHistoryResponse>("vendor/quotes-history", { params }),
+
+  // Vendor-specific endpoint to fetch detail of a single historical quote
+  getVendorQuoteHistoryById: (quoteId: string) =>
+    api.get<VendorQuoteHistoryDetailResponse>(
+      `vendor/quotes-history/${encodeURIComponent(quoteId)}`,
+    ),
+
+  // Vendor-specific endpoint to fetch order fulfillment timeline
+  getVendorQuoteFulfillment: (quoteId: string) =>
+    api.get<FulfillmentTimelineResponse>(
+      `vendor/quotes-history/${encodeURIComponent(quoteId)}/fulfillment`,
+    ),
+
+  // Vendor-specific endpoint to update fulfillment stage
+  updateVendorQuoteFulfillmentStage: (
+    quoteId: string,
+    payload: UpdateFulfillmentStageRequest,
+  ) =>
+    api.patch<UpdateFulfillmentStageResponse>(
+      `vendor/quotes-history/${encodeURIComponent(quoteId)}/fulfillment/stage`,
+      payload,
+    ),
 
   // Vendor quote request payment plans (active list)
   getVendorQuotePaymentPlans: () =>

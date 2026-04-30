@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -106,6 +107,7 @@ export function VendorQuoteHistoryTable({
   filterCounts,
   loading,
 }: VendorQuoteHistoryTableProps) {
+  const router = useRouter();
   const tabs: FilterTab[] = [
     { key: "all", label: "All", count: filterCounts.all }, // Ensure 'all' is always present
     { key: "pending", label: "Pending", count: filterCounts.pending },
@@ -187,7 +189,11 @@ export function VendorQuoteHistoryTable({
                   </TableRow>
                 ))
               : quotes.map((quote) => (
-                  <TableRow key={quote.id} className="border-gray-100">
+                  <TableRow
+                    key={quote.id}
+                    className="cursor-pointer border-gray-100 hover:bg-gray-50/50"
+                    onClick={() => router.push(`/vendor-quote-history/${quote.id}`)}
+                  >
                     <TableCell className="font-medium text-brand-title">
                       {quote.reference}
                     </TableCell>
@@ -201,7 +207,7 @@ export function VendorQuoteHistoryTable({
                       ₦{quote.amountQuoted.toLocaleString("en-NG")}
                     </TableCell>
                     <TableCell className="text-brand-description">
-                      {quote.dateSubmitted}
+                      {new Date(quote.dateSubmitted).toLocaleDateString("en-CA")}
                     </TableCell>
                     <TableCell>
                       <StatusBadge status={quote.status} />

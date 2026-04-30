@@ -614,3 +614,194 @@ export interface VendorQuoteHistoryParams {
   search?: string;
   view?: QuoteHistoryFilter;
 }
+
+// ── Vendor Quote History Detail (GET /vendor/quotes-history/:quoteId) ──
+
+export interface VendorQuoteHistoryDetailPriceOption {
+  id: string;
+  position: number;
+  quality: string;
+  possibleDeliveryAt: string;
+  pricePerUnit: number;
+  totalPrice: number;
+  note: string;
+  /** "pending" | "accepted" | "rejected" */
+  decision: string;
+  decisionLabel: string;
+  decisionNote: string;
+  decisionAt: string;
+}
+
+export interface VendorQuoteHistoryDetailItemAttachment {
+  id: string;
+  imageUrl: string;
+  originalFilename: string;
+}
+
+export interface VendorQuoteHistoryDetailItem {
+  id: string;
+  materialId: string;
+  materialName: string;
+  quantity: number;
+  unit: string;
+  description: string;
+  imageUrl: string;
+  attachments: VendorQuoteHistoryDetailItemAttachment[];
+  priceOptions: VendorQuoteHistoryDetailPriceOption[];
+}
+
+export interface VendorQuoteHistoryDetailSummary {
+  totalItems: number;
+  totalPriceOptions: number;
+  acceptedItems: number;
+  acceptedLines: number;
+  totalQuoted: number;
+  expectedDelivery: string;
+  dateSubmitted: string;
+}
+
+export interface VendorQuoteHistoryDetailOrder {
+  id: string;
+  stage: string;
+  stageLabel: string;
+  expectedDeliveryAt: string;
+}
+
+export interface VendorQuoteHistoryDetail {
+  id: string;
+  quoteNumber: string;
+  /** Internal status, e.g. "submitted" */
+  status: string;
+  /** Display-friendly status, e.g. "Awarded" */
+  displayStatus: string;
+  currency: string;
+  totalAmount: number;
+  note: string;
+  submittedAt: string;
+  withdrawnAt: string;
+  createdAt: string;
+  updatedAt: string;
+  rfq: {
+    id: string;
+    rfqNumber: string;
+    title: string;
+    status: string;
+    expectedDelivery: string;
+  };
+  summary: VendorQuoteHistoryDetailSummary;
+  paymentPlan: {
+    id: string;
+    name: string;
+    code: string;
+    description: string;
+    netDays: number;
+  } | null;
+  paymentPlanSetBy: string;
+  paymentPlanSetAt: string;
+  items: VendorQuoteHistoryDetailItem[];
+  order: VendorQuoteHistoryDetailOrder | null;
+}
+
+export interface VendorQuoteHistoryDetailResponse {
+  success: boolean;
+  message: string;
+  data: VendorQuoteHistoryDetail;
+  statusCode: number;
+}
+
+// ── Vendor Order Fulfillment Timeline (GET /vendor/quotes-history/:quoteId/fulfillment) ──
+
+export interface FulfillmentTimelineEntry {
+  type: string;            // "stage" | "payment"
+  stage: string;           // "created" | "in_production" | "in_transit" | "delivered"
+  label: string;           // e.g. "In Production", "50% Payment Approved"
+  occurredAt: string;
+  /** "done" | "active" | "pending" */
+  state: string;
+  id: string;
+  /** Payment-specific fields */
+  percentage?: number;
+  amount?: number;
+  currency?: string;
+  approvedAt?: string;
+  hasProof?: boolean;
+}
+
+export interface FulfillmentPayment {
+  id: string;
+  label: string;
+  percentage: number;
+  amount: number;
+  currency: string;
+  status: string;          // "pending" | "approved"
+  approvedAt: string;
+  reference: string;
+  proof: {
+    url: string;
+    publicId: string;
+    originalFilename: string;
+  } | null;
+}
+
+export interface FulfillmentOrder {
+  id: string;
+  quoteId: string;
+  stage: string;
+  stageLabel: string;
+  expectedDeliveryAt: string;
+  productionStartedAt: string;
+  shippedAt: string;
+  deliveredAt: string;
+  cancelledAt: string;
+  note: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FulfillmentTotals {
+  totalQuoted: number;
+  totalApproved: number;
+  outstanding: number;
+  currency: string;
+}
+
+export interface FulfillmentTimelineResponse {
+  success: boolean;
+  message: string;
+  data: {
+    order: FulfillmentOrder;
+    timeline: FulfillmentTimelineEntry[];
+    payments: FulfillmentPayment[];
+    totals: FulfillmentTotals;
+  };
+  statusCode: number;
+}
+
+// ── Update Fulfillment Stage (PATCH /vendor/quotes-history/:quoteId/fulfillment/stage) ──
+
+export interface UpdateFulfillmentStageRequest {
+  stage: string;   // "in_production" | "in_transit" | "delivered"
+  note?: string;
+}
+
+export interface UpdateFulfillmentStageResponse {
+  success: boolean;
+  message: string;
+  data: {
+    order: {
+      id: string;
+      quoteId: string;
+      stage: string;
+      stageLabel: string;
+      expectedDeliveryAt: string;
+      productionStartedAt: string;
+      shippedAt: string;
+      deliveredAt: string;
+      cancelledAt: string;
+      note: string;
+      updatedAt: string;
+    };
+  };
+  statusCode: number;
+}
+
