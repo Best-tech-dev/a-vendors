@@ -9,29 +9,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { AlertTriangle } from "lucide-react";
-import { cn } from "@/lib/utils";
 import type { VendorMaterial } from "@/types/inventory";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-type StockFilter = "in_stock" | "low_stock" | "out_of_stock";
-
-interface FilterTab {
-  key: StockFilter;
-  label: string;
-  count: number;
-}
-
 interface VendorInventoryTableProps {
   materials: VendorMaterial[];
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-  activeFilter: StockFilter;
-  onFilterChange: (filter: StockFilter) => void;
-  filterCounts: { in_stock: number; low_stock: number; out_of_stock: number };
   loading?: boolean;
 }
 
@@ -52,42 +40,11 @@ export function VendorInventoryTable({
   page,
   totalPages,
   onPageChange,
-  activeFilter,
-  onFilterChange,
-  filterCounts,
   loading,
 }: VendorInventoryTableProps) {
-  const tabs: FilterTab[] = [
-    { key: "in_stock", label: "In stock", count: filterCounts.in_stock },
-    { key: "low_stock", label: "Low stock", count: filterCounts.low_stock },
-    {
-      key: "out_of_stock",
-      label: "Out of stock",
-      count: filterCounts.out_of_stock,
-    },
-  ];
 
   return (
-    <div>
-      {/* Stock filter tabs */}
-      <div className="border-b border-gray-200 px-4 pt-4">
-        <div className="inline-flex rounded-lg bg-[#F1F3F5] p-1">
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => onFilterChange(tab.key)}
-              className={cn(
-                "rounded-md px-4 py-1.5 text-sm font-medium transition-colors",
-                activeFilter === tab.key
-                  ? "bg-brand-primary text-white shadow-sm"
-                  : "text-brand-description hover:text-brand-title",
-              )}
-            >
-              {tab.label} ({tab.count})
-            </button>
-          ))}
-        </div>
-      </div>
+    <div className="overflow-hidden">
 
       {/* Table */}
       <Table>

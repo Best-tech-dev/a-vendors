@@ -9,6 +9,7 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { useSearchParams } from "next/navigation";
+import { cn } from "@/lib/utils";
 import { VendorInventoryTable } from "./_components/vendor-inventory-table";
 import { VendorAddCategoryDialog } from "./_components/vendor-add-category-dialog";
 import { VendorAddMaterialDialog } from "./_components/vendor-add-material-dialog";
@@ -169,6 +170,41 @@ export default function VendorInventoryPage() {
         />
       </div>
 
+      {/* Tabs */}
+      <div className="inline-flex rounded-lg bg-[#1B2232] p-1">
+        {(
+          [
+            { key: "in_stock", label: "In stock", count: filterCounts.in_stock },
+            {
+              key: "low_stock",
+              label: "Low stock",
+              count: filterCounts.low_stock,
+            },
+            {
+              key: "out_of_stock",
+              label: "Out of stock",
+              count: filterCounts.out_of_stock,
+            },
+          ] as const
+        ).map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => {
+              setActiveFilter(tab.key);
+              setPage(1);
+            }}
+            className={cn(
+              "rounded-md px-4 py-1.5 text-sm font-medium transition-colors",
+              activeFilter === tab.key
+                ? "bg-white text-[#1B2232] shadow-sm"
+                : "text-white hover:bg-white/10",
+            )}
+          >
+            {tab.label} ({tab.count})
+          </button>
+        ))}
+      </div>
+
       {/* Table or empty state */}
       {isEmpty ? (
         <div className="rounded-lg border border-gray-200 bg-white">
@@ -194,12 +230,6 @@ export default function VendorInventoryPage() {
             page={page}
             totalPages={totalPages}
             onPageChange={setPage}
-            activeFilter={activeFilter}
-            onFilterChange={(f) => {
-              setActiveFilter(f);
-              setPage(1);
-            }}
-            filterCounts={filterCounts}
             loading={loading}
           />
         </div>
