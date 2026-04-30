@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { StatsCard } from "@/app/_components/stats-card";
 import { EmptyState } from "@/app/_components/empty-state";
 import Image from "next/image";
@@ -8,6 +10,8 @@ import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { useSearchParams } from "next/navigation";
 import { VendorInventoryTable } from "./_components/vendor-inventory-table";
+import { VendorAddCategoryDialog } from "./_components/vendor-add-category-dialog";
+import { VendorAddMaterialDialog } from "./_components/vendor-add-material-dialog";
 import { inventoryApi } from "@/lib/api/inventory";
 import type {
   VendorMaterial,
@@ -37,6 +41,8 @@ export default function VendorInventoryPage() {
   const [page, setPage] = useState(1);
   const [activeFilter, setActiveFilter] = useState<StockFilter>("in_stock");
   const [loading, setLoading] = useState(true);
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
+  const [materialDialogOpen, setMaterialDialogOpen] = useState(false);
 
   const [materials, setMaterials] = useState<VendorMaterial[]>([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -102,18 +108,41 @@ export default function VendorInventoryPage() {
     fetchInventory(page, search, activeFilter);
   }, [page, search, activeFilter, fetchInventory]);
 
+  const handleMutationSuccess = () => {
+    fetchInventory(page, search, activeFilter);
+  };
+
   const formatCurrency = (value: number) => `₦${value.toLocaleString("en-NG")}`;
 
   const isEmpty = !loading && materials.length === 0;
 
   return (
     <div className="space-y-6">
-      {/* Page header — read-only, no action buttons */}
-      <div>
-        <h1 className="text-2xl font-bold text-brand-title">Inventory</h1>
-        <p className="text-sm text-brand-description">
-          Manage your materials and stock levels
-        </p>
+      {/* Page header with action buttons */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-brand-title">Inventory</h1>
+          <p className="text-sm text-brand-description">
+            Manage your materials and stock levels
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <Button
+            className="bg-[#F6F6F8] hover:bg-[#EDEDEE] border-0 text-brand-title"
+            variant="outline"
+            onClick={() => setCategoryDialogOpen(true)}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add category
+          </Button>
+          <Button
+            onClick={() => setMaterialDialogOpen(true)}
+            className="bg-brand-primary hover:bg-brand-primary/90 text-white border-0"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add material
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -175,6 +204,17 @@ export default function VendorInventoryPage() {
           />
         </div>
       )}
+
+      <VendorAddCategoryDialog
+        open={categoryDialogOpen}
+        onOpenChange={setCategoryDialogOpen}
+        onSuccess={handleMutationSuccess}
+      />
+      <VendorAddMaterialDialog
+        open={materialDialogOpen}
+        onOpenChange={setMaterialDialogOpen}
+        onSuccess={handleMutationSuccess}
+      />
     </div>
   );
 }
